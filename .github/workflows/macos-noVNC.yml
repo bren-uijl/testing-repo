@@ -14,17 +14,25 @@ jobs:
         run: |
           brew install \
             cloudflared \
-            novnc \
             websockify
 
-      - name: Start Safari
+      - name: Download noVNC
+        run: |
+          git clone https://github.com/novnc/noVNC.git
+
+      - name: Prevent sleep
+        run: |
+          caffeinate -dimsu &
+          open -a Finder
+          sleep 5
+
+      - name: Open Safari
         run: |
           open -a Safari "https://apple.com"
           sleep 5
 
       - name: Enable macOS VNC server
         run: |
-
           sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
             -activate \
             -configure \
@@ -35,20 +43,29 @@ jobs:
             -agent \
             -privs -all
 
+      - name: Verify VNC
+        run: |
+          nc -zv localhost 5900 || true
+          lsof -i :5900 || true
+
       - name: Start noVNC
         run: |
-
-          NOVNC_DIR=$(brew --prefix)/share/novnc
-
           nohup websockify \
-            --web "$NOVNC_DIR" \
+            --web noVNC \
             6080 \
             localhost:5900 \
             > novnc.log 2>&1 &
 
+          sleep 5
+
+          cat novnc.log || true
+
+      - name: Verify noVNC
+        run: |
+          curl http://localhost:6080/vnc.html || true
+
       - name: Start Cloudflare tunnel
         run: |
-
           nohup cloudflared tunnel \
             --protocol http2 \
             --ha-connections 1 \
@@ -71,12 +88,16 @@ jobs:
           echo "PASSWORD:"
           echo "password"
 
+          echo ""
+          echo "OPEN THIS:"
+          echo "/vnc.html"
+
           echo "================================="
+
+          cat cloudflare.log || true
 
       - name: Keep alive
         run: |
-          caffeinate -dimsu &
-
           while true
           do
             echo "alive $(date)"
