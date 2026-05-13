@@ -1,0 +1,60 @@
+name: Ollama Gemma Manual Run
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-gemma:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Ollama
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+
+      - name: Start Ollama
+        run: |
+          ollama serve > /tmp/ollama.log 2>&1 &
+          
+          echo "Waiting for Ollama to start..."
+          for i in {1..30}; do
+            if curl -s http://127.0.0.1:11434 > /dev/null; then
+              echo "Ollama is running"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Pull Gemma 3 1B
+        run: |
+          ollama pull gemma3:1b
+
+      - name: Run Prompt and Save Response
+        run: |
+          mkdir -p responses
+
+          TIMESTAMP=$(date +"%m%d%H%M%S")
+          OUTPUT_FILE="responses/${TIMESTAMP}.md"
+
+          PROMPT="Explain what GitHub Actions are in one short paragraph."
+
+          {
+            echo "# Prompt"
+            echo
+            echo "$PROMPT"
+            echo
+            echo "# Response"
+            echo
+            ollama run gemma3:1b "$PROMPT"
+          } > "$OUTPUT_FILE"
+
+          echo "Saved response to $OUTPUT_FILE"
+
+      - name: Upload Response Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ollama-response
+          path: responses/
