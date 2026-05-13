@@ -33,13 +33,21 @@ jobs:
           open -a Safari "https://apple.com"
           sleep 5
 
-      - name: Enable macOS VNC
+      - name: Enable macOS VNC WITHOUT password
         run: |
+          sudo defaults delete \
+            /Library/Preferences/com.apple.VNCSettings.txt \
+            VNCPassword || true
+
+          sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
+            -deactivate || true
+
           sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
             -activate \
             -configure \
             -access -on \
             -clientopts -setvnclegacy -vnclegacy yes \
+            -clientopts -clearvncpw \
             -restart \
             -agent \
             -privs -all
@@ -91,6 +99,10 @@ jobs:
             | head -n 1)
 
           echo "$URL/vnc.html"
+
+          echo ""
+          echo "NO PASSWORD REQUIRED"
+          echo "Leave username/password empty"
 
           echo "================================="
 
