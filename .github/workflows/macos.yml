@@ -567,14 +567,29 @@ jobs:
                           "cmd": "command",
                           "ctrl": "ctrl",
                           "alt": "alt",
-                          "shift": "shift"
+                          "shift": "shift",
+                          "Enter": "return",
+                          "Backspace": "delete",
+                          "Tab": "tab",
+                          "Escape": "esc",
+                          "ArrowUp": "arrow-up",
+                          "ArrowDown": "arrow-down",
+                          "ArrowLeft": "arrow-left",
+                          "ArrowRight": "arrow-right"
                       }
 
                       if text in keymap:
 
                           subprocess.run([
                               "cliclick",
-                              f"kd:{keymap[text]}"
+                              f"kp:{keymap[text]}"
+                          ])
+
+                      elif len(text) == 1:
+
+                          subprocess.run([
+                              "cliclick",
+                              f"t:{text}"
                           ])
 
                       self.ok()
@@ -582,28 +597,8 @@ jobs:
 
                   if path == "/keyup":
 
-                      text = query.get(
-                          "text",
-                          [""]
-                      )[0]
-
-                      keymap = {
-                          "cmd": "command",
-                          "ctrl": "ctrl",
-                          "alt": "alt",
-                          "shift": "shift"
-                      }
-
-                      if text in keymap:
-
-                          subprocess.run([
-                              "cliclick",
-                              f"ku:{keymap[text]}"
-                          ])
-
                       self.ok()
                       return
-
                   if path == "/":
 
                       path = "/index.html"
