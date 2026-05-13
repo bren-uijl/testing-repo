@@ -1,0 +1,54 @@
+name: Remote macOS Stream
+
+on:
+  workflow_dispatch:
+
+jobs:
+  macos-remote:
+    runs-on: macos-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Install dependencies
+        run: |
+          brew install ffmpeg cloudflared
+
+      - name: Start Safari
+        run: |
+          open -a Safari https://apple.com
+          sleep 10
+
+      - name: Create stream folder
+        run: mkdir -p stream
+
+      - name: Start HLS stream (NO WEBSOCKETS)
+        run: |
+          ffmpeg \
+            -f avfoundation \
+            -framerate 15 \
+            -i "1:none" \
+            -vf scale=1280:-1 \
+            -c:v libx264 \
+            -preset ultrafast \
+            -tune zerolatency \
+            -f hls \
+            -hls_time 1 \
+            -hls_list_size 3 \
+            -hls_flags delete_segments \
+            stream/index.m3u8 &
+      
+      - name: Start HTTP server
+        run: |
+          cd stream
+          python3 -m http.server 8080 &
+      
+      - name: Expose publicly
+        run: |
+          cloudflared tunnel --url http://localhost:8080 > tunnel.log 2>&1 &
+          sleep 15
+          cat tunnel.log
+
+      - name: Keep alive
+        run: |
+          caffeinate -dimsu &
+          while true; do sleep 60; done
