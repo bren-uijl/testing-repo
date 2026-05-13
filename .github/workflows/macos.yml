@@ -22,7 +22,7 @@ jobs:
         run: |
           screenresolution set 1440x900x24 || true
 
-      - name: Create stream directory
+      - name: Create folders
         run: |
           mkdir -p stream
 
@@ -31,7 +31,7 @@ jobs:
           open -a Safari "https://apple.com"
           sleep 8
 
-      - name: Start screenshot loop
+      - name: Screenshot loop
         run: |
           cat > screenshot.sh << 'EOF'
           while true
@@ -73,11 +73,19 @@ jobs:
               }
 
               #screen {
-                position: fixed;
-                inset: 0;
 
-                width: 100vw;
-                height: 100vh;
+                position: absolute;
+
+                top: 50%;
+                left: 50%;
+
+                transform: translate(-50%, -50%);
+
+                width: auto;
+                height: auto;
+
+                max-width: 100vw;
+                max-height: 100vh;
 
                 object-fit: contain;
 
@@ -98,7 +106,8 @@ jobs:
 
             <script>
 
-              const screen = document.getElementById("screen");
+              const screen =
+                document.getElementById("screen");
 
               const REMOTE_WIDTH = 1440;
               const REMOTE_HEIGHT = 900;
@@ -120,15 +129,20 @@ jobs:
                     }
                   );
 
-                  const blob = await response.blob();
+                  const blob =
+                    await response.blob();
 
-                  const url = URL.createObjectURL(blob);
+                  const url =
+                    URL.createObjectURL(blob);
 
                   const oldSrc = screen.src;
 
                   screen.src = url;
 
-                  if (oldSrc.startsWith("blob:")) {
+                  if (
+                    oldSrc &&
+                    oldSrc.startsWith("blob:")
+                  ) {
                     URL.revokeObjectURL(oldSrc);
                   }
 
@@ -158,57 +172,50 @@ jobs:
                 }
               }
 
-              screen.addEventListener("click", async (e) => {
+              screen.addEventListener(
+                "click",
+                async (e) => {
 
-                const rect =
-                  screen.getBoundingClientRect();
+                  const rect =
+                    screen.getBoundingClientRect();
 
-                const scale = Math.min(
-                  rect.width / REMOTE_WIDTH,
-                  rect.height / REMOTE_HEIGHT
-                );
+                  const relX =
+                    (e.clientX - rect.left)
+                    / rect.width;
 
-                const displayedWidth =
-                  REMOTE_WIDTH * scale;
+                  const relY =
+                    (e.clientY - rect.top)
+                    / rect.height;
 
-                const displayedHeight =
-                  REMOTE_HEIGHT * scale;
+                  if (
+                    relX < 0 ||
+                    relX > 1 ||
+                    relY < 0 ||
+                    relY > 1
+                  ) {
+                    return;
+                  }
 
-                const offsetX =
-                  (rect.width - displayedWidth) / 2;
+                  const x = Math.round(
+                    relX * REMOTE_WIDTH
+                  );
 
-                const offsetY =
-                  (rect.height - displayedHeight) / 2;
+                  const y = Math.round(
+                    relY * REMOTE_HEIGHT
+                  );
 
-                const localX =
-                  e.clientX - rect.left - offsetX;
+                  console.log({
+                    relX,
+                    relY,
+                    x,
+                    y
+                  });
 
-                const localY =
-                  e.clientY - rect.top - offsetY;
-
-                if (
-                  localX < 0 ||
-                  localY < 0 ||
-                  localX > displayedWidth ||
-                  localY > displayedHeight
-                ) {
-                  return;
+                  await send(
+                    `/click?x=${x}&y=${y}`
+                  );
                 }
-
-                const x = Math.round(
-                  localX / scale
-                );
-
-                const y = Math.round(
-                  localY / scale
-                );
-
-                console.log("click", x, y);
-
-                await send(
-                  `/click?x=${x}&y=${y}`
-                );
-              });
+              );
 
               document.addEventListener(
                 "keydown",
@@ -244,20 +251,26 @@ jobs:
 
           class Handler(BaseHTTPRequestHandler):
 
-              def log_message(self, format, *args):
+              def log_message(
+                  self,
+                  format,
+                  *args
+              ):
                   return
 
               def do_GET(self):
 
-                  parsed = urllib.parse.urlparse(
-                      self.path
-                  )
+                  parsed =
+                      urllib.parse.urlparse(
+                          self.path
+                      )
 
                   path = parsed.path
 
-                  query = urllib.parse.parse_qs(
-                      parsed.query
-                  )
+                  query =
+                      urllib.parse.parse_qs(
+                          parsed.query
+                      )
 
                   if path == "/click":
 
@@ -394,7 +407,7 @@ jobs:
           ).serve_forever()
           EOF
 
-      - name: Start server
+      - name: Start control server
         run: |
           nohup python3 control.py >/dev/null 2>&1 &
 
