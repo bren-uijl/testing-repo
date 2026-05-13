@@ -48,14 +48,22 @@ jobs:
         run: |
           mkdir -p responses
 
+          echo "folder made"
+
           TIMESTAMP=$(date +"%m%d%H%M%S")
           FILE="responses/${TIMESTAMP}.md"
 
+          echo "got date and time"
+
           PROMPT="Why is the sky blue?"
+
+          echo "got prompt"
+
+          echo "sending response..."
 
           RESPONSE=$(curl -s http://127.0.0.1:11434/api/chat \
             -d "{
-              \"model\": \"gemma3:1b\",
+              \"model\": \"granite4.1:8b\",
               \"messages\": [
                 {
                   \"role\": \"user\",
