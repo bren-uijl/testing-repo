@@ -8,45 +8,59 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Install Ollama
         run: |
-          curl -L https://ollama.com/download/ollama-darwin -o ollama
-          chmod +x ollama
-          sudo mv ollama /usr/local/bin/ollama
+          curl -fsSL https://ollama.com/install.sh | sh || true
+
+          # Find actual binary
+          OLLAMA_BIN=$(find /Applications/Ollama.app -type f -name ollama | head -n 1)
+
+          echo "Found Ollama binary: $OLLAMA_BIN"
+
+          sudo ln -sf "$OLLAMA_BIN" /usr/local/bin/ollama
 
           ollama --version
 
-      - name: Start Ollama Server
+      - name: Start Ollama
         run: |
           nohup ollama serve > ollama.log 2>&1 &
 
-          echo "Waiting for Ollama server..."
+          echo "Waiting for Ollama..."
 
-          for i in {1..30}; do
-            if curl -s http://127.0.0.1:11434/api/tags > /dev/null; then
+          for i in {1..60}; do
+            if curl -s http://127.0.0.1:11434/api/tags >/dev/null; then
               echo "Ollama is ready"
               break
             fi
             sleep 2
           done
 
-      - name: Pull Gemma 3 1B
+      - name: Pull model
         run: |
           ollama pull gemma3:1b
 
-      - name: Run Prompt and Save Response
+      - name: Run prompt
         run: |
           mkdir -p responses
 
           TIMESTAMP=$(date +"%m%d%H%M%S")
-          OUTPUT_FILE="responses/${TIMESTAMP}.md"
+          FILE="responses/${TIMESTAMP}.md"
 
-          PROMPT="Explain GitHub Actions in one short paragraph."
+          PROMPT="Why is the sky blue?"
 
-          RESPONSE=$(ollama run gemma3:1b "$PROMPT")
+          RESPONSE=$(curl -s http://127.0.0.1:11434/api/chat \
+            -d "{
+              \"model\": \"gemma3:1b\",
+              \"messages\": [
+                {
+                  \"role\": \"user\",
+                  \"content\": \"$PROMPT\"
+                }
+              ],
+              \"stream\": false
+            }" | jq -r '.message.content')
 
           {
             echo "# Prompt"
@@ -56,11 +70,11 @@ jobs:
             echo "# Response"
             echo
             echo "$RESPONSE"
-          } > "$OUTPUT_FILE"
+          } > "$FILE"
 
-          echo "Created $OUTPUT_FILE"
+          cat "$FILE"
 
-      - name: Upload Responses
+      - name: Upload responses
         uses: actions/upload-artifact@v4
         with:
           name: responses
