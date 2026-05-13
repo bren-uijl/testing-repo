@@ -1,54 +1,130 @@
-name: Remote macOS Stream
+name: Remote macOS Safari Stream
 
 on:
   workflow_dispatch:
 
 jobs:
-  macos-remote:
+  remote-macos:
     runs-on: macos-latest
     timeout-minutes: 360
 
     steps:
       - name: Install dependencies
         run: |
-          brew install ffmpeg cloudflared
-
-      - name: Start Safari
-        run: |
-          open -a Safari https://apple.com
-          sleep 10
+          brew install cloudflared imagemagick
 
       - name: Create stream folder
-        run: mkdir -p stream
-
-      - name: Start HLS stream (NO WEBSOCKETS)
         run: |
-          ffmpeg \
-            -f avfoundation \
-            -framerate 15 \
-            -i "1:none" \
-            -vf scale=1280:-1 \
-            -c:v libx264 \
-            -preset ultrafast \
-            -tune zerolatency \
-            -f hls \
-            -hls_time 1 \
-            -hls_list_size 3 \
-            -hls_flags delete_segments \
-            stream/index.m3u8 &
-      
-      - name: Start HTTP server
+          mkdir -p stream
+
+      - name: Open Safari
+        run: |
+          open -a Safari "https://www.apple.com"
+          sleep 10
+
+      - name: Start screenshot streamer
+        run: |
+          cat > streamer.sh << 'EOF'
+          while true
+          do
+            screencapture -x stream/frame.jpg
+
+            convert stream/frame.jpg \
+              -quality 60 \
+              stream/frame.jpg
+
+            cp stream/frame.jpg stream/latest.jpg
+
+            sleep 0.2
+          done
+          EOF
+
+          chmod +x streamer.sh
+          nohup ./streamer.sh >/dev/null 2>&1 &
+
+      - name: Create viewer page
+        run: |
+          cat > stream/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>Remote macOS</title>
+
+            <style>
+              html, body {
+                margin: 0;
+                background: black;
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+              }
+
+              img {
+                width: 100vw;
+                height: 100vh;
+                object-fit: contain;
+                background: black;
+              }
+
+              #topbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 40px;
+                background: rgba(0,0,0,0.7);
+                color: white;
+                font-family: sans-serif;
+                display: flex;
+                align-items: center;
+                padding-left: 10px;
+                z-index: 999;
+              }
+            </style>
+          </head>
+
+          <body>
+            <div id="topbar">
+              GitHub Actions Remote macOS Safari Stream
+            </div>
+
+            <img id="screen" src="latest.jpg">
+
+            <script>
+              const img = document.getElementById("screen");
+
+              setInterval(() => {
+                img.src = "latest.jpg?t=" + Date.now();
+              }, 200);
+            </script>
+          </body>
+          </html>
+          EOF
+
+      - name: Start web server
         run: |
           cd stream
-          python3 -m http.server 8080 &
-      
-      - name: Expose publicly
-        run: |
-          cloudflared tunnel --url http://localhost:8080 > tunnel.log 2>&1 &
-          sleep 15
-          cat tunnel.log
+          nohup python3 -m http.server 8080 >/dev/null 2>&1 &
 
-      - name: Keep alive
+      - name: Start Cloudflare tunnel
+        run: |
+          nohup cloudflared tunnel \
+            --url http://localhost:8080 \
+            > cloudflare.log 2>&1 &
+
+          sleep 15
+
+          echo "========== CLOUDFLARE URL =========="
+          cat cloudflare.log | grep trycloudflare.com || true
+          echo "==================================="
+
+      - name: Keep runner alive
         run: |
           caffeinate -dimsu &
-          while true; do sleep 60; done
+
+          while true
+          do
+            echo "Runner alive: $(date)"
+            sleep 60
+          done
