@@ -236,13 +236,8 @@ jobs:
       - name: Create control server
         run: |
           cat > control.py << 'EOF'
-          from http.server import (
-              BaseHTTPRequestHandler,
-              HTTPServer
-          )
-
+          from http.server import BaseHTTPRequestHandler, HTTPServer
           from socketserver import ThreadingMixIn
-
           import urllib.parse
           import subprocess
           import os
@@ -251,38 +246,23 @@ jobs:
 
           class Handler(BaseHTTPRequestHandler):
 
-              def log_message(
-                  self,
-                  format,
-                  *args
-              ):
+              def log_message(self, format, *args):
                   return
 
               def do_GET(self):
 
-                  parsed =
-                      urllib.parse.urlparse(
-                          self.path
-                      )
+                  parsed = urllib.parse.urlparse(self.path)
 
                   path = parsed.path
 
-                  query =
-                      urllib.parse.parse_qs(
-                          parsed.query
-                      )
+                  query = urllib.parse.parse_qs(
+                      parsed.query
+                  )
 
                   if path == "/click":
 
-                      x = query.get(
-                          "x",
-                          ["0"]
-                      )[0]
-
-                      y = query.get(
-                          "y",
-                          ["0"]
-                      )[0]
+                      x = query.get("x", ["0"])[0]
+                      y = query.get("y", ["0"])[0]
 
                       subprocess.run([
                           "cliclick",
@@ -290,16 +270,12 @@ jobs:
                       ])
 
                       self.send_response(200)
-
                       self.send_header(
                           "Cache-Control",
                           "no-store"
                       )
-
                       self.end_headers()
-
                       self.wfile.write(b"ok")
-
                       return
 
                   if path == "/key":
@@ -345,16 +321,12 @@ jobs:
                           ])
 
                       self.send_response(200)
-
                       self.send_header(
                           "Cache-Control",
                           "no-store"
                       )
-
                       self.end_headers()
-
                       self.wfile.write(b"ok")
-
                       return
 
                   if path == "/":
@@ -410,6 +382,7 @@ jobs:
       - name: Start control server
         run: |
           nohup python3 control.py >/dev/null 2>&1 &
+
 
       - name: Start Cloudflare tunnel
         run: |
