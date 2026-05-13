@@ -12,13 +12,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install cloudflared imagemagick cliclick screenresolution
+          brew install \
+            cloudflared \
+            imagemagick \
+            cliclick \
+            screenresolution
 
-      - name: Set display resolution
+      - name: Set resolution
         run: |
           screenresolution set 1440x900x24 || true
 
-      - name: Create folders
+      - name: Create stream directory
         run: |
           mkdir -p stream
 
@@ -27,7 +31,7 @@ jobs:
           open -a Safari "https://apple.com"
           sleep 8
 
-      - name: Screenshot loop
+      - name: Start screenshot loop
         run: |
           cat > screenshot.sh << 'EOF'
           while true
@@ -36,7 +40,7 @@ jobs:
 
             if [ -f stream/latest.jpg ]; then
               convert stream/latest.jpg \
-                -quality 55 \
+                -quality 60 \
                 stream/latest.jpg 2>/dev/null || true
             fi
 
@@ -75,16 +79,14 @@ jobs:
                 width: 100vw;
                 height: 100vh;
 
-                object-fit: fill;
+                object-fit: contain;
 
                 background: black;
-
-                cursor: crosshair;
 
                 user-select: none;
                 -webkit-user-select: none;
 
-                touch-action: none;
+                cursor: crosshair;
               }
 
             </style>
@@ -130,14 +132,14 @@ jobs:
                     URL.revokeObjectURL(oldSrc);
                   }
 
-                } catch (e) {
+                } catch(e) {
                   console.log(e);
                 }
 
                 loading = false;
               }
 
-              setInterval(refresh, 300);
+              setInterval(refresh, 250);
 
               refresh();
 
@@ -158,33 +160,65 @@ jobs:
 
               screen.addEventListener("click", async (e) => {
 
-                const rect = screen.getBoundingClientRect();
+                const rect =
+                  screen.getBoundingClientRect();
 
-                const relX =
-                  (e.clientX - rect.left) / rect.width;
+                const scale = Math.min(
+                  rect.width / REMOTE_WIDTH,
+                  rect.height / REMOTE_HEIGHT
+                );
 
-                const relY =
-                  (e.clientY - rect.top) / rect.height;
+                const displayedWidth =
+                  REMOTE_WIDTH * scale;
 
-                const x =
-                  Math.round(relX * REMOTE_WIDTH);
+                const displayedHeight =
+                  REMOTE_HEIGHT * scale;
 
-                const y =
-                  Math.round(relY * REMOTE_HEIGHT);
+                const offsetX =
+                  (rect.width - displayedWidth) / 2;
+
+                const offsetY =
+                  (rect.height - displayedHeight) / 2;
+
+                const localX =
+                  e.clientX - rect.left - offsetX;
+
+                const localY =
+                  e.clientY - rect.top - offsetY;
+
+                if (
+                  localX < 0 ||
+                  localY < 0 ||
+                  localX > displayedWidth ||
+                  localY > displayedHeight
+                ) {
+                  return;
+                }
+
+                const x = Math.round(
+                  localX / scale
+                );
+
+                const y = Math.round(
+                  localY / scale
+                );
 
                 console.log("click", x, y);
 
-                await send(`/click?x=${x}&y=${y}`);
-              });
-
-              document.addEventListener("keydown", async (e) => {
-
-                console.log("key", e.key);
-
                 await send(
-                  `/key?text=${encodeURIComponent(e.key)}`
+                  `/click?x=${x}&y=${y}`
                 );
               });
+
+              document.addEventListener(
+                "keydown",
+                async (e) => {
+
+                  await send(
+                    `/key?text=${encodeURIComponent(e.key)}`
+                  );
+                }
+              );
 
             </script>
 
@@ -192,10 +226,14 @@ jobs:
           </html>
           EOF
 
-      - name: Create threaded control server
+      - name: Create control server
         run: |
           cat > control.py << 'EOF'
-          from http.server import BaseHTTPRequestHandler, HTTPServer
+          from http.server import (
+              BaseHTTPRequestHandler,
+              HTTPServer
+          )
+
           from socketserver import ThreadingMixIn
 
           import urllib.parse
@@ -211,16 +249,27 @@ jobs:
 
               def do_GET(self):
 
-                  parsed = urllib.parse.urlparse(self.path)
+                  parsed = urllib.parse.urlparse(
+                      self.path
+                  )
 
                   path = parsed.path
 
-                  query = urllib.parse.parse_qs(parsed.query)
+                  query = urllib.parse.parse_qs(
+                      parsed.query
+                  )
 
                   if path == "/click":
 
-                      x = query.get("x", ["0"])[0]
-                      y = query.get("y", ["0"])[0]
+                      x = query.get(
+                          "x",
+                          ["0"]
+                      )[0]
+
+                      y = query.get(
+                          "y",
+                          ["0"]
+                      )[0]
 
                       subprocess.run([
                           "cliclick",
@@ -228,14 +277,24 @@ jobs:
                       ])
 
                       self.send_response(200)
-                      self.send_header("Cache-Control", "no-store")
+
+                      self.send_header(
+                          "Cache-Control",
+                          "no-store"
+                      )
+
                       self.end_headers()
+
                       self.wfile.write(b"ok")
+
                       return
 
                   if path == "/key":
 
-                      text = query.get("text", [""])[0]
+                      text = query.get(
+                          "text",
+                          [""]
+                      )[0]
 
                       if text == "Enter":
 
@@ -273,9 +332,16 @@ jobs:
                           ])
 
                       self.send_response(200)
-                      self.send_header("Cache-Control", "no-store")
+
+                      self.send_header(
+                          "Cache-Control",
+                          "no-store"
+                      )
+
                       self.end_headers()
+
                       self.wfile.write(b"ok")
+
                       return
 
                   if path == "/":
@@ -293,12 +359,14 @@ jobs:
                       )
 
                       if file_path.endswith(".html"):
+
                           self.send_header(
                               "Content-Type",
                               "text/html"
                           )
 
                       elif file_path.endswith(".jpg"):
+
                           self.send_header(
                               "Content-Type",
                               "image/jpeg"
@@ -326,7 +394,7 @@ jobs:
           ).serve_forever()
           EOF
 
-      - name: Start control server
+      - name: Start server
         run: |
           nohup python3 control.py >/dev/null 2>&1 &
 
@@ -339,15 +407,16 @@ jobs:
           sleep 15
 
           echo ""
-          echo "====================================="
+          echo "================================="
           echo "REMOTE MAC URL"
-          echo "====================================="
+          echo "================================="
 
-          grep -o 'https://[-0-9a-z]*\.trycloudflare.com' \
+          grep -o \
+            'https://[-0-9a-z]*\.trycloudflare.com' \
             cloudflare.log \
             | head -n 1
 
-          echo "====================================="
+          echo "================================="
 
       - name: Keep alive
         run: |
