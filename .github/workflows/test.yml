@@ -74,6 +74,18 @@ jobs:
 
           cat "$FILE"
 
+      - name: Commit responses to repo
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add responses/*.md
+
+          git commit -m "Add Ollama response" || echo "Nothing to commit"
+
+          git push
+
+
       - name: Upload responses
         uses: actions/upload-artifact@v4
         with:
