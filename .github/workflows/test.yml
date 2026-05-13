@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   run-gemma:
-    runs-on: macos-latest
+    runs-on: macos-26-intel
 
     steps:
       - uses: actions/checkout@v4
