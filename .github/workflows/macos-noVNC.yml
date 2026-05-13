@@ -14,7 +14,9 @@ jobs:
         run: |
           brew install cloudflared
 
-          python3 -m pip install --break-system-packages websockify
+          python3 -m pip install \
+            --break-system-packages \
+            websockify
 
       - name: Download noVNC
         run: |
@@ -42,11 +44,11 @@ jobs:
             -agent \
             -privs -all
 
-      - name: Check VNC
+      - name: Check VNC server
         run: |
           sleep 5
 
-          echo "Checking port 5900"
+          echo "Checking VNC server..."
 
           lsof -i :5900 || true
 
@@ -90,13 +92,9 @@ jobs:
 
           echo "$URL/vnc.html"
 
-          echo ""
-          echo "PASSWORD:"
-          echo "password"
-
           echo "================================="
 
-      - name: Keep alive
+      - name: Keep runner alive
         run: |
           while true
           do
