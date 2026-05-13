@@ -18,7 +18,7 @@ jobs:
             cliclick \
             screenresolution
 
-      - name: Set resolution
+      - name: Set display resolution
         run: |
           screenresolution set 1440x900x24 || true
 
@@ -73,7 +73,6 @@ jobs:
               }
 
               #screen {
-
                 position: absolute;
 
                 top: 50%;
@@ -109,10 +108,10 @@ jobs:
               const screen =
                 document.getElementById("screen");
 
-              const REMOTE_WIDTH = 1440;
-              const REMOTE_HEIGHT = 900;
-
               let loading = false;
+
+              let remoteWidth = 1440;
+              let remoteHeight = 900;
 
               async function refresh() {
 
@@ -131,6 +130,12 @@ jobs:
 
                   const blob =
                     await response.blob();
+
+                  const bitmap =
+                    await createImageBitmap(blob);
+
+                  remoteWidth = bitmap.width;
+                  remoteHeight = bitmap.height;
 
                   const url =
                     URL.createObjectURL(blob);
@@ -197,16 +202,16 @@ jobs:
                   }
 
                   const x = Math.round(
-                    relX * REMOTE_WIDTH
+                    relX * remoteWidth
                   );
 
                   const y = Math.round(
-                    relY * REMOTE_HEIGHT
+                    relY * remoteHeight
                   );
 
                   console.log({
-                    relX,
-                    relY,
+                    remoteWidth,
+                    remoteHeight,
                     x,
                     y
                   });
@@ -251,7 +256,9 @@ jobs:
 
               def do_GET(self):
 
-                  parsed = urllib.parse.urlparse(self.path)
+                  parsed = urllib.parse.urlparse(
+                      self.path
+                  )
 
                   path = parsed.path
 
@@ -261,8 +268,15 @@ jobs:
 
                   if path == "/click":
 
-                      x = query.get("x", ["0"])[0]
-                      y = query.get("y", ["0"])[0]
+                      x = query.get(
+                          "x",
+                          ["0"]
+                      )[0]
+
+                      y = query.get(
+                          "y",
+                          ["0"]
+                      )[0]
 
                       subprocess.run([
                           "cliclick",
@@ -270,12 +284,16 @@ jobs:
                       ])
 
                       self.send_response(200)
+
                       self.send_header(
                           "Cache-Control",
                           "no-store"
                       )
+
                       self.end_headers()
+
                       self.wfile.write(b"ok")
+
                       return
 
                   if path == "/key":
@@ -321,12 +339,16 @@ jobs:
                           ])
 
                       self.send_response(200)
+
                       self.send_header(
                           "Cache-Control",
                           "no-store"
                       )
+
                       self.end_headers()
+
                       self.wfile.write(b"ok")
+
                       return
 
                   if path == "/":
@@ -383,6 +405,10 @@ jobs:
         run: |
           nohup python3 control.py >/dev/null 2>&1 &
 
+      - name: Debug server
+        run: |
+          sleep 2
+          curl http://localhost:8080 || true
 
       - name: Start Cloudflare tunnel
         run: |
