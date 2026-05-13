@@ -1,4 +1,4 @@
-name: Remote macOS Safari Stream
+name: Remote macOS Safari
 
 on:
   workflow_dispatch:
@@ -9,40 +9,40 @@ jobs:
     timeout-minutes: 360
 
     steps:
+
       - name: Install dependencies
         run: |
-          brew install cloudflared imagemagick
+          brew install cloudflared imagemagick cliclick
 
-      - name: Create stream folder
+      - name: Create stream directory
         run: |
           mkdir -p stream
 
       - name: Open Safari
         run: |
-          open -a Safari "https://www.apple.com"
-          sleep 10
+          open -a Safari "https://apple.com"
+          sleep 8
 
-      - name: Start screenshot streamer
+      - name: Create screenshot loop
         run: |
-          cat > streamer.sh << 'EOF'
+          cat > screenshot.sh << 'EOF'
           while true
           do
-            screencapture -x stream/frame.jpg
+            screencapture -x stream/latest.jpg 2>/dev/null || true
 
-            convert stream/frame.jpg \
-              -quality 60 \
-              stream/frame.jpg
+            convert stream/latest.jpg \
+              -quality 55 \
+              stream/latest.jpg 2>/dev/null || true
 
-            cp stream/frame.jpg stream/latest.jpg
-
-            sleep 0.2
+            sleep 0.15
           done
           EOF
 
-          chmod +x streamer.sh
-          nohup ./streamer.sh >/dev/null 2>&1 &
+          chmod +x screenshot.sh
 
-      - name: Create viewer page
+          nohup ./screenshot.sh >/dev/null 2>&1 &
+
+      - name: Create remote desktop webpage
         run: |
           cat > stream/index.html << 'EOF'
           <!DOCTYPE html>
@@ -54,20 +54,22 @@ jobs:
             <style>
               html, body {
                 margin: 0;
-                background: black;
+                padding: 0;
                 overflow: hidden;
+                background: black;
                 width: 100%;
                 height: 100%;
               }
 
-              img {
+              #screen {
                 width: 100vw;
                 height: 100vh;
                 object-fit: contain;
                 background: black;
+                cursor: crosshair;
               }
 
-              #topbar {
+              #bar {
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -76,36 +78,145 @@ jobs:
                 background: rgba(0,0,0,0.7);
                 color: white;
                 font-family: sans-serif;
+                z-index: 999;
                 display: flex;
                 align-items: center;
-                padding-left: 10px;
-                z-index: 999;
+                padding-left: 12px;
               }
             </style>
           </head>
 
           <body>
-            <div id="topbar">
-              GitHub Actions Remote macOS Safari Stream
+
+            <div id="bar">
+              GitHub Actions Remote macOS
             </div>
 
             <img id="screen" src="latest.jpg">
 
             <script>
-              const img = document.getElementById("screen");
 
-              setInterval(() => {
-                img.src = "latest.jpg?t=" + Date.now();
-              }, 200);
+              const screen = document.getElementById("screen");
+
+              function refresh() {
+                screen.src = "latest.jpg?t=" + Date.now();
+              }
+
+              setInterval(refresh, 180);
+
+              async function send(path) {
+                try {
+                  await fetch(path);
+                } catch(e) {}
+              }
+
+              screen.addEventListener("click", async (e) => {
+
+                const rect = screen.getBoundingClientRect();
+
+                const x = Math.round(
+                  ((e.clientX - rect.left) / rect.width) * 1440
+                );
+
+                const y = Math.round(
+                  ((e.clientY - rect.top) / rect.height) * 900
+                );
+
+                await send(`/click?x=${x}&y=${y}`);
+              });
+
+              document.addEventListener("keydown", async (e) => {
+                await send(`/key?text=${encodeURIComponent(e.key)}`);
+              });
+
             </script>
+
           </body>
           </html>
           EOF
 
-      - name: Start web server
+      - name: Create control server
         run: |
-          cd stream
-          nohup python3 -m http.server 8080 >/dev/null 2>&1 &
+          cat > control.py << 'EOF'
+          from http.server import BaseHTTPRequestHandler, HTTPServer
+          import urllib.parse
+          import subprocess
+          import os
+
+          ROOT = "stream"
+
+          class Handler(BaseHTTPRequestHandler):
+
+              def do_GET(self):
+
+                  parsed = urllib.parse.urlparse(self.path)
+                  path = parsed.path
+                  query = urllib.parse.parse_qs(parsed.query)
+
+                  if path == "/click":
+
+                      x = query.get("x", ["0"])[0]
+                      y = query.get("y", ["0"])[0]
+
+                      subprocess.run([
+                          "cliclick",
+                          f"c:{x},{y}"
+                      ])
+
+                      self.send_response(200)
+                      self.end_headers()
+                      self.wfile.write(b"ok")
+                      return
+
+                  if path == "/key":
+
+                      text = query.get("text", [""])[0]
+
+                      if text == "Enter":
+                          subprocess.run(["cliclick", "kp:return"])
+
+                      elif text == "Backspace":
+                          subprocess.run(["cliclick", "kp:delete"])
+
+                      elif len(text) == 1:
+                          subprocess.run(["cliclick", f"t:{text}"])
+
+                      self.send_response(200)
+                      self.end_headers()
+                      self.wfile.write(b"ok")
+                      return
+
+                  if path == "/":
+                      path = "/index.html"
+
+                  file_path = ROOT + path
+
+                  if os.path.exists(file_path):
+
+                      self.send_response(200)
+
+                      if file_path.endswith(".html"):
+                          self.send_header("Content-Type", "text/html")
+
+                      elif file_path.endswith(".jpg"):
+                          self.send_header("Content-Type", "image/jpeg")
+
+                      self.end_headers()
+
+                      with open(file_path, "rb") as f:
+                          self.wfile.write(f.read())
+
+                      return
+
+                  self.send_response(404)
+                  self.end_headers()
+
+          HTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+          EOF
+
+      - name: Start server
+        run: |
+          nohup python3 control.py >/dev/null 2>&1 &
 
       - name: Start Cloudflare tunnel
         run: |
@@ -115,9 +226,12 @@ jobs:
 
           sleep 15
 
-          echo "========== CLOUDFLARE URL =========="
-          cat cloudflare.log | grep trycloudflare.com || true
-          echo "==================================="
+          echo ""
+          echo "=============================="
+          echo "REMOTE MAC URL:"
+          grep -o 'https://[-0-9a-z]*\.trycloudflare.com' cloudflare.log | head -n 1
+          echo "=============================="
+          echo ""
 
       - name: Keep runner alive
         run: |
@@ -125,6 +239,6 @@ jobs:
 
           while true
           do
-            echo "Runner alive: $(date)"
+            echo "alive $(date)"
             sleep 60
           done
