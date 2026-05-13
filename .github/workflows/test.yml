@@ -3,6 +3,9 @@ name: Ollama Gemma Manual Run
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   run-gemma:
     runs-on: macos-latest
