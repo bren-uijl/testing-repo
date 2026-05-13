@@ -1,0 +1,84 @@
+name: Remote macOS noVNC
+
+on:
+  workflow_dispatch:
+
+jobs:
+  remote-macos:
+    runs-on: macos-latest
+    timeout-minutes: 360
+
+    steps:
+
+      - name: Install dependencies
+        run: |
+          brew install \
+            cloudflared \
+            novnc \
+            websockify
+
+      - name: Start Safari
+        run: |
+          open -a Safari "https://apple.com"
+          sleep 5
+
+      - name: Enable macOS VNC server
+        run: |
+
+          sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart \
+            -activate \
+            -configure \
+            -access -on \
+            -clientopts -setvnclegacy -vnclegacy yes \
+            -clientopts -setvncpw -vncpw password \
+            -restart \
+            -agent \
+            -privs -all
+
+      - name: Start noVNC
+        run: |
+
+          NOVNC_DIR=$(brew --prefix)/share/novnc
+
+          nohup websockify \
+            --web "$NOVNC_DIR" \
+            6080 \
+            localhost:5900 \
+            > novnc.log 2>&1 &
+
+      - name: Start Cloudflare tunnel
+        run: |
+
+          nohup cloudflared tunnel \
+            --protocol http2 \
+            --ha-connections 1 \
+            --url http://localhost:6080 \
+            > cloudflare.log 2>&1 &
+
+          sleep 15
+
+          echo ""
+          echo "================================="
+          echo "REMOTE MAC URL"
+          echo "================================="
+
+          grep -o \
+            'https://[-0-9a-z]*\.trycloudflare.com' \
+            cloudflare.log \
+            | head -n 1
+
+          echo ""
+          echo "PASSWORD:"
+          echo "password"
+
+          echo "================================="
+
+      - name: Keep alive
+        run: |
+          caffeinate -dimsu &
+
+          while true
+          do
+            echo "alive $(date)"
+            sleep 60
+          done
