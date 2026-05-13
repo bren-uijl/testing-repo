@@ -22,7 +22,7 @@ jobs:
         run: |
           screenresolution set 1440x900x24 || true
 
-      - name: Create folders
+      - name: Create stream folder
         run: |
           mkdir -p stream
 
@@ -31,7 +31,7 @@ jobs:
           open -a Safari "https://apple.com"
           sleep 8
 
-      - name: Screenshot loop
+      - name: Start screenshot loop
         run: |
           cat > screenshot.sh << 'EOF'
           while true
@@ -44,7 +44,7 @@ jobs:
                 stream/latest.jpg 2>/dev/null || true
             fi
 
-            sleep 0.25
+            sleep 0.20
           done
           EOF
 
@@ -84,17 +84,15 @@ jobs:
                 width: auto;
                 height: auto;
 
-                max-width: calc(100vw - 80px);
+                max-width: calc(100vw - 100px);
                 max-height: 100vh;
 
                 object-fit: contain;
 
-                background: black;
+                cursor: crosshair;
 
                 user-select: none;
                 -webkit-user-select: none;
-
-                cursor: crosshair;
               }
 
               #sidebar {
@@ -104,7 +102,7 @@ jobs:
                 top: 0;
                 right: 0;
 
-                width: 80px;
+                width: 100px;
                 height: 100vh;
 
                 background: #111;
@@ -113,20 +111,36 @@ jobs:
 
                 display: flex;
                 flex-direction: column;
+
                 align-items: center;
 
-                padding-top: 20px;
+                padding-top: 10px;
 
                 box-sizing: border-box;
 
                 z-index: 9999;
               }
 
-              #label {
+              .btn {
+
+                width: 80px;
+                height: 34px;
+
+                margin-bottom: 8px;
+
+                border: none;
+
+                border-radius: 8px;
+
+                background: #222;
+
                 color: white;
-                font-size: 12px;
-                margin-bottom: 10px;
-                text-align: center;
+
+                cursor: pointer;
+              }
+
+              .btn.active {
+                background: #0066ff;
               }
 
               #slider {
@@ -134,13 +148,15 @@ jobs:
                 direction: rtl;
 
                 width: 30px;
-                height: 250px;
+                height: 220px;
+
+                margin-top: 15px;
               }
 
               #value {
                 color: white;
-                margin-top: 15px;
-                font-size: 13px;
+                margin-top: 10px;
+                font-size: 12px;
               }
 
             </style>
@@ -152,21 +168,33 @@ jobs:
 
             <div id="sidebar">
 
-              <div id="label">
-                Refresh
-              </div>
+              <button class="btn" id="cmd">
+                CMD
+              </button>
+
+              <button class="btn" id="ctrl">
+                CTRL
+              </button>
+
+              <button class="btn" id="alt">
+                ALT
+              </button>
+
+              <button class="btn" id="shift">
+                SHIFT
+              </button>
 
               <input
                 id="slider"
                 type="range"
                 min="50"
                 max="1000"
-                value="250"
+                value="200"
                 step="10"
               >
 
               <div id="value">
-                250ms
+                200ms
               </div>
 
             </div>
@@ -187,9 +215,20 @@ jobs:
               let remoteWidth = 1440;
               let remoteHeight = 900;
 
-              let refreshInterval = 250;
+              let refreshInterval = 200;
 
               let refreshTimer;
+
+              let mouseDown = false;
+
+              const heldModifiers = new Set();
+
+              const modifierMap = {
+                cmd: "cmd",
+                ctrl: "ctrl",
+                alt: "alt",
+                shift: "shift"
+              };
 
               function startRefreshLoop() {
 
@@ -203,16 +242,19 @@ jobs:
                 );
               }
 
-              slider.addEventListener("input", () => {
+              slider.addEventListener(
+                "input",
+                () => {
 
-                refreshInterval =
-                  Number(slider.value);
+                  refreshInterval =
+                    Number(slider.value);
 
-                value.innerText =
-                  refreshInterval + "ms";
+                  value.innerText =
+                    refreshInterval + "ms";
 
-                startRefreshLoop();
-              });
+                  startRefreshLoop();
+                }
+              );
 
               async function refresh() {
 
@@ -252,9 +294,7 @@ jobs:
                     URL.revokeObjectURL(oldSrc);
                   }
 
-                } catch(e) {
-                  console.log(e);
-                }
+                } catch(e) {}
 
                 loading = false;
               }
@@ -273,74 +313,163 @@ jobs:
                     keepalive: true
                   });
 
-                } catch(e) {
-                  console.log(e);
-                }
+                } catch(e) {}
+              }
+
+              function getCoords(e) {
+
+                const rect =
+                  screen.getBoundingClientRect();
+
+                const relX =
+                  (e.clientX - rect.left)
+                  / rect.width;
+
+                const relY =
+                  (e.clientY - rect.top)
+                  / rect.height;
+
+                return {
+                  x: Math.round(relX * remoteWidth),
+                  y: Math.round(relY * remoteHeight)
+                };
               }
 
               screen.addEventListener(
-                "click",
+                "mousedown",
                 async (e) => {
 
-                  const rect =
-                    screen.getBoundingClientRect();
+                  mouseDown = true;
 
-                  const relX =
-                    (e.clientX - rect.left)
-                    / rect.width;
-
-                  const relY =
-                    (e.clientY - rect.top)
-                    / rect.height;
-
-                  if (
-                    relX < 0 ||
-                    relX > 1 ||
-                    relY < 0 ||
-                    relY > 1
-                  ) {
-                    return;
-                  }
-
-                  const x = Math.round(
-                    relX * remoteWidth
-                  );
-
-                  const y = Math.round(
-                    relY * remoteHeight
-                  );
-
-                  console.log({
-                    x,
-                    y
-                  });
+                  const {x, y} =
+                    getCoords(e);
 
                   await send(
-                    `/click?x=${x}&y=${y}`
+                    `/mousedown?x=${x}&y=${y}`
                   );
                 }
+              );
+
+              screen.addEventListener(
+                "mouseup",
+                async (e) => {
+
+                  mouseDown = false;
+
+                  const {x, y} =
+                    getCoords(e);
+
+                  await send(
+                    `/mouseup?x=${x}&y=${y}`
+                  );
+                }
+              );
+
+              screen.addEventListener(
+                "mousemove",
+                async (e) => {
+
+                  if (!mouseDown) return;
+
+                  const {x, y} =
+                    getCoords(e);
+
+                  await send(
+                    `/mousemove?x=${x}&y=${y}`
+                  );
+                }
+              );
+
+              screen.addEventListener(
+                "wheel",
+                async (e) => {
+
+                  e.preventDefault();
+
+                  const delta =
+                    Math.sign(e.deltaY) * 8;
+
+                  await send(
+                    `/scroll?dy=${delta}`
+                  );
+                },
+                { passive: false }
               );
 
               document.addEventListener(
                 "keydown",
                 async (e) => {
 
+                  if (e.repeat) return;
+
                   await send(
-                    `/key?text=${encodeURIComponent(e.key)}`
+                    `/keydown?text=${encodeURIComponent(e.key)}`
                   );
                 }
               );
+
+              document.addEventListener(
+                "keyup",
+                async (e) => {
+
+                  await send(
+                    `/keyup?text=${encodeURIComponent(e.key)}`
+                  );
+                }
+              );
+
+              for (const id of Object.keys(modifierMap)) {
+
+                const btn =
+                  document.getElementById(id);
+
+                btn.addEventListener(
+                  "click",
+                  async () => {
+
+                    const key =
+                      modifierMap[id];
+
+                    if (heldModifiers.has(key)) {
+
+                      heldModifiers.delete(key);
+
+                      btn.classList.remove(
+                        "active"
+                      );
+
+                      await send(
+                        `/keyup?text=${key}`
+                      );
+
+                    } else {
+
+                      heldModifiers.add(key);
+
+                      btn.classList.add(
+                        "active"
+                      );
+
+                      await send(
+                        `/keydown?text=${key}`
+                      );
+                    }
+                  }
+                );
+              }
 
             </script>
 
           </body>
           </html>
           EOF
+
       - name: Create control server
         run: |
           cat > control.py << 'EOF'
           from http.server import BaseHTTPRequestHandler, HTTPServer
           from socketserver import ThreadingMixIn
+
           import urllib.parse
           import subprocess
           import os
@@ -351,6 +480,15 @@ jobs:
 
               def log_message(self, format, *args):
                   return
+
+              def ok(self):
+                  self.send_response(200)
+                  self.send_header(
+                      "Cache-Control",
+                      "no-store"
+                  )
+                  self.end_headers()
+                  self.wfile.write(b"ok")
 
               def do_GET(self):
 
@@ -364,92 +502,110 @@ jobs:
                       parsed.query
                   )
 
-                  if path == "/click":
+                  if path == "/mousedown":
 
-                      x = query.get(
-                          "x",
-                          ["0"]
-                      )[0]
+                      x = query.get("x", ["0"])[0]
+                      y = query.get("y", ["0"])[0]
 
-                      y = query.get(
-                          "y",
+                      subprocess.run([
+                          "cliclick",
+                          f"dd:{x},{y}"
+                      ])
+
+                      self.ok()
+                      return
+
+                  if path == "/mouseup":
+
+                      x = query.get("x", ["0"])[0]
+                      y = query.get("y", ["0"])[0]
+
+                      subprocess.run([
+                          "cliclick",
+                          f"du:{x},{y}"
+                      ])
+
+                      self.ok()
+                      return
+
+                  if path == "/mousemove":
+
+                      x = query.get("x", ["0"])[0]
+                      y = query.get("y", ["0"])[0]
+
+                      subprocess.run([
+                          "cliclick",
+                          f"m:{x},{y}"
+                      ])
+
+                      self.ok()
+                      return
+
+                  if path == "/scroll":
+
+                      dy = query.get(
+                          "dy",
                           ["0"]
                       )[0]
 
                       subprocess.run([
                           "cliclick",
-                          f"c:{x},{y}"
+                          f"w:0,{dy}"
                       ])
 
-                      self.send_response(200)
-
-                      self.send_header(
-                          "Cache-Control",
-                          "no-store"
-                      )
-
-                      self.end_headers()
-
-                      self.wfile.write(b"ok")
-
+                      self.ok()
                       return
 
-                  if path == "/key":
+                  if path == "/keydown":
 
                       text = query.get(
                           "text",
                           [""]
                       )[0]
 
-                      if text == "Enter":
+                      keymap = {
+                          "cmd": "command",
+                          "ctrl": "ctrl",
+                          "alt": "alt",
+                          "shift": "shift"
+                      }
+
+                      if text in keymap:
 
                           subprocess.run([
                               "cliclick",
-                              "kp:return"
+                              f"kd:{keymap[text]}"
                           ])
 
-                      elif text == "Backspace":
+                      self.ok()
+                      return
+
+                  if path == "/keyup":
+
+                      text = query.get(
+                          "text",
+                          [""]
+                      )[0]
+
+                      keymap = {
+                          "cmd": "command",
+                          "ctrl": "ctrl",
+                          "alt": "alt",
+                          "shift": "shift"
+                      }
+
+                      if text in keymap:
 
                           subprocess.run([
                               "cliclick",
-                              "kp:delete"
+                              f"ku:{keymap[text]}"
                           ])
 
-                      elif text == "Tab":
-
-                          subprocess.run([
-                              "cliclick",
-                              "kp:tab"
-                          ])
-
-                      elif text == "Escape":
-
-                          subprocess.run([
-                              "cliclick",
-                              "kp:esc"
-                          ])
-
-                      elif len(text) == 1:
-
-                          subprocess.run([
-                              "cliclick",
-                              f"t:{text}"
-                          ])
-
-                      self.send_response(200)
-
-                      self.send_header(
-                          "Cache-Control",
-                          "no-store"
-                      )
-
-                      self.end_headers()
-
-                      self.wfile.write(b"ok")
-
+                      self.ok()
                       return
 
                   if path == "/":
+
                       path = "/index.html"
 
                   file_path = ROOT + path
@@ -503,11 +659,6 @@ jobs:
         run: |
           nohup python3 control.py >/dev/null 2>&1 &
 
-      - name: Debug server
-        run: |
-          sleep 2
-          curl http://localhost:8080 || true
-
       - name: Start Cloudflare tunnel
         run: |
           nohup cloudflared tunnel \
@@ -528,7 +679,7 @@ jobs:
 
           echo "================================="
 
-      - name: Keep alive
+      - name: Keep runner alive
         run: |
           caffeinate -dimsu &
 
