@@ -1,0 +1,76 @@
+name: Remote Linux noVNC
+
+on:
+  workflow_dispatch:
+
+jobs:
+  remote-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Install desktop and tools
+        run: |
+          sudo apt update
+
+          sudo apt install -y \
+            xfce4 xfce4-goodies \
+            x11vnc xvfb \
+            novnc websockify \
+            cloudflared
+
+      - name: Start virtual display
+        run: |
+          Xvfb :0 -screen 0 1280x800x24 &
+          echo "DISPLAY=:0" >> $GITHUB_ENV
+          sleep 2
+
+      - name: Start desktop
+        run: |
+          startxfce4 &
+
+          sleep 3
+
+      - name: Start VNC server (NO PASSWORD)
+        run: |
+          x11vnc \
+            -display :0 \
+            -nopw \
+            -forever \
+            -shared \
+            -rfbport 5900 &
+
+          sleep 2
+
+      - name: Start noVNC
+        run: |
+          websockify \
+            --web /usr/share/novnc/ \
+            6080 \
+            localhost:5900 &
+
+          sleep 3
+
+      - name: Start Cloudflare tunnel
+        run: |
+          cloudflared tunnel \
+            --protocol http2 \
+            --ha-connections 1 \
+            --url http://localhost:6080 \
+            > cloudflare.log 2>&1 &
+
+          sleep 10
+
+          echo "=============================="
+          echo "REMOTE LINUX URL:"
+          grep -o 'https://[-0-9a-z]*\.trycloudflare.com' cloudflare.log | head -n 1
+          echo ""
+          echo "NO PASSWORD"
+          echo "=============================="
+
+      - name: Keep runner alive
+        run: |
+          while true; do
+            echo "alive $(date)"
+            sleep 60
+          done
