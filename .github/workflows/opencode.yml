@@ -1,0 +1,85 @@
+name: OpenCode Auto Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: "What should OpenCode do?"
+        required: true
+        default: "Inspect this project and improve it where useful."
+      branch:
+        description: "Branch to run on"
+        required: true
+        default: "main"
+
+permissions:
+  contents: write
+
+jobs:
+  opencode:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl git
+
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Verify OpenCode
+        run: |
+          opencode --version
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run OpenCode in opencode folder
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+        run: |
+          if [ ! -d "opencode" ]; then
+            echo "Folder ./opencode does not exist"
+            exit 1
+          fi
+
+          cd opencode
+
+          opencode run "${{ github.event.inputs.prompt }}"
+
+      - name: Show changes
+        run: |
+          git status
+          git diff --stat || true
+
+      - name: Commit changes
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add .
+
+          git commit -m "OpenCode automated changes"
+
+      - name: Push changes
+        run: |
+          git push origin HEAD:${{ github.event.inputs.branch }}
