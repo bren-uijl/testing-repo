@@ -1,0 +1,627 @@
+name: Remote Linux Image Stream
+
+on:
+  workflow_dispatch:
+
+jobs:
+  remote-linux-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Install desktop and tools
+        run: |
+          sudo apt-get update
+
+          sudo apt-get install -y \
+            xfce4 \
+            xfce4-goodies \
+            xvfb \
+            x11vnc \
+            xdotool \
+            scrot \
+            imagemagick \
+            xterm \
+            wget \
+            curl \
+            python3
+
+      - name: Install cloudflared
+        run: |
+          wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared-linux-amd64.deb
+          cloudflared --version
+
+      - name: Start virtual display
+        run: |
+          Xvfb :0 -screen 0 1280x800x24 &
+          echo "DISPLAY=:0" >> $GITHUB_ENV
+          sleep 2
+
+      - name: Start XFCE desktop
+        run: |
+          export DISPLAY=:0
+          startxfce4 &
+          sleep 5
+
+      - name: Open browser or terminal
+        run: |
+          export DISPLAY=:0
+
+          if command -v google-chrome >/dev/null 2>&1; then
+            google-chrome \
+              --no-sandbox \
+              --disable-dev-shm-usage \
+              --disable-gpu \
+              https://example.com &
+          elif command -v firefox >/dev/null 2>&1; then
+            firefox https://example.com &
+          else
+            xterm &
+          fi
+
+          sleep 5
+
+      - name: Create stream folder
+        run: |
+          mkdir -p stream
+
+      - name: Start screenshot loop
+        run: |
+          cat > screenshot.sh << 'EOF'
+          #!/usr/bin/env bash
+
+          export DISPLAY=:0
+
+          while true
+          do
+            scrot stream/raw.png 2>/dev/null || true
+
+            if [ -f stream/raw.png ]; then
+              convert stream/raw.png \
+                -quality 65 \
+                stream/latest.jpg 2>/dev/null || true
+            fi
+
+            sleep 0.20
+          done
+          EOF
+
+          chmod +x screenshot.sh
+          nohup ./screenshot.sh >/dev/null 2>&1 &
+
+      - name: Create webpage
+        run: |
+          cat > stream/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>Remote Linux Image Stream</title>
+
+            <style>
+              html, body {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                background: black;
+                font-family: sans-serif;
+              }
+
+              #screen {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+
+                width: auto;
+                height: auto;
+
+                max-width: calc(100vw - 105px);
+                max-height: 100vh;
+
+                object-fit: contain;
+                cursor: crosshair;
+
+                user-select: none;
+                -webkit-user-select: none;
+              }
+
+              #sidebar {
+                position: fixed;
+                top: 0;
+                right: 0;
+
+                width: 105px;
+                height: 100vh;
+
+                background: #111;
+                border-left: 1px solid #333;
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+
+                padding-top: 10px;
+                box-sizing: border-box;
+
+                z-index: 9999;
+              }
+
+              .btn {
+                width: 85px;
+                height: 32px;
+
+                margin-bottom: 7px;
+
+                border: none;
+                border-radius: 8px;
+
+                background: #222;
+                color: white;
+
+                cursor: pointer;
+                font-size: 12px;
+              }
+
+              .btn.active {
+                background: #0066ff;
+              }
+
+              #slider {
+                writing-mode: vertical-lr;
+                direction: rtl;
+
+                width: 30px;
+                height: 220px;
+
+                margin-top: 12px;
+              }
+
+              #value {
+                color: white;
+                margin-top: 8px;
+                font-size: 12px;
+              }
+
+              #status {
+                color: #aaa;
+                margin-top: 8px;
+                font-size: 11px;
+                text-align: center;
+                width: 90px;
+              }
+            </style>
+          </head>
+
+          <body>
+            <img id="screen">
+
+            <div id="sidebar">
+              <button class="btn" id="ctrl">CTRL</button>
+              <button class="btn" id="alt">ALT</button>
+              <button class="btn" id="shift">SHIFT</button>
+              <button class="btn" id="super">SUPER</button>
+
+              <button class="btn" id="enter">ENTER</button>
+              <button class="btn" id="tab">TAB</button>
+              <button class="btn" id="esc">ESC</button>
+
+              <input
+                id="slider"
+                type="range"
+                min="50"
+                max="1000"
+                value="200"
+                step="10"
+              >
+
+              <div id="value">200ms</div>
+              <div id="status">image HTTP</div>
+            </div>
+
+            <script>
+              const screen = document.getElementById("screen");
+              const slider = document.getElementById("slider");
+              const value = document.getElementById("value");
+              const statusBox = document.getElementById("status");
+
+              let loading = false;
+              let refreshInterval = 200;
+              let refreshTimer;
+
+              let remoteWidth = 1280;
+              let remoteHeight = 800;
+
+              let mouseDown = false;
+
+              const held = new Set();
+
+              async function send(path) {
+                try {
+                  await fetch(path, {
+                    method: "GET",
+                    cache: "no-store",
+                    keepalive: true
+                  });
+                } catch (e) {}
+              }
+
+              async function refresh() {
+                if (loading) return;
+
+                loading = true;
+
+                try {
+                  const response = await fetch(
+                    "latest.jpg?t=" + Date.now(),
+                    { cache: "no-store" }
+                  );
+
+                  const blob = await response.blob();
+                  const bitmap = await createImageBitmap(blob);
+
+                  remoteWidth = bitmap.width;
+                  remoteHeight = bitmap.height;
+
+                  const url = URL.createObjectURL(blob);
+                  const old = screen.src;
+
+                  screen.src = url;
+
+                  if (old && old.startsWith("blob:")) {
+                    URL.revokeObjectURL(old);
+                  }
+
+                  statusBox.innerText =
+                    remoteWidth + "x" + remoteHeight;
+                } catch (e) {
+                  statusBox.innerText = "waiting...";
+                }
+
+                loading = false;
+              }
+
+              function startLoop() {
+                if (refreshTimer) {
+                  clearInterval(refreshTimer);
+                }
+
+                refreshTimer = setInterval(refresh, refreshInterval);
+              }
+
+              slider.addEventListener("input", () => {
+                refreshInterval = Number(slider.value);
+                value.innerText = refreshInterval + "ms";
+                startLoop();
+              });
+
+              function coords(e) {
+                const rect = screen.getBoundingClientRect();
+
+                const relX = (e.clientX - rect.left) / rect.width;
+                const relY = (e.clientY - rect.top) / rect.height;
+
+                return {
+                  x: Math.round(relX * remoteWidth),
+                  y: Math.round(relY * remoteHeight),
+                  inside: relX >= 0 && relX <= 1 && relY >= 0 && relY <= 1
+                };
+              }
+
+              screen.addEventListener("mousedown", async (e) => {
+                e.preventDefault();
+
+                const c = coords(e);
+                if (!c.inside) return;
+
+                mouseDown = true;
+
+                await send(`/mousedown?x=${c.x}&y=${c.y}&button=${e.button}`);
+              });
+
+              screen.addEventListener("mouseup", async (e) => {
+                e.preventDefault();
+
+                const c = coords(e);
+                if (!c.inside) return;
+
+                mouseDown = false;
+
+                await send(`/mouseup?x=${c.x}&y=${c.y}&button=${e.button}`);
+              });
+
+              screen.addEventListener("mousemove", async (e) => {
+                if (!mouseDown) return;
+
+                const c = coords(e);
+                if (!c.inside) return;
+
+                await send(`/mousemove?x=${c.x}&y=${c.y}`);
+              });
+
+              screen.addEventListener("contextmenu", (e) => {
+                e.preventDefault();
+              });
+
+              screen.addEventListener(
+                "wheel",
+                async (e) => {
+                  e.preventDefault();
+
+                  const direction = e.deltaY > 0 ? "down" : "up";
+
+                  await send(`/scroll?direction=${direction}`);
+                },
+                { passive: false }
+              );
+
+              document.addEventListener("keydown", async (e) => {
+                if (e.target.tagName === "INPUT") return;
+
+                e.preventDefault();
+
+                if (e.repeat) return;
+
+                await send(`/keydown?key=${encodeURIComponent(e.key)}`);
+              });
+
+              document.addEventListener("keyup", async (e) => {
+                if (e.target.tagName === "INPUT") return;
+
+                e.preventDefault();
+
+                await send(`/keyup?key=${encodeURIComponent(e.key)}`);
+              });
+
+              function toggleButton(id, key) {
+                const btn = document.getElementById(id);
+
+                btn.addEventListener("click", async () => {
+                  if (held.has(key)) {
+                    held.delete(key);
+                    btn.classList.remove("active");
+                    await send(`/keyup?key=${encodeURIComponent(key)}`);
+                  } else {
+                    held.add(key);
+                    btn.classList.add("active");
+                    await send(`/keydown?key=${encodeURIComponent(key)}`);
+                  }
+                });
+              }
+
+              toggleButton("ctrl", "Control");
+              toggleButton("alt", "Alt");
+              toggleButton("shift", "Shift");
+              toggleButton("super", "Meta");
+
+              document.getElementById("enter").onclick = () => send("/press?key=Enter");
+              document.getElementById("tab").onclick = () => send("/press?key=Tab");
+              document.getElementById("esc").onclick = () => send("/press?key=Escape");
+
+              startLoop();
+              refresh();
+            </script>
+          </body>
+          </html>
+          EOF
+
+      - name: Create control server
+        run: |
+          cat > control.py << 'EOF'
+          from http.server import BaseHTTPRequestHandler, HTTPServer
+          from socketserver import ThreadingMixIn
+
+          import os
+          import urllib.parse
+          import subprocess
+
+          ROOT = "stream"
+          DISPLAY_ENV = dict(os.environ)
+          DISPLAY_ENV["DISPLAY"] = ":0"
+
+          def run_cmd(args):
+              subprocess.run(
+                  args,
+                  env=DISPLAY_ENV,
+                  stdout=subprocess.DEVNULL,
+                  stderr=subprocess.DEVNULL
+              )
+
+          def key_to_xdotool(key):
+              mapping = {
+                  "Enter": "Return",
+                  "Backspace": "BackSpace",
+                  "Tab": "Tab",
+                  "Escape": "Escape",
+                  "ArrowUp": "Up",
+                  "ArrowDown": "Down",
+                  "ArrowLeft": "Left",
+                  "ArrowRight": "Right",
+                  "Delete": "Delete",
+                  "Home": "Home",
+                  "End": "End",
+                  "PageUp": "Page_Up",
+                  "PageDown": "Page_Down",
+                  "Control": "Control_L",
+                  "Alt": "Alt_L",
+                  "Shift": "Shift_L",
+                  "Meta": "Super_L"
+              }
+
+              return mapping.get(key, key)
+
+          class Handler(BaseHTTPRequestHandler):
+              def log_message(self, format, *args):
+                  return
+
+              def ok(self):
+                  self.send_response(200)
+                  self.send_header("Cache-Control", "no-store")
+                  self.end_headers()
+                  self.wfile.write(b"ok")
+
+              def do_GET(self):
+                  parsed = urllib.parse.urlparse(self.path)
+                  path = parsed.path
+                  query = urllib.parse.parse_qs(parsed.query)
+
+                  if path == "/mousedown":
+                      x = query.get("x", ["0"])[0]
+                      y = query.get("y", ["0"])[0]
+                      button = query.get("button", ["0"])[0]
+
+                      btn = "1"
+                      if button == "2":
+                          btn = "2"
+                      elif button == "1":
+                          btn = "3"
+
+                      run_cmd(["xdotool", "mousemove", x, y, "mousedown", btn])
+                      self.ok()
+                      return
+
+                  if path == "/mouseup":
+                      x = query.get("x", ["0"])[0]
+                      y = query.get("y", ["0"])[0]
+                      button = query.get("button", ["0"])[0]
+
+                      btn = "1"
+                      if button == "2":
+                          btn = "2"
+                      elif button == "1":
+                          btn = "3"
+
+                      run_cmd(["xdotool", "mousemove", x, y, "mouseup", btn])
+                      self.ok()
+                      return
+
+                  if path == "/mousemove":
+                      x = query.get("x", ["0"])[0]
+                      y = query.get("y", ["0"])[0]
+
+                      run_cmd(["xdotool", "mousemove", x, y])
+                      self.ok()
+                      return
+
+                  if path == "/scroll":
+                      direction = query.get("direction", ["down"])[0]
+
+                      if direction == "up":
+                          run_cmd(["xdotool", "click", "4"])
+                      else:
+                          run_cmd(["xdotool", "click", "5"])
+
+                      self.ok()
+                      return
+
+                  if path == "/keydown":
+                      key = query.get("key", [""])[0]
+
+                      if len(key) == 1:
+                          run_cmd(["xdotool", "type", "--delay", "0", key])
+                      else:
+                          run_cmd(["xdotool", "keydown", key_to_xdotool(key)])
+
+                      self.ok()
+                      return
+
+                  if path == "/keyup":
+                      key = query.get("key", [""])[0]
+
+                      if len(key) != 1:
+                          run_cmd(["xdotool", "keyup", key_to_xdotool(key)])
+
+                      self.ok()
+                      return
+
+                  if path == "/press":
+                      key = query.get("key", [""])[0]
+
+                      run_cmd(["xdotool", "key", key_to_xdotool(key)])
+
+                      self.ok()
+                      return
+
+                  if path == "/":
+                      path = "/index.html"
+
+                  file_path = ROOT + path
+
+                  if os.path.exists(file_path):
+                      self.send_response(200)
+                      self.send_header(
+                          "Cache-Control",
+                          "no-store, no-cache, must-revalidate"
+                      )
+
+                      if file_path.endswith(".html"):
+                          self.send_header("Content-Type", "text/html")
+                      elif file_path.endswith(".jpg"):
+                          self.send_header("Content-Type", "image/jpeg")
+                      elif file_path.endswith(".png"):
+                          self.send_header("Content-Type", "image/png")
+
+                      self.end_headers()
+
+                      with open(file_path, "rb") as f:
+                          self.wfile.write(f.read())
+
+                      return
+
+                  self.send_response(404)
+                  self.end_headers()
+
+          class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+              daemon_threads = True
+
+          ThreadedHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
+          EOF
+
+      - name: Start control server
+        run: |
+          nohup python3 control.py > server.log 2>&1 &
+          sleep 2
+
+          curl -I http://localhost:8080 || true
+          cat server.log || true
+
+      - name: Start Cloudflare tunnel
+        run: |
+          cloudflared tunnel \
+            --protocol http2 \
+            --ha-connections 1 \
+            --url http://localhost:8080 \
+            > cloudflare.log 2>&1 &
+
+          sleep 15
+
+          echo ""
+          echo "================================="
+          echo "REMOTE LINUX IMAGE URL"
+          echo "================================="
+
+          URL=$(grep -o \
+            'https://[-0-9a-z]*\.trycloudflare.com' \
+            cloudflare.log \
+            | head -n 1)
+
+          echo "$URL"
+
+          echo ""
+          echo "NO noVNC"
+          echo "NO WebSockets in the browser page"
+          echo "Plain HTTP image polling"
+          echo "================================="
+
+          cat cloudflare.log || true
+
+      - name: Keep alive
+        run: |
+          while true
+          do
+            echo "alive $(date)"
+            sleep 60
+          done
