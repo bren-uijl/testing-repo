@@ -56,7 +56,7 @@ jobs:
 
           cd opencode
 
-          opencode run "you are an non-respondable agent, configured in github actions. you have to complete the following request withing six hours: ${{ github.event.inputs.prompt }}. after each edit, commit what youve done. write instructions for your future self down in a .opencode folder, in styles that are simular to those written on `opencode.ai/docs`" --model deepseek-v4-flash-free --variant max
+          opencode run "you are an non-respondable agent, configured in github actions. you have to complete the following request withing six hours: ${{ github.event.inputs.prompt }}. after each edit, commit what youve done. write instructions for your future self down in a .opencode folder, in styles that are simular to those written on `opencode.ai/docs`" --model "deepseek-v4-flash-free" --variant max
 
       - name: Show changes
         run: |
