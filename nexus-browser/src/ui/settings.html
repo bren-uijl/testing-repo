@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Settings</title>
+  <style>
+    :root {
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #16213e;
+      --bg-tertiary: #0f3460;
+      --bg-hover: #1f4068;
+      --text-primary: #e8e8e8;
+      --text-secondary: #a0a0a0;
+      --accent: #e94560;
+      --accent-hover: #ff6b81;
+      --border-color: #2a2a4a;
+      --success: #4ecca3;
+      --warning: #ffc857;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .settings-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .settings-header {
+      margin-bottom: 32px;
+    }
+
+    .settings-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .settings-header p {
+      color: var(--text-secondary);
+    }
+
+    .settings-section {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .section-content {
+      padding: 20px;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-info h3 {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .setting-info p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      transition: 0.2s;
+    }
+
+    .toggle-slider:before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      bottom: 2px;
+      background: var(--text-secondary);
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .toggle input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+      background: white;
+    }
+
+    select, input[type="text"] {
+      padding: 8px 12px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+    }
+
+    select:focus, input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-hover);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .about-section {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .about-logo {
+      font-size: 48px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+
+    .about-version {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="settings-container">
+    <div class="settings-header">
+      <h1>Settings</h1>
+      <p>Customize your Nexus Browser experience</p>
+    </div>
+
+    <div class="settings-section">
+      <div class="section-header">Privacy Shield</div>
+      <div class="section-content">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="blocked-trackers">0</div>
+            <div class="stat-label">Trackers Blocked</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="blocked-ads">0</div>
+            <div class="stat-label">Ads Blocked</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="data-saved">0 KB</div>
+            <div class="stat-label">Data Saved</div>
+          </div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>Enable Privacy Shield</h3>
+            <p>Block trackers and ads automatically</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="privacy-toggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>Block Third-Party Cookies</h3>
+            <p>Prevent cross-site tracking</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="cookies-toggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>Do Not Track</h3>
+            <p>Send DNT header with requests</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="dnt-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-secondary" id="reset-stats">Reset Stats</button>
+          <button class="btn btn-secondary" id="manage-blocklist">Manage Blocklist</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="section-header">Appearance</div>
+      <div class="section-content">
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>Theme</h3>
+            <p>Choose your preferred theme</p>
+          </div>
+          <select id="theme-select">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+            <option value="system">System</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>Show Tab Bar</h3>
+            <p>Display tabs at the top</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="tabs-toggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>Show Bookmarks Bar</h3>
+            <p>Display bookmarks below the URL bar</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="bookmarks-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="section-header">Search Engine</div>
+      <div class="section-content">
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>Default Search Engine</h3>
+            <p>Used when typing in the address bar</p>
+          </div>
+          <select id="search-engine">
+            <option value="google">Google</option>
+            <option value="bing">Bing</option>
+            <option value="duckduckgo">DuckDuckGo</option>
+            <option value="brave">Brave Search</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="section-header">On Startup</div>
+      <div class="section-content">
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>When Nexus starts</h3>
+            <p>Choose what to show on startup</p>
+          </div>
+          <select id="startup-select">
+            <option value="home">Open home page</option>
+            <option value="continue">Continue where you left off</option>
+            <option value="blank">Open blank page</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="section-header">Downloads</div>
+      <div class="section-content">
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>Download Location</h3>
+            <p>Where files are saved</p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="download-path" value="~/Downloads/Nexus" readonly>
+            <button class="btn btn-secondary" id="change-path">Change</button>
+          </div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>Ask where to save each file</h3>
+            <p>Prompt for location before downloading</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="ask-location-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="section-header">Password Manager</div>
+      <div class="section-content">
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>Offer to save passwords</h3>
+            <p>Save login credentials securely</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="save-passwords-toggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>Auto-sign in</h3>
+            <p>Automatically fill saved credentials</p>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="auto-signin-toggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-secondary" id="manage-passwords">Manage Passwords</button>
+          <button class="btn btn-secondary" id="export-passwords">Export</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="section-header">About</div>
+      <div class="section-content">
+        <div class="about-section">
+          <div class="about-logo">Nexus</div>
+          <div class="about-version">Version 0.1.0</div>
+          <p style="color: var(--text-secondary); margin-bottom: 24px;">
+            A next-generation browser with full Chrome Web Store support.
+            Fast, private, and extensible.
+          </p>
+          <div class="btn-group" style="justify-content: center;">
+            <button class="btn btn-primary" id="check-updates">Check for Updates</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const settings = JSON.parse(localStorage.getItem('nexus_settings') || '{}');
+
+      document.querySelectorAll('input[type="checkbox"], select').forEach(el => {
+        const key = el.id.replace(/-toggle|-select|-engine|-path|-select/g, '');
+        if (settings[key] !== undefined) {
+          if (el.type === 'checkbox') {
+            el.checked = settings[key];
+          } else {
+            el.value = settings[key];
+          }
+        }
+      });
+
+      document.querySelectorAll('input[type="checkbox"], select').forEach(el => {
+        el.addEventListener('change', () => {
+          const key = el.id.replace(/-toggle|-select|-engine|-path|-select/g, '');
+          settings[key] = el.type === 'checkbox' ? el.checked : el.value;
+          localStorage.setItem('nexus_settings', JSON.stringify(settings));
+        });
+      });
+
+      document.getElementById('reset-stats')?.addEventListener('click', () => {
+        document.getElementById('blocked-trackers').textContent = '0';
+        document.getElementById('blocked-ads').textContent = '0';
+        document.getElementById('data-saved').textContent = '0 KB';
+      });
+
+      document.getElementById('check-updates')?.addEventListener('click', () => {
+        alert('Nexus Browser is up to date.');
+      });
+    });
+  </script>
+</body>
+</html>
