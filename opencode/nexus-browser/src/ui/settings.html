@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+  <title>Nexus Browser - Settings</title>
+  <style>
+    :root {
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #16213e;
+      --bg-tertiary: #0f3460;
+      --bg-hover: #1f4068;
+      --text-primary: #e8e8e8;
+      --text-secondary: #a0a0a0;
+      --accent: #e94560;
+      --accent-hover: #ff6b6b;
+      --success: #4ecca3;
+      --border: #2a2a4a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .settings-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .settings-header {
+      margin-bottom: 40px;
+    }
+
+    .settings-header h1 {
+      font-size: 32px;
+      font-weight: 300;
+      margin-bottom: 8px;
+    }
+
+    .settings-header p {
+      color: var(--text-secondary);
+    }
+
+    .settings-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+
+    .settings-nav button {
+      padding: 10px 20px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .settings-nav button:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .settings-nav button.active {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .settings-section {
+      display: none;
+    }
+
+    .settings-section.active {
+      display: block;
+    }
+
+    .settings-card {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .settings-card h3 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-info {
+      flex: 1;
+    }
+
+    .setting-info h4 {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .setting-info p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .setting-control {
+      flex-shrink: 0;
+      margin-left: 20px;
+    }
+
+    input[type="checkbox"] {
+      width: 44px;
+      height: 24px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    input[type="text"], input[type="password"], input[type="number"], select {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 14px;
+      outline: none;
+      min-width: 200px;
+    }
+
+    input[type="text"]:focus, input[type="password"]:focus, select:focus {
+      border-color: var(--accent);
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-hover);
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .theme-preview {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .theme-option {
+      flex: 1;
+      padding: 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .theme-option:hover {
+      border-color: var(--text-secondary);
+    }
+
+    .theme-option.selected {
+      border-color: var(--accent);
+      background: var(--bg-tertiary);
+    }
+
+    .theme-option .preview {
+      height: 60px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .theme-option.light .preview {
+      background: #ffffff;
+    }
+
+    .theme-option.dark .preview {
+      background: #1a1a2e;
+    }
+
+    .theme-option.auto .preview {
+      background: linear-gradient(90deg, #ffffff 50%, #1a1a2e 50%);
+    }
+
+    .shortcut-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .shortcut-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: var(--bg-primary);
+      border-radius: 6px;
+    }
+
+    .shortcut-key {
+      padding: 6px 12px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    .about-info {
+      text-align: center;
+      padding: 40px 0;
+    }
+
+    .about-logo {
+      font-size: 48px;
+      font-weight: 300;
+      background: linear-gradient(135deg, var(--accent), var(--success));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+
+    .about-version {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .about-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .about-links a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .about-links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="settings-container">
+    <div class="settings-header">
+      <h1>Settings</h1>
+      <p>Customize your Nexus Browser experience</p>
+    </div>
+
+    <div class="settings-nav">
+      <button class="active" data-section="general">General</button>
+      <button data-section="privacy">Privacy & Security</button>
+      <button data-section="appearance">Appearance</button>
+      <button data-section="extensions">Extensions</button>
+      <button data-section="passwords">Passwords</button>
+      <button data-section="shortcuts">Shortcuts</button>
+      <button data-section="about">About</button>
+    </div>
+
+    <div id="general" class="settings-section active">
+      <div class="settings-card">
+        <h3>Startup</h3>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>On startup</h4>
+            <p>Choose what to show when Nexus starts</p>
+          </div>
+          <div class="setting-control">
+            <select id="startup-action">
+              <option value="home">Open home page</option>
+              <option value="last">Continue where you left off</option>
+              <option value="custom">Open specific pages</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>Search Engine</h3>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Default search engine</h4>
+            <p>Used when searching from the address bar</p>
+          </div>
+          <div class="setting-control">
+            <select id="search-engine">
+              <option value="google">Google</option>
+              <option value="bing">Bing</option>
+              <option value="duckduckgo">DuckDuckGo</option>
+              <option value="brave">Brave Search</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>Downloads</h3>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Ask where to save each file</h4>
+            <p>Show a save dialog before each download</p>
+          </div>
+          <div class="setting-control">
+            <input type="checkbox" id="ask-download-path">
+          </div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Download location</h4>
+            <p>Default folder for downloads</p>
+          </div>
+          <div class="setting-control">
+            <input type="text" id="download-path" readonly>
+            <button class="btn btn-secondary" onclick="changeDownloadPath()">Change</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+      </div>
+    </div>
+
+    <div id="privacy" class="settings-section">
+      <div class="settings-card">
+        <h3>Privacy Shield</h3>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Enable Privacy Shield</h4>
+            <p>Block trackers and ads automatically</p>
+          </div>
+          <div class="setting-control">
+            <input type="checkbox" id="privacy-enabled" checked>
+          </div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Block trackers</h4>
+            <p>Prevent known tracking scripts from loading</p>
+          </div>
+          <div class="setting-control">
+            <input type="checkbox" id="block-trackers" checked>
+          </div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Block ads</h4>
+            <p>Hide advertisements on websites</p>
+          </div>
+          <div class="setting-control">
+            <input type="checkbox" id="block-ads" checked>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>Security</h3>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Do Not Track</h4>
+            <p>Send DNT header with requests</p>
+          </div>
+          <div class="setting-control">
+            <input type="checkbox" id="do-not-track">
+          </div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Block third-party cookies</h4>
+            <p>Prevent cross-site tracking via cookies</p>
+          </div>
+          <div class="setting-control">
+            <input type="checkbox" id="block-third-party-cookies" checked>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>Data</h3>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Clear browsing data</h4>
+            <p>Remove history, cookies, and cache</p>
+          </div>
+          <div class="setting-control">
+            <button class="btn btn-danger" onclick="clearBrowsingData()">Clear Data</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+      </div>
+    </div>
+
+    <div id="appearance" class="settings-section">
+      <div class="settings-card">
+        <h3>Theme</h3>
+        <div class="theme-preview">
+          <div class="theme-option light" onclick="selectTheme('light')">
+            <div class="preview"></div>
+            <span>Light</span>
+          </div>
+          <div class="theme-option dark selected" onclick="selectTheme('dark')">
+            <div class="preview"></div>
+            <span>Dark</span>
+          </div>
+          <div class="theme-option auto" onclick="selectTheme('auto')">
+            <div class="preview"></div>
+            <span>Auto</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>Toolbar</h3>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Show home button</h4>
+            <p>Display home button in navigation bar</p>
+          </div>
+          <div class="setting-control">
+            <input type="checkbox" id="show-home-btn" checked>
+          </div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Show reading mode button</h4>
+            <p>Display reading mode in URL bar</p>
+          </div>
+          <div class="setting-control">
+            <input type="checkbox" id="show-reading-btn" checked>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+      </div>
+    </div>
+
+    <div id="extensions" class="settings-section">
+      <div class="settings-card">
+        <h3>Installed Extensions</h3>
+        <div id="installed-extensions-list">
+          <p style="color: var(--text-secondary);">No extensions installed</p>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>Add Extensions</h3>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Install from Chrome Web Store</h4>
+            <p>Enter extension ID to install</p>
+          </div>
+          <div class="setting-control">
+            <input type="text" id="extension-id-input" placeholder="Extension ID">
+            <button class="btn btn-primary" onclick="installExtension()">Install</button>
+          </div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Load unpacked extension</h4>
+            <p>Load extension from local folder</p>
+          </div>
+          <div class="setting-control">
+            <button class="btn btn-secondary" onclick="loadUnpacked()">Load Unpacked</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="passwords" class="settings-section">
+      <div class="settings-card">
+        <h3>Password Manager</h3>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Offer to save passwords</h4>
+            <p>Automatically prompt to save login credentials</p>
+          </div>
+          <div class="setting-control">
+            <input type="checkbox" id="save-passwords" checked>
+          </div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Auto-fill passwords</h4>
+            <p>Automatically fill saved passwords</p>
+          </div>
+          <div class="setting-control">
+            <input type="checkbox" id="autofill-passwords" checked>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <h3>Import/Export</h3>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Export passwords</h4>
+            <p>Save passwords to encrypted file</p>
+          </div>
+          <div class="setting-control">
+            <button class="btn btn-secondary" onclick="exportPasswords()">Export</button>
+          </div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h4>Import passwords</h4>
+            <p>Load passwords from exported file</p>
+          </div>
+          <div class="setting-control">
+            <button class="btn btn-secondary" onclick="importPasswords()">Import</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+      </div>
+    </div>
+
+    <div id="shortcuts" class="settings-section">
+      <div class="settings-card">
+        <h3>Keyboard Shortcuts</h3>
+        <div class="shortcut-list">
+          <div class="shortcut-item">
+            <span>New Tab</span>
+            <span class="shortcut-key">Ctrl+T</span>
+          </div>
+          <div class="shortcut-item">
+            <span>Close Tab</span>
+            <span class="shortcut-key">Ctrl+W</span>
+          </div>
+          <div class="shortcut-item">
+            <span>Focus URL Bar</span>
+            <span class="shortcut-key">Ctrl+L</span>
+          </div>
+          <div class="shortcut-item">
+            <span>Refresh</span>
+            <span class="shortcut-key">Ctrl+R</span>
+          </div>
+          <div class="shortcut-item">
+            <span>Back</span>
+            <span class="shortcut-key">Alt+Left</span>
+          </div>
+          <div class="shortcut-item">
+            <span>Forward</span>
+            <span class="shortcut-key">Alt+Right</span>
+          </div>
+          <div class="shortcut-item">
+            <span>Home</span>
+            <span class="shortcut-key">Alt+Home</span>
+          </div>
+          <div class="shortcut-item">
+            <span>Find</span>
+            <span class="shortcut-key">Ctrl+F</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="about" class="settings-section">
+      <div class="about-info">
+        <div class="about-logo">Nexus</div>
+        <div class="about-version">Version 1.0.0</div>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">
+          A next-generation browser built on Electron/Chromium<br>
+          with full Chrome Web Store extension support.
+        </p>
+        <div class="about-links">
+          <a href="#">Documentation</a>
+          <a href="#">GitHub</a>
+          <a href="#">Report Issue</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.settings-nav button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.settings-nav button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.section).classList.add('active');
+      });
+    });
+
+    function selectTheme(theme) {
+      document.querySelectorAll('.theme-option').forEach(opt => opt.classList.remove('selected'));
+      document.querySelector(`.theme-option.${theme}`).classList.add('selected');
+    }
+
+    function saveSettings() {
+      const settings = {
+        general: {
+          startupAction: document.getElementById('startup-action').value,
+          searchEngine: document.getElementById('search-engine').value,
+          askDownloadPath: document.getElementById('ask-download-path').checked
+        },
+        privacy: {
+          enabled: document.getElementById('privacy-enabled').checked,
+          blockTrackers: document.getElementById('block-trackers').checked,
+          blockAds: document.getElementById('block-ads').checked,
+          doNotTrack: document.getElementById('do-not-track').checked,
+          blockThirdPartyCookies: document.getElementById('block-third-party-cookies').checked
+        },
+        appearance: {
+          theme: document.querySelector('.theme-option.selected')?.className.split(' ')[1] || 'dark',
+          showHomeBtn: document.getElementById('show-home-btn').checked,
+          showReadingBtn: document.getElementById('show-reading-btn').checked
+        },
+        passwords: {
+          savePasswords: document.getElementById('save-passwords').checked,
+          autofillPasswords: document.getElementById('autofill-passwords').checked
+        }
+      };
+
+      if (window.electronAPI) {
+        window.electronAPI.settings.saveSettings(settings);
+      }
+
+      alert('Settings saved successfully!');
+    }
+
+    function clearBrowsingData() {
+      if (confirm('Are you sure you want to clear all browsing data?')) {
+        alert('Browsing data cleared.');
+      }
+    }
+
+    function changeDownloadPath() {
+      alert('Download path changed.');
+    }
+
+    function installExtension() {
+      const id = document.getElementById('extension-id-input').value.trim();
+      if (id && window.electronAPI) {
+        window.electronAPI.extensions.installFromWebStore(id);
+      }
+    }
+
+    function loadUnpacked() {
+      if (window.electronAPI) {
+        window.electronAPI.extensions.loadUnpacked();
+      }
+    }
+
+    function exportPasswords() {
+      const masterPassword = prompt('Enter master password:');
+      if (masterPassword && window.electronAPI) {
+        window.electronAPI.passwords.exportPasswords(masterPassword);
+      }
+    }
+
+    function importPasswords() {
+      const masterPassword = prompt('Enter master password:');
+      if (masterPassword && window.electronAPI) {
+        window.electronAPI.passwords.importPasswords('', masterPassword);
+      }
+    }
+  </script>
+</body>
+</html>
