@@ -48,11 +48,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Run OpenCode in opencode folder
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}
-          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
         run: |
           if [ ! -d "opencode" ]; then
             echo "Folder ./opencode does not exist"
@@ -61,7 +56,7 @@ jobs:
 
           cd opencode
 
-          opencode run "${{ github.event.inputs.prompt }}"
+          opencode run "you are an non-respondable agent, configured in github actions. you have to complete the following request withing six hours: ${{ github.event.inputs.prompt }}. after each edit, commit what youve done. write instructions for your future self down in a .opencode folder, in styles that are simular to those written on `opencode.ai/docs`" --model deepseek-v4-flash --variant max
 
       - name: Show changes
         run: |
