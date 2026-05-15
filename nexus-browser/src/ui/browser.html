@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+  <title>Nexus Browser</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <div id="titlebar">
+      <div class="titlebar-drag-region"></div>
+      <div class="window-controls">
+        <button class="window-control" id="minimize-btn" title="Minimize">─</button>
+        <button class="window-control" id="maximize-btn" title="Maximize">□</button>
+        <button class="window-control" id="close-btn" title="Close">✕</button>
+      </div>
+    </div>
+
+    <div id="toolbar">
+      <div class="nav-buttons">
+        <button id="back-btn" class="nav-btn" title="Go back">←</button>
+        <button id="forward-btn" class="nav-btn" title="Go forward">→</button>
+        <button id="refresh-btn" class="nav-btn" title="Refresh">⟳</button>
+        <button id="home-btn" class="nav-btn" title="Home">⌂</button>
+      </div>
+
+      <div class="url-bar-container">
+        <div id="url-bar" class="url-bar">
+          <span id="security-icon" class="security-icon">🔒</span>
+          <input type="text" id="url-input" class="url-input" placeholder="Search or enter web address" spellcheck="false">
+          <button id="star-btn" class="url-btn" title="Bookmark this page">☆</button>
+        </div>
+      </div>
+
+      <div class="toolbar-actions">
+        <button id="extensions-btn" class="toolbar-btn" title="Extensions">🧩</button>
+        <button id="menu-btn" class="toolbar-btn" title="Menu">☰</button>
+      </div>
+    </div>
+
+    <div id="tab-bar">
+      <div id="tabs" class="tabs"></div>
+      <button id="new-tab-btn" class="new-tab-btn" title="New tab">+</button>
+    </div>
+
+    <div id="content-area">
+      <div id="webview-container"></div>
+      <div id="home-page" class="home-page">
+        <div class="home-content">
+          <h1 class="logo">Nexus</h1>
+          <p class="tagline">Fast. Private. Extensible.</p>
+          <div class="search-box">
+            <input type="text" id="home-search" placeholder="Search the web..." class="home-search-input">
+          </div>
+          <div id="quick-links" class="quick-links"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="status-bar">
+      <span id="status-text"></span>
+      <span id="zoom-level">100%</span>
+    </div>
+
+    <div id="extensions-panel" class="panel hidden">
+      <div class="panel-header">
+        <h2>Extensions</h2>
+        <button id="close-extensions" class="close-btn">×</button>
+      </div>
+      <div class="panel-content">
+        <div id="installed-extensions" class="extensions-list"></div>
+        <button id="install-extension-btn" class="action-btn">Install Extension from File</button>
+        <a href="https://chrome.google.com/webstore" target="_blank" class="chrome-web-store-link">
+          Browse Chrome Web Store →
+        </a>
+      </div>
+    </div>
+
+    <div id="bookmarks-panel" class="panel hidden">
+      <div class="panel-header">
+        <h2>Bookmarks</h2>
+        <button id="close-bookmarks" class="close-btn">×</button>
+      </div>
+      <div class="panel-content">
+        <div id="bookmarks-list" class="bookmarks-list"></div>
+      </div>
+    </div>
+
+    <div id="menu-panel" class="panel hidden">
+      <div class="panel-content">
+        <button id="menu-new-tab" class="menu-item">New Tab</button>
+        <button id="menu-new-window" class="menu-item">New Window</button>
+        <div class="menu-divider"></div>
+        <button id="menu-bookmarks" class="menu-item">Bookmarks</button>
+        <button id="menu-history" class="menu-item">History</button>
+        <button id="menu-downloads" class="menu-item">Downloads</button>
+        <div class="menu-divider"></div>
+        <button id="menu-extensions" class="menu-item">Extensions</button>
+        <button id="menu-settings" class="menu-item">Settings</button>
+        <div class="menu-divider"></div>
+        <button id="menu-zoom-in" class="menu-item">Zoom In</button>
+        <button id="menu-zoom-out" class="menu-item">Zoom Out</button>
+        <button id="menu-reset-zoom" class="menu-item">Reset Zoom</button>
+        <div class="menu-divider"></div>
+        <button id="menu-about" class="menu-item">About Nexus Browser</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="browser.js"></script>
+</body>
+</html>
