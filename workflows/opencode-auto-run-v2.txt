@@ -1,0 +1,189 @@
+name: OpenCode Auto Run v2
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: "What should OpenCode do? Be specific for best results."
+        required: true
+        default: "Inspect this project and improve it where useful."
+      branch:
+        description: "Branch to run on"
+        required: true
+        default: "main"
+      model:
+        description: "AI model to use"
+        required: false
+        default: "opencode/qwen3.6-plus-free"
+      working_directory:
+        description: "Subdirectory to work in (leave empty for repo root)"
+        required: false
+        default: ""
+
+permissions: write-all
+
+jobs:
+  opencode:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Pre-flight checks
+        id: preflight
+        run: |
+          echo "=== Environment Info ==="
+          echo "Runner OS: $RUNNER_OS"
+          echo "Node version: $(node --version 2>/dev/null || echo 'not installed')"
+          echo "Python version: $(python3 --version 2>/dev/null || echo 'not installed')"
+          echo "Disk space: $(df -h / | tail -1)"
+          echo "Memory: $(free -h | grep Mem)"
+          echo ""
+          echo "=== Repository State ==="
+          echo "Current branch: $(git branch --show-current)"
+          echo "Last commit: $(git log -1 --oneline)"
+          echo "File count: $(find . -not -path './.git/*' -type f | wc -l)"
+          echo ""
+
+          if [ -n "${{ github.event.inputs.working_directory }}" ]; then
+            if [ ! -d "${{ github.event.inputs.working_directory }}" ]; then
+              echo "::error::Working directory '${{ github.event.inputs.working_directory }}' does not exist"
+              exit 1
+            fi
+            echo "Working directory verified: ${{ github.event.inputs.working_directory }}"
+          fi
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends curl git jq
+
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Verify OpenCode
+        run: |
+          opencode --version
+          echo "OpenCode installed successfully"
+
+      - name: Configure git
+        run: |
+          git config user.name "opencode-agent[bot]"
+          git config user.email "opencode-agent@users.noreply.github.com"
+
+      - name: Run OpenCode
+        id: opencode_run
+        run: |
+          TARGET_DIR="."
+          if [ -n "${{ github.event.inputs.working_directory }}" ]; then
+            TARGET_DIR="${{ github.event.inputs.working_directory }}"
+          fi
+
+          cd "$TARGET_DIR"
+
+          SYSTEM_PROMPT="You are an autonomous AI agent running in GitHub Actions. You have the following characteristics and constraints:
+
+          ROLE: You are a skilled software engineer with expertise in code review, refactoring, bug fixing, and feature implementation.
+
+          BEHAVIOR RULES:
+          1. Always read and understand existing code before making changes
+          2. Follow the existing code style and conventions of the project
+          3. Make incremental, well-tested changes
+          4. Never break existing functionality
+          5. Write clear, concise code without unnecessary comments
+          6. Prefer editing existing files over creating new ones
+          7. Always verify your changes work before committing
+
+          WORKFLOW:
+          1. Explore the codebase to understand structure and conventions
+          2. Plan your changes mentally before executing
+          3. Make one logical change at a time
+          4. After each file edit, commit immediately with a descriptive message
+          5. Run any available tests or linting after changes
+          6. If something fails, diagnose and fix before proceeding
+
+          COMMIT STANDARDS:
+          - Use conventional commit format when possible (feat:, fix:, refactor:, docs:, chore:)
+          - Keep commits atomic - one logical change per commit
+          - Write meaningful commit messages that explain WHAT and WHY
+
+          ERROR HANDLING:
+          - If a tool fails, retry once with adjusted parameters
+          - If stuck, document the issue in a comment and move on
+          - Never leave the codebase in a broken state
+
+          TIME CONSTRAINT: You have 6 hours to complete your task. Prioritize high-impact changes."
+
+          FULL_PROMPT="${SYSTEM_PROMPT}
+
+          USER REQUEST: ${{ github.event.inputs.prompt }}
+
+          Remember: After each edit, commit what you've done. Write instructions for your future self down in a .opencode folder, in styles that are similar to those written on opencode.ai/docs"
+
+          echo "=== Starting OpenCode Run ==="
+          echo "Model: ${{ github.event.inputs.model }}"
+          echo "Working directory: $TARGET_DIR"
+          echo "Prompt length: ${#FULL_PROMPT} characters"
+          echo ""
+
+          opencode run "$FULL_PROMPT" --model "${{ github.event.inputs.model }}"
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Capture run summary
+        if: always()
+        run: |
+          echo "=== Run Summary ==="
+          echo "Status: ${{ steps.opencode_run.outcome }}"
+          echo "Branch: ${{ github.event.inputs.branch }}"
+          echo "Model: ${{ github.event.inputs.model }}"
+          echo ""
+          echo "=== Git Status ==="
+          git status
+          echo ""
+          echo "=== Recent Commits ==="
+          git log --oneline -10 || true
+          echo ""
+          echo "=== Changes Summary ==="
+          git diff --stat HEAD~1..HEAD 2>/dev/null || echo "No previous commit to compare"
+
+      - name: Commit remaining changes
+        if: always()
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add -A
+
+          git commit -m "opencode: automated changes from workflow run
+
+          Triggered by: ${{ github.actor }}
+          Model: ${{ github.event.inputs.model }}
+          Branch: ${{ github.event.inputs.branch }}"
+
+      - name: Push changes
+        if: always()
+        run: |
+          git push origin HEAD:${{ github.event.inputs.branch }}
+
+      - name: Upload run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencode-run-output
+          path: |
+            **/*.md
+            **/*.txt
+          retention-days: 30
+          if-no-files-found: ignore
