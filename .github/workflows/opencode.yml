@@ -12,9 +12,8 @@ on:
         required: true
         default: "main"
 
-permissions:
-  contents: write
-  actions: write
+permissions: write-all
+  
   
 
 jobs:
