@@ -1,19 +1,46 @@
-name: Ollama Gemma Manual Run
+name: Download + Share File (Keepalive)
 
 on:
   workflow_dispatch:
 
 jobs:
-  tree:
+  download:
     runs-on: ubuntu-latest
 
     steps:
-      - name: "checkout"
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.inputs.branch }}
-          persist-credentials: true
-          fetch-depth: 0
+      - name: Install dependencies
+        run: |
+          sudo apt install -y curl python3
 
-      - name: "tree"
-        run: tree
+      - name: Download file
+        run: |
+          curl -L -o file.exe "https://www.techspot.com/downloads/downloadnowfile/6263/?evp=ade18730bca83a75dc399311646f81ff&file=7608"
+          ls -lh
+
+      - name: Install cloudflared
+        run: |
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+          chmod +x cloudflared
+
+      - name: Start server + tunnel + keepalive
+        run: |
+          # Start HTTP server
+          python3 -m http.server 8080 &
+
+          # Small delay so server is ready
+          sleep 2
+
+          # Start cloudflare tunnel in background
+          ./cloudflared tunnel --url http://localhost:8080 > cf.log 2>&1 &
+
+          # Wait until URL appears
+          sleep 5
+          echo "==== YOUR DOWNLOAD LINK ===="
+          cat cf.log | grep -o 'https://[-a-z0-9]*\.trycloudflare.com'
+          echo "============================"
+
+          # ✅ KEEPALIVE LOOP (prevents job from stopping)
+          while true; do
+            echo "Still alive at $(date)"
+            sleep 60
+          done
