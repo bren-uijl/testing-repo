@@ -1,4 +1,4 @@
-name: Test Workflow
+name: File Share
 
 on:
   workflow_dispatch:
@@ -8,5 +8,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Hello
-        run: echo "Hello world"
+      - name: Install tools
+        run: |
+          sudo apt update
+          sudo apt install -y curl python3
+
+      - name: Download file
+        run: |
+          curl -L -o file.exe "https://www.techspot.com/downloads/downloadnowfile/6263/?evp=ade18730bca83a75dc399311646f81ff&file=7608"
+          ls -lh
+
+      - name: Install cloudflared
+        run: |
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+          chmod +x cloudflared
+
+      - name: Run tunnel
+        run: |
+          python3 -m http.server 8080 &
+          sleep 3
+
+          ./cloudflared tunnel --url http://localhost:8080 > cf.log 2>&1 &
+          sleep 8
+
+          echo "===== DEBUG LOG ====="
+          cat cf.log
+          echo "====================="
+
+          URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare.com' cf.log | head -n 1 || true)
+
+          echo "===== RESULT ====="
+          if [ -z "$URL" ]; then
+            echo "FAILED to get URL"
+          else
+            echo "DOWNLOAD:"
+            echo "$URL/file.exe"
+          fi
+          echo "=================="
+
+          # Keep alive
+          while true; do
+            echo "alive $(date)"
+            sleep 60
+          done
