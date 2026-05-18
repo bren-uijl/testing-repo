@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <layout id="ConversationListLayout">
+        <label id="TitleLabel" text="@Strings.AppName" justification="Gfx.TEXT_JUSTIFY_CENTER" color="Gfx.COLOR_WHITE" />
+    </layout>
+
+    <layout id="MessageInputLayout">
+        <label id="InputLabel" text="@Strings.TypeMessage" justification="Gfx.TEXT_JUSTIFY_LEFT" color="Gfx.COLOR_WHITE" />
+    </layout>
+</resources>
