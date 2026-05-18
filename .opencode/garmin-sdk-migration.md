@@ -7,6 +7,7 @@ The Garmin AI Chat app was migrated to match the current Connect IQ SDK API. Thi
 **Migration Date:** May 18, 2026
 **Target SDK:** Connect IQ 4.x/5.x
 **Target Device:** vivoactive 5
+**Current Version:** v1.1.0
 
 ---
 
@@ -126,6 +127,9 @@ Added `using Toybox.Json;` to files that use `Json.encode()` or `Json.decode()`:
 Added `using Toybox.Time;` to:
 - `source/Message.mc`
 
+Added `using Toybox.System;` to:
+- `source/PropertyStore.mc`
+
 ### 6. getInitialView() Return Format
 
 **Old:**
@@ -152,6 +156,63 @@ The `getInitialView()` method should return both view and delegate as an array.
 
 ---
 
+## Bug Fixes
+
+### 1. Undefined Variable in MessageInputView
+- **Issue:** `storage` was referenced in `onSendComplete()` but not defined as class member
+- **Fix:** Added `storage` as class member, initialized in `initialize()`
+
+### 2. Direct Array Access
+- **Issue:** `conversation.messages.remove()` accessed internal array directly
+- **Fix:** Added `Conversation.removeLastMessage()` method
+
+### 3. Memory Overflow Prevention
+- **Issue:** No limit on conversations or messages could fill device memory
+- **Fix:** Added `MAX_CONVERSATIONS = 20` and `MAX_MESSAGES_PER_CONVERSATION = 30`
+- Auto-evicts oldest conversation when limit reached
+- Auto-removes oldest messages when per-conversation limit reached
+
+### 4. Bounds Checking
+- **Issue:** `setApiKeyPart(index)` had no bounds validation
+- **Fix:** Added index validation (0-9 range)
+
+### 5. Null Safety
+- **Issue:** Corrupted data could cause crashes
+- **Fix:** Added null checks in:
+  - `Conversation.load()`
+  - `Message.fromDictionary()`
+  - `ConversationListView.loadConversations()`
+  - `ConversationView.loadData()`
+  - `NviApiClient.onResponse()`
+
+---
+
+## New Features Added
+
+### 1. System Prompt Support
+- Configurable system prompt stored in PropertyStore
+- Included in API requests as first message
+- Reset to default via Settings menu
+- Default: "You are a helpful assistant on a Garmin watch. Keep responses concise and under 200 characters."
+
+### 2. Improved Error Messages
+- User-friendly messages for common HTTP codes:
+  - 401: "Invalid API key"
+  - 403: "Access denied"
+  - 429: "Rate limited, try later"
+  - 500: "Server error"
+  - 503: "Service unavailable"
+- Truncated API error messages to fit watch screen
+
+### 3. Swipe-to-Delete Conversations
+- Swipe left to enter delete mode
+- Red visual indicator for delete mode
+- Tap conversation to select for deletion
+- Tap New button to confirm deletion
+- Swipe right to exit delete mode
+
+---
+
 ## API Reference Changes Summary
 
 | Old API | New API | Status |
@@ -162,6 +223,16 @@ The `getInitialView()` method should return both view and delegate as an array.
 | `WatchUi.getView()` | Store view reference in delegate | Required |
 | `new Time.Gregorian(ms)` | Use relative time or `new Time.Duration(ms)` | Required |
 | `[view]` return from getInitialView | `[view, delegate]` | Required |
+
+---
+
+## PropertyStore Constants
+
+```monkeyc
+MAX_CONVERSATIONS = 20
+MAX_MESSAGES_PER_CONVERSATION = 30
+API_KEY_SEGMENT_COUNT = 10
+```
 
 ---
 
@@ -189,14 +260,14 @@ monkeydo dist/AIChat.prg vivoactive5
 |------|---------|
 | `source/AiChatApp.mc` | Fixed getInitialView, pushView patterns |
 | `source/ApiKeyInputView.mc` | Fixed Rez.Strings, delegate pattern |
-| `source/Conversation.mc` | No changes needed |
-| `source/ConversationListView.mc` | Fixed Rez.Strings, delegate pattern |
-| `source/ConversationView.mc` | Fixed Rez.Strings, delegate pattern, pushView |
-| `source/Message.mc` | Fixed Time API, added imports |
-| `source/MessageInputView.mc` | Fixed Rez.Strings, delegate pattern, added Json import |
-| `source/NviApiClient.mc` | Fixed makeWebRequest, WebResponseDelegate, added Json import |
-| `source/PropertyStore.mc` | No changes needed |
-| `source/SettingsView.mc` | Fixed Rez.Strings, delegate pattern |
+| `source/Conversation.mc` | Added removeLastMessage(), message limit, null safety |
+| `source/ConversationListView.mc` | Fixed Rez.Strings, delegate pattern, added delete mode |
+| `source/ConversationView.mc` | Fixed Rez.Strings, delegate pattern, null safety |
+| `source/Message.mc` | Fixed Time API, added null safety |
+| `source/MessageInputView.mc` | Fixed Rez.Strings, delegate pattern, storage bug |
+| `source/NviApiClient.mc` | Fixed makeWebRequest, WebResponseDelegate, error messages |
+| `source/PropertyStore.mc` | Added limits, system prompt, bounds checking |
+| `source/SettingsView.mc` | Fixed Rez.Strings, added system prompt option |
 | `phone/source/AiChatPhoneApp.mc` | Fixed getInitialView, added Json import |
 | `phone/source/PhoneSettingsView.mc` | Fixed delegate pattern |
 
@@ -210,14 +281,14 @@ monkeydo dist/AIChat.prg vivoactive5
 3. Test on physical device
 
 ### Priority 2
-4. Add proper error handling for HTTP timeouts
-5. Implement conversation truncation for memory limits
-6. Add haptic feedback on send/receive
+4. Add proper launcher icon (48x48 PNG)
+5. Implement streaming response support
+6. Add conversation export
 
 ### Priority 3
-7. Add streaming response support
-8. Implement conversation search
-9. Add custom system prompt support
+7. Add conversation search
+8. Add temperature control per conversation
+9. Add message editing
 
 ---
 
@@ -230,4 +301,4 @@ monkeydo dist/AIChat.prg vivoactive5
 
 ---
 
-*These instructions are for the next agent session. The app targets vivoactive 5 with Connect IQ SDK 4.x/5.x.*
+*These instructions are for the next agent session. The app targets vivoactive 5 with Connect IQ SDK 4.x/5.x. Current version: v1.1.0.*
