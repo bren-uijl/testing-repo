@@ -3,102 +3,17 @@ name: Ollama Gemma Manual Run
 on:
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  run-gemma:
-    runs-on: macos-26-intel
+  tree:
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Ollama
-        run: |
-          curl -fsSL https://ollama.com/install.sh | sh || true
-
-          # Find actual binary
-          OLLAMA_BIN=$(find /Applications/Ollama.app -type f -name ollama | head -n 1)
-
-          echo "Found Ollama binary: $OLLAMA_BIN"
-
-          sudo ln -sf "$OLLAMA_BIN" /usr/local/bin/ollama
-
-          ollama --version
-
-      - name: Start Ollama
-        run: |
-          nohup ollama serve > ollama.log 2>&1 &
-
-          echo "Waiting for Ollama..."
-
-          for i in {1..60}; do
-            if curl -s http://127.0.0.1:11434/api/tags >/dev/null; then
-              echo "Ollama is ready"
-              break
-            fi
-            sleep 2
-          done
-
-      - name: Pull model
-        run: |
-          ollama pull granite4.1:8b
-
-      - name: Run prompt
-        run: |
-          mkdir -p responses
-
-          echo "folder made"
-
-          TIMESTAMP=$(date +"%m%d%H%M%S")
-          FILE="responses/${TIMESTAMP}.md"
-
-          echo "got date and time"
-
-          PROMPT="Why is the sky blue?"
-
-          echo "got prompt"
-
-          echo "sending response..."
-
-          RESPONSE=$(curl -s http://127.0.0.1:11434/api/chat \
-            -d "{
-              \"model\": \"granite4.1:8b\",
-              \"messages\": [
-                {
-                  \"role\": \"user\",
-                  \"content\": \"$PROMPT\"
-                }
-              ],
-              \"stream\": false
-            }" | jq -r '.message.content')
-
-          {
-            echo "# Prompt"
-            echo
-            echo "$PROMPT"
-            echo
-            echo "# Response"
-            echo
-            echo "$RESPONSE"
-          } > "$FILE"
-
-          cat "$FILE"
-
-      - name: Commit responses to repo
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add responses/*.md
-
-          git commit -m "Add Ollama response" || echo "Nothing to commit"
-
-          git push
-
-
-      - name: Upload responses
-        uses: actions/upload-artifact@v4
+      - name: "checkout"
+        uses: actions/checkout@v4
         with:
-          name: responses
-          path: responses/
+          ref: ${{ github.event.inputs.branch }}
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: "tree"
+        run: tree
