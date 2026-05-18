@@ -11,6 +11,8 @@ class ConversationView extends WatchUi.View
     var isLoading;
     var errorMessage;
     var storage;
+    var loadingDots;
+    var loadingTimer;
 
     function initialize(convId) {
         View.initialize();
@@ -19,6 +21,8 @@ class ConversationView extends WatchUi.View
         isLoading = false;
         errorMessage = null;
         storage = null;
+        loadingDots = "";
+        loadingTimer = null;
 
         loadData(convId);
     }
@@ -43,6 +47,32 @@ class ConversationView extends WatchUi.View
     function onLayout(dc) {
         if (storage == null) {
             storage = Application.getApp().getPropertyStore();
+        }
+        startLoadingAnimation();
+    }
+
+    function onExit() {
+        if (loadingTimer != null) {
+            System.cancelTimer(loadingTimer);
+        }
+    }
+
+    function startLoadingAnimation() {
+        if (loadingTimer != null) {
+            System.cancelTimer(loadingTimer);
+        }
+        loadingTimer = System.setTimer(500, method(:updateLoadingDots), null);
+    }
+
+    function updateLoadingDots(info) {
+        if (loadingDots.length() >= 3) {
+            loadingDots = "";
+        } else {
+            loadingDots = loadingDots + ".";
+        }
+        if (isLoading) {
+            View.requestUpdate();
+            loadingTimer = System.setTimer(500, method(:updateLoadingDots), null);
         }
     }
 
@@ -148,7 +178,7 @@ class ConversationView extends WatchUi.View
             dc.fillRoundedRectangle(replyBtnX, replyBtnY, replyBtnWidth, replyBtnHeight, 8);
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, replyBtnY + 14, Graphics.FONT_SMALL, Rez.Strings.Loading, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, replyBtnY + 14, Graphics.FONT_SMALL, Rez.Strings.Loading + loadingDots, Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         if (errorMessage != null) {
@@ -232,6 +262,16 @@ class ConversationView extends WatchUi.View
 
     function setLoading(loading) {
         isLoading = loading;
+        if (loading) {
+            loadingDots = ".";
+            startLoadingAnimation();
+        } else {
+            if (loadingTimer != null) {
+                System.cancelTimer(loadingTimer);
+                loadingTimer = null;
+            }
+            loadingDots = "";
+        }
         View.requestUpdate();
     }
 

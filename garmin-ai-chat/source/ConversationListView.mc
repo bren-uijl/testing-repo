@@ -80,6 +80,11 @@ class ConversationListView extends WatchUi.View
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         dc.drawText(width / 2, 18, Graphics.FONT_TINY, Rez.Strings.AppName, Graphics.TEXT_JUSTIFY_CENTER);
 
+        if (!storage.isApiKeySet()) {
+            dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(width / 2, 30, Graphics.FONT_TINY, Rez.Strings.NoApiKey, Graphics.TEXT_JUSTIFY_CENTER);
+        }
+
         if (deleteMode) {
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
             dc.drawText(width - 35, 18, Graphics.FONT_TINY, "X", Graphics.TEXT_JUSTIFY_RIGHT);
