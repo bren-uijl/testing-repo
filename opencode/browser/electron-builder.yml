@@ -14,7 +14,7 @@ win:
     - target: nsis
       arch:
         - x64
-  icon: assets/icon.svg
+  icon: assets/icon.png
   artifactName: ${productName}-Setup-${version}.${ext}
 
 nsis:
@@ -24,9 +24,9 @@ nsis:
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: Nexus Browser
-  installerIcon: assets/icon.svg
-  uninstallerIcon: assets/icon.svg
-  installerHeaderIcon: assets/icon.svg
+  installerIcon: assets/icon.png
+  uninstallerIcon: assets/icon.png
+  installerHeaderIcon: assets/icon.png
   include: build/installer.nsh
   license: LICENSE
   differentialPackage: false
@@ -35,7 +35,7 @@ mac:
   target:
     - dmg
     - zip
-  icon: assets/icon.svg
+  icon: assets/icon.png
   category: public.app-category.utilities
 
 linux:

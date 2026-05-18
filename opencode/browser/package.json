@@ -55,7 +55,7 @@
           "arch": ["x64"]
         }
       ],
-      "icon": "assets/icon.svg",
+      "icon": "icon.png",
       "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "nsis": {
@@ -65,16 +65,13 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Nexus Browser",
-      "installerIcon": "assets/icon.svg",
-      "uninstallerIcon": "assets/icon.svg",
-      "installerHeaderIcon": "assets/icon.svg",
       "include": "build/installer.nsh",
       "license": "LICENSE",
       "differentialPackage": false
     },
     "mac": {
       "target": ["dmg", "zip"],
-      "icon": "assets/icon.svg",
+      "icon": "icon.png",
       "category": "public.app-category.utilities"
     },
     "linux": {
