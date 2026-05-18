@@ -107,6 +107,18 @@ class PhoneSettingsView extends WatchUi.View
         var y = evt.getY();
 
         if (y >= 110 && y <= 150) {
+            WatchUi.invokeTextInput(
+                new PhoneTextInputDelegate(self),
+                { :title => "Enter NVIDIA API Key", :maxSize => 70 }
+            );
+        }
+    }
+
+    function onApiKeyEntered(text) {
+        if (text != null && text.length() > 0) {
+            apiKeyInput = text;
+            storage.setApiKey(text);
+            View.requestUpdate();
         }
     }
 
@@ -129,6 +141,20 @@ class PhoneSettingsView extends WatchUi.View
         statusMessage = "Synced to watch!";
         View.requestUpdate();
         return true;
+    }
+end
+
+class PhoneTextInputDelegate extends WatchUi.TextConfirmationDelegate
+
+    var view;
+
+    function initialize(settingsView) {
+        TextConfirmationDelegate.initialize();
+        view = settingsView;
+    }
+
+    function onConfirmed(text) {
+        view.onApiKeyEntered(text);
     }
 end
 
