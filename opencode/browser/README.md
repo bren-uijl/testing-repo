@@ -35,13 +35,32 @@ npm run dev        # Run with dev flags
 ## Building
 
 ```bash
-npm run build        # Build for current platform
-npm run build:win    # Build for Windows
-npm run build:mac    # Build for macOS
-npm run build:linux  # Build for Linux
-npm run build:all    # Build for all platforms
-npm run package      # Build without publishing
+npm run build              # Build for current platform
+npm run build:win          # Build for Windows
+npm run build:mac          # Build for macOS
+npm run build:linux        # Build for Linux
+npm run build:all          # Build for all platforms
+npm run build:offline      # Build Windows offline installer (.exe)
+npm run build-installer    # Run full installer build script
+npm run package            # Build without publishing
 ```
+
+### Offline Windows Installer
+
+To create a fully offline Windows installer that does not require internet access:
+
+```bash
+npm run build:offline
+```
+
+This produces `dist/Nexus Browser-Setup-1.0.0.exe` - a self-contained installer that includes:
+- All application files
+- All dependencies (bundled in the asar archive)
+- NSIS installer with custom installation options
+- Desktop and Start Menu shortcuts
+- Uninstaller
+
+The installer can be distributed and installed on any Windows machine without requiring Node.js, npm, or internet access.
 
 ## Testing & Linting
 
@@ -71,6 +90,12 @@ npm run format     # Format with Prettier
 ```
 browser/
 ├── package.json                    # Project config, dependencies, build scripts
+├── electron-builder.yml            # Electron-builder configuration for offline installer
+├── README.md                       # User-facing documentation
+├── LICENSE                         # MIT License
+├── .gitignore                      # Git ignore rules
+├── assets/
+│   └── icon.svg                    # Application icon (SVG source)
 ├── src/
 │   ├── main.js                     # Electron main process
 │   ├── preload.js                  # Preload script for secure IPC
@@ -88,9 +113,13 @@ browser/
 │       ├── download-manager.js     # Download handling with pause/resume
 │       ├── reading-mode.js         # Distraction-free reading view
 │       └── password-manager.js     # Encrypted password vault
+├── build/
+│   └── installer.nsh               # NSIS custom installer script
+├── scripts/
+│   └── build-installer.js          # Automated offline installer build script
 └── installers/
-    ├── windows/                    # Windows installer scripts
-    └── linux/                      # Linux installer scripts
+    ├── windows/                    # Windows installer scripts (legacy)
+    └── linux/                      # Linux installer scripts (legacy)
 ```
 
 ## Architecture
