@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string id="AppName">AI Chat</string>
+    <string id="ApiKey">NVIDIA API Key</string>
+    <string id="ApiKeyHint">Enter your 70-character API key</string>
+    <string id="Model">Model</string>
+    <string id="Sync">Sync to Watch</string>
+    <string id="Synced">Synced to watch!</string>
+</resources>
