@@ -62,7 +62,8 @@ class NviApiClient
                 "Content-Type" => "application/json",
                 "Authorization" => "Bearer " + apiKey
             },
-            :body => Json.encode(requestBody)
+            :body => Json.encode(requestBody),
+            :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_STRING
         };
 
         try {

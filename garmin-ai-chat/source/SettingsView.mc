@@ -45,7 +45,7 @@ class SettingsView extends WatchUi.View
 
         items.add({
             :label => "Model",
-            :value => storage.getModel(),
+            :value => getModelDisplayName(storage.getModel()),
             :action => "model"
         });
 
@@ -193,6 +193,36 @@ class SettingsView extends WatchUi.View
         storage.clearAllConversations();
         buildItems();
         View.requestUpdate();
+    }
+
+    function getModelDisplayName(modelId) {
+        if (modelId == null) {
+            return "Unknown";
+        }
+
+        if (modelId.indexOf("nemotron") >= 0) {
+            return "Nemotron Nano 9B";
+        } else if (modelId.indexOf("llama-3.1-8b") >= 0) {
+            return "Llama 3.1 8B";
+        } else if (modelId.indexOf("llama-3.1-70b") >= 0) {
+            return "Llama 3.1 70B";
+        } else if (modelId.indexOf("mistral-7b") >= 0) {
+            return "Mistral 7B";
+        } else if (modelId.indexOf("gemma-2-9b") >= 0) {
+            return "Gemma 2 9B";
+        } else if (modelId.indexOf("gpt-oss-120b") >= 0) {
+            return "GPT-OSS 120B";
+        } else if (modelId.indexOf("gpt-oss-20b") >= 0) {
+            return "GPT-OSS 20B";
+        } else if (modelId.indexOf("mistral-medium") >= 0) {
+            return "Mistral Med 3.5";
+        }
+
+        var parts = modelId.split("/");
+        if (parts.size() > 1) {
+            return parts.get(1);
+        }
+        return modelId;
     }
 
     function onSwipe(evt) {
