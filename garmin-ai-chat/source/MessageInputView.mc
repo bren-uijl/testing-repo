@@ -34,6 +34,7 @@ class MessageInputView extends WatchUi.View
     function onExit() {
         if (cursorTimer != null) {
             System.cancelTimer(cursorTimer);
+            cursorTimer = null;
         }
     }
 
@@ -70,6 +71,11 @@ class MessageInputView extends WatchUi.View
             displayText = displayText + "|";
         }
         dc.drawText(20, inputY + 35, Graphics.FONT_SMALL, displayText, Graphics.TEXT_JUSTIFY_LEFT);
+
+        if (currentText.length() > 0) {
+            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(width - 15, inputY + 35, Graphics.FONT_TINY, currentText.length().toString() + "/500", Graphics.TEXT_JUSTIFY_RIGHT);
+        }
 
         if (errorMessage != null) {
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
