@@ -61,7 +61,7 @@ jobs:
           git checkout -b "$BRANCH"
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
-      - name: Comment: starting work
+      - name: comment starting work
         run: |
           gh issue comment "$ISSUE_NUMBER" \
             --body "🤖 OpenCode started working on this issue..."
