@@ -22,7 +22,9 @@ class NviApiClient
     }
 
     function setModel(m) {
-        model = m;
+        if (m != null && m.length() > 0) {
+            model = m;
+        }
     }
 
     function setCallback(cb) {
@@ -35,6 +37,13 @@ class NviApiClient
         if (apiKey == null || apiKey.length() == 0) {
             if (callback != null) {
                 callback.onComplete(null, "No API key set");
+            }
+            return;
+        }
+
+        if (messages == null || messages.size() == 0) {
+            if (callback != null) {
+                callback.onComplete(null, "No messages to send");
             }
             return;
         }
@@ -72,15 +81,25 @@ class NviApiClient
 
         if (responseCode == 200 && data != null) {
             try {
-                var jsonData = data instanceof Blob ? data.toString() : data;
+                var jsonData = parseDataToString(data);
+                if (jsonData == null || jsonData.length() == 0) {
+                    callback.onComplete(null, "Empty response");
+                    return;
+                }
+
                 var json = Json.decode(jsonData);
                 var choices = json.get(:choices);
                 if (choices != null && choices.size() > 0) {
                     var choice = choices.get(0);
-                    var message = choice.get(:message);
-                    if (message != null) {
-                        callback.onComplete(message.get(:content), null);
-                        return;
+                    if (choice != null) {
+                        var message = choice.get(:message);
+                        if (message != null) {
+                            var content = message.get(:content);
+                            if (content != null && content.length() > 0) {
+                                callback.onComplete(content, null);
+                                return;
+                            }
+                        }
                     }
                 }
                 callback.onComplete(null, "Invalid response format");
@@ -91,11 +110,16 @@ class NviApiClient
             var errorMsg = "HTTP " + responseCode.toString();
             if (data != null) {
                 try {
-                    var jsonData = data instanceof Blob ? data.toString() : data;
-                    var json = Json.decode(jsonData);
-                    var error = json.get(:error);
-                    if (error != null) {
-                        errorMsg = error.get(:message);
+                    var jsonData = parseDataToString(data);
+                    if (jsonData != null && jsonData.length() > 0) {
+                        var json = Json.decode(jsonData);
+                        var error = json.get(:error);
+                        if (error != null) {
+                            var message = error.get(:message);
+                            if (message != null) {
+                                errorMsg = message;
+                            }
+                        }
                     }
                 } catch (e) {
                 }
@@ -106,8 +130,25 @@ class NviApiClient
 
     function onError(error) {
         if (callback != null) {
-            callback.onComplete(null, "Request failed: " + error.toString());
+            var errorMsg = "Request failed";
+            if (error != null) {
+                errorMsg = errorMsg + ": " + error.toString();
+            }
+            callback.onComplete(null, errorMsg);
         }
+    }
+
+    function parseDataToString(data) {
+        if (data == null) {
+            return null;
+        }
+        if (data instanceof Lang.String) {
+            return data;
+        }
+        if (data instanceof Blob) {
+            return data.toString();
+        }
+        return data.toString();
     }
 end
 

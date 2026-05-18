@@ -25,9 +25,18 @@ class ConversationView extends WatchUi.View
 
     function loadData(convId) {
         storage = Application.getApp().getPropertyStore();
+        if (convId == null || convId.length() == 0) {
+            conversation = null;
+            return;
+        }
         var data = storage.getConversation(convId);
         if (data != null) {
-            conversation = Conversation.load(convId, data);
+            try {
+                conversation = Conversation.load(convId, data);
+            } catch (e) {
+                System.println("Failed to load conversation: " + e.toString());
+                conversation = null;
+            }
         }
     }
 
@@ -210,7 +219,7 @@ class ConversationView extends WatchUi.View
         if (error != null) {
             errorMessage = error;
         } else if (response != null) {
-            conversation.messages.remove(conversation.messages.size() - 1);
+            conversation.removeLastMessage();
 
             var assistantMsg = Message.assistantMessage(response);
             conversation.addMessage(assistantMsg);

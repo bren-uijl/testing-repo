@@ -34,10 +34,19 @@ class ConversationListView extends WatchUi.View
 
         for (var i = 0; i < ids.size(); i++) {
             var id = ids.get(i);
+            if (id == null) {
+                continue;
+            }
             var data = storage.getConversation(id);
             if (data != null) {
-                var conv = Conversation.load(id, data);
-                conversations.add(conv);
+                try {
+                    var conv = Conversation.load(id, data);
+                    if (conv != null) {
+                        conversations.add(conv);
+                    }
+                } catch (e) {
+                    System.println("Failed to load conversation " + id + ": " + e.toString());
+                }
             }
         }
 

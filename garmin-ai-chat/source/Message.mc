@@ -52,8 +52,21 @@ class Message
     }
 
     static function fromDictionary(dict) {
-        var msg = new Message(dict.get(:id), dict.get(:role), dict.get(:content));
-        msg.timestamp = dict.get(:timestamp);
+        if (dict == null) {
+            return new Message("unknown", "system", "Corrupted message");
+        }
+        var msgId = dict.get(:id);
+        var msgRole = dict.get(:role);
+        var msgContent = dict.get(:content);
+        var msg = new Message(
+            msgId != null ? msgId : "unknown",
+            msgRole != null ? msgRole : "system",
+            msgContent != null ? msgContent : ""
+        );
+        var ts = dict.get(:timestamp);
+        if (ts != null) {
+            msg.timestamp = ts;
+        }
         return msg;
     }
 

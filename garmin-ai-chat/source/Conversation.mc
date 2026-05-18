@@ -18,6 +18,13 @@ class Conversation
     }
 
     function addMessage(msg) {
+        var storage = Application.getApp().getPropertyStore();
+        var maxMessages = storage.getMaxMessagesPerConversation();
+
+        if (messages.size() >= maxMessages) {
+            messages.remove(0);
+        }
+
         messages.add(msg);
         updatedAt = System.getTimer();
 
@@ -30,6 +37,12 @@ class Conversation
         }
 
         save();
+    }
+
+    function removeLastMessage() {
+        if (messages.size() > 0) {
+            messages.remove(messages.size() - 1);
+        }
     }
 
     function getMessages() {
@@ -111,14 +124,23 @@ class Conversation
     }
 
     static function load(convId, convData) {
-        var conv = new Conversation(convId, convData.get(:title));
-        conv.createdAt = convData.get(:createdAt);
-        conv.updatedAt = convData.get(:updatedAt);
+        if (convData == null) {
+            return new Conversation(convId, "Unknown");
+        }
+        var title = convData.get(:title);
+        var conv = new Conversation(convId, title != null ? title : "Unknown");
+        var created = convData.get(:createdAt);
+        var updated = convData.get(:updatedAt);
+        conv.createdAt = created != null ? created : System.getTimer();
+        conv.updatedAt = updated != null ? updated : System.getTimer();
 
         var msgList = convData.get(:messages);
         if (msgList != null) {
             for (var i = 0; i < msgList.size(); i++) {
-                conv.messages.add(Message.fromDictionary(msgList.get(i)));
+                var msgData = msgList.get(i);
+                if (msgData != null) {
+                    conv.messages.add(Message.fromDictionary(msgData));
+                }
             }
         }
 

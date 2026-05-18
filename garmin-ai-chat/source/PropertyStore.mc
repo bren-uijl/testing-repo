@@ -1,9 +1,14 @@
 using Toybox.Application;
 using Toybox.Lang;
+using Toybox.System;
 
 class PropertyStore
 
     var store;
+
+    static const MAX_CONVERSATIONS = 20;
+    static const MAX_MESSAGES_PER_CONVERSATION = 30;
+    static const API_KEY_SEGMENT_COUNT = 10;
 
     function initialize() {
         store = Application.getApp().getAppProperty("AiChatStore");
@@ -30,7 +35,7 @@ class PropertyStore
         var parts = store.get(:apiKeyParts);
         if (parts == null || parts.size() == 0) {
             parts = [];
-            for (var i = 0; i < 10; i++) {
+            for (var i = 0; i < API_KEY_SEGMENT_COUNT; i++) {
                 parts.add("");
             }
             store.put(:apiKeyParts, parts);
@@ -45,6 +50,10 @@ class PropertyStore
     }
 
     function setApiKeyPart(index, value) {
+        if (index < 0 || index >= API_KEY_SEGMENT_COUNT) {
+            System.println("Invalid API key part index: " + index.toString());
+            return;
+        }
         var parts = getApiKeyParts();
         parts.set(index, value);
         store.put(:apiKeyParts, parts);
@@ -104,10 +113,41 @@ class PropertyStore
             }
         }
         if (!found) {
+            if (ids.size() >= MAX_CONVERSATIONS) {
+                evictOldestConversation(ids);
+            }
             ids.add(id);
         }
         store.put(:conversations, ids);
         save();
+    }
+
+    function evictOldestConversation(ids) {
+        if (ids.size() == 0) {
+            return;
+        }
+
+        var oldestId = null;
+        var oldestTime = System.getTimer();
+
+        for (var i = 0; i < ids.size(); i++) {
+            var convId = ids.get(i);
+            var data = getConversation(convId);
+            if (data != null) {
+                var updatedAt = data.get(:updatedAt);
+                if (updatedAt != null && updatedAt < oldestTime) {
+                    oldestTime = updatedAt;
+                    oldestId = convId;
+                }
+            }
+        }
+
+        if (oldestId == null) {
+            oldestId = ids.get(0);
+        }
+
+        deleteConversation(oldestId);
+        ids.remove(0);
     }
 
     function deleteConversation(id) {
@@ -143,6 +183,10 @@ class PropertyStore
     function setLastConversationId(id) {
         store.put(:lastConversationId, id);
         save();
+    }
+
+    function getMaxMessagesPerConversation() {
+        return MAX_MESSAGES_PER_CONVERSATION;
     }
 
     function save() {

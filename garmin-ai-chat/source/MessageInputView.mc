@@ -14,6 +14,7 @@ class MessageInputView extends WatchUi.View
     var conversation;
     var cursorVisible;
     var cursorTimer;
+    var storage;
 
     function initialize(existingConv) {
         View.initialize();
@@ -23,6 +24,7 @@ class MessageInputView extends WatchUi.View
         conversation = existingConv;
         cursorVisible = true;
         cursorTimer = null;
+        storage = Application.getApp().getPropertyStore();
     }
 
     function onLayout(dc) {
@@ -148,7 +150,6 @@ class MessageInputView extends WatchUi.View
             return;
         }
 
-        var storage = Application.getApp().getPropertyStore();
         if (!storage.isApiKeySet()) {
             errorMessage = Rez.Strings.NoApiKey;
             View.requestUpdate();
@@ -198,7 +199,7 @@ class MessageInputView extends WatchUi.View
         if (error != null) {
             errorMessage = error;
         } else if (response != null) {
-            conversation.messages.remove(conversation.messages.size() - 1);
+            conversation.removeLastMessage();
 
             var assistantMsg = Message.assistantMessage(response);
             conversation.addMessage(assistantMsg);
