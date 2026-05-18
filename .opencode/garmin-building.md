@@ -1,180 +1,137 @@
-# Garmin AI Chat - Building & Development Guide
+# Garmin AI Chat - Building Guide (SDK 9.1.0)
 
-> This guide covers how to build, test, and extend the Garmin AI Chat Connect IQ app.
+> Updated: May 18, 2026 | SDK 9.1.0 | API Level 5.2+
 
-## Quick Start
+## Status
 
-```bash
-# Set up the SDK
-export CONNECTIQ_SDK_DIR=/path/to/connectiq-sdk
+The app has been updated for SDK 9.1.0 syntax compatibility. The following changes were made:
 
-# Build the app
-cd garmin-ai-chat
-./build.sh
+### Syntax Fixes Applied
 
-# Run in simulator
-./build.sh vivoactive5 watch run
-```
+1. **Class declarations** - Added missing opening braces `{` after class declarations
+2. **Closing braces** - Replaced `end` keywords with `}` (SDK 9.1.0 requires brace syntax)
 
-## Project Overview
+### Remaining Build Issues
 
-AI Chat is a Connect IQ app for Garmin vívoactive 5 that enables conversational AI using NVIDIA's API. Users can chat with multiple AI models directly from their watch.
+The build does not complete successfully due to API changes in SDK 9.1.0:
 
-**Current Version:** 1.2.0
-**Target Device:** vívoactive 5 (390x390 circular AMOLED, touch-only)
-**SDK:** Connect IQ 4.x/5.x
-**Language:** Monkey C
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| `Toybox.Json` module not found | JSON moved to `Toybox.Communications` | Use `Communications.makeWebRequest()` |
+| `TextConfirmationDelegate` not found | Renamed to `ConfirmationDelegate` | Update class references |
+| `WebResponseDelegate` not found | API restructured | Check SDK 9.1.0 API docs |
+| Phone app compilation | Phone API differs from watch | Build watch app separately |
 
-## Architecture
-
-### Source Files
-
-| File | Purpose |
-|------|---------|
-| `AiChatApp.mc` | App entry point, navigation hub |
-| `PropertyStore.mc` | Persistent storage (conversations, settings) |
-| `Message.mc` | Message data model |
-| `Conversation.mc` | Conversation model with message list |
-| `NviApiClient.mc` | HTTP client for NVIDIA API |
-| `ConversationListView.mc` | Main screen with conversation list + quick prompts |
-| `MessageInputView.mc` | Text input for composing messages |
-| `ConversationView.mc` | Chat view with message bubbles |
-| `SettingsView.mc` | Settings menu |
-| `ApiKeyInputView.mc` | 10-segment API key input |
-| `AboutView.mc` | App info screen |
-
-### Data Flow
-
-```
-User Input → MessageInputView → NviApiClient → NVIDIA API → Response → ConversationView
-                                      ↓
-                              PropertyStore (persist)
-```
-
-### Storage
-
-Uses `Application.getAppProperty()` for persistence:
-- Conversations stored as dictionaries with message arrays
-- Max 20 conversations, 30 messages per conversation
-- Auto-evicts oldest when limits reached
-- API key stored as full string + segmented parts
-
-## Building
+## Build Environment Setup
 
 ### Prerequisites
 
-1. Connect IQ SDK 9.x
-2. Java 17+
-3. SDK Manager with vivoactive5 device downloaded
+- Java 17+
+- Connect IQ SDK 9.1.0
+- SDK Manager (for device definitions)
 
-### Build Options
-
-```bash
-# Watch app only
-./build.sh
-
-# Watch + phone app
-./build.sh vivoactive5 full
-
-# Build and run in simulator
-./build.sh vivoactive5 watch run
-```
-
-### Manual Build
+### SDK Installation
 
 ```bash
-monkeyc -w -y developer_key.der -f monkey.jungle -o dist/AIChat.prg -d vivoactive5
+# Download SDK
+curl -L -o connectiq-sdk.zip "https://developer.garmin.com/downloads/connect-iq/sdks/connectiq-sdk-lin-9.1.0-2026-03-09-6a872a80b.zip"
+
+# Extract
+unzip connectiq-sdk.zip -d /opt/connectiq-sdk
+
+# Set environment
+export CONNECTIQ_SDK_DIR=/opt/connectiq-sdk
 ```
 
-## Features (v1.2.0)
+### Device Setup
 
-### Core
-- Start and continue AI conversations on watch
-- 8 AI models (NVIDIA, Meta, Mistral, Google, OpenAI)
-- Persistent local storage for conversations
-- Phone companion app for API key config
+SDK 9.1.0 requires devices to be installed via SDK Manager. The devices are stored in:
 
-### Conversation List
-- Sorted by last updated
-- Quick prompt templates (Translate, Summarize, Explain, etc.)
-- Swipe-to-delete conversations
-- Settings access from gear icon
-
-### Conversation View
-- Message bubbles (blue=user, gray=assistant)
-- Tap title to rename
-- Tap message count to clear
-- Retry on failed requests
-- Cancel during loading
-- Haptic feedback
-
-### Settings
-- API key input (10 segments × 7 chars)
-- Model cycling with friendly names
-- System prompt reset
-- Clear all conversations
-- About screen
-
-## Adding Features
-
-### New Model
-
-Update these files:
-1. `source/SettingsView.mc` → `cycleModel()` and `getModelDisplayName()`
-2. `phone/source/PhoneSettingsView.mc` → `models` array
-3. `README.md` → supported models table
-
-### New View
-
-1. Create `source/MyView.mc` extending `WatchUi.View`
-2. Create `MyInputDelegate` extending `WatchUi.BehaviorDelegate`
-3. Add navigation method in `AiChatApp.mc`
-4. Push with `WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE)`
-
-### New String Resource
-
-Add to `resources/strings.xml`:
-```xml
-<string id="MyString">My Text</string>
+```
+~/.Garmin/ConnectIQ/Sdks/connectiq-sdk-9.1.0/devices/
 ```
 
-Access in code: `Rez.Strings.MyString`
+Each device needs a `compiler.json` file with the following structure:
+
+```json
+{
+    "deviceId": "vivoactive5",
+    "displayName": "vívoactive® 5",
+    "deviceFamily": "round-390x390",
+    "bitsPerPixel": 16,
+    "resolution": { "width": 390, "height": 390 },
+    "appTypes": [
+        { "type": "watchApp", "memoryLimit": 65536, "prgLimit": 65536 }
+    ],
+    "launcherIcon": { "width": 56, "height": 56 },
+    "alphaBlendingSupport": true
+}
+```
+
+## Build Commands
+
+### Watch App Only
+
+```bash
+cd garmin-ai-chat
+
+# Using build script
+./build.sh vivoactive5 watch
+
+# Manual build
+monkeyc -w \
+    -y developer_key.der \
+    -f monkey.jungle \
+    -o dist/AIChat.prg \
+    -d vivoactive5
+```
+
+### With Jungle File (SDK 9.1.0 format)
+
+```bash
+# Create jungle file
+cat > build.jungle << EOF
+project.manifest = manifest.xml
+sourcePath = source/
+resourcePath = resources/
+EOF
+
+# Build
+monkeyc -w \
+    -f build.jungle \
+    -o dist/AIChat.prg \
+    -d vivoactive5 \
+    -y developer_key.der
+```
 
 ## Known Issues
 
-1. Memory constraints limit conversation length
-2. Text input on watch is slow (use phone app for API key)
-3. HTTP requests may timeout on slow connections
-4. No background sync - app must be open
-5. 500 char limit via watch text input
-6. Text-only, no image support
+1. **API Symbol Resolution**: Custom device definitions don't link to the API database properly. Use SDK Manager-installed devices.
 
-## Testing Checklist
+2. **Phone App**: The phone app uses different APIs and should be built separately.
 
-- [ ] App launches and shows conversation list
-- [ ] Quick prompts toggle and start conversations
-- [ ] Text input sends message to API
-- [ ] API response displays correctly
-- [ ] Conversation persists after restart
-- [ ] API key set via 10-segment input
-- [ ] API key set via phone app
-- [ ] Model changes in settings
-- [ ] Conversations can be cleared
-- [ ] Scroll works in all views
-- [ ] Back navigation works
-- [ ] Error handling for missing API key
-- [ ] Error handling for network failures
-- [ ] Retry works on failed requests
-- [ ] Cancel works during loading
-- [ ] Rename conversation works
-- [ ] Clear conversation works
-- [ ] Haptic feedback triggers
-- [ ] Swipe-to-delete works
+3. **API Changes**: SDK 9.1.0 has significant API changes from 4.x/5.x:
+   - `Toybox.Json` → `Toybox.Communications`
+   - `TextConfirmationDelegate` → `ConfirmationDelegate`
+   - Various method renames and restructures
+
+## Troubleshooting
+
+### "Invalid device id specified"
+
+The SDK 9.1.0 requires devices to be installed via SDK Manager. Run the SDK Manager GUI or set up the device folder manually in `~/.Garmin/ConnectIQ/Sdks/`.
+
+### "Undefined symbol" errors
+
+The device's API level must match the SDK's api.db. Check that `connectIQVersion` in `compiler.json` matches an available API version.
+
+### "Cannot resolve module" errors
+
+The module may have been renamed or removed in the SDK version. Check the API documentation for the correct module name.
 
 ## Resources
 
 - [Connect IQ SDK](https://developer.garmin.com/connect-iq/)
+- [SDK Manager](https://developer.garmin.com/connect-iq/sdk/)
 - [Monkey C Guide](https://developer.garmin.com/connect-iq/monkey-c/)
 - [API Reference](https://developer.garmin.com/connect-iq/reference/)
-- [vívoactive 5 Specs](https://developer.garmin.com/connect-iq/compatible-devices/)
-- [NVIDIA API](https://build.nvidia.com/)
