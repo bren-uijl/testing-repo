@@ -74,6 +74,9 @@ monkeyc -w -y developer_key.der -m manifest.xml -m phone/manifest.xml \
 | meta/llama-3.1-70b-instruct | Meta |
 | mistralai/mistral-7b-instruct-v0.2 | Mistral AI |
 | google/gemma-2-9b-it | Google |
+| openai/gpt-oss-120b | OpenAI |
+| openai/gpt-oss-20b | OpenAI |
+| mistralai/mistral-medium-3.5-128b | Mistral AI |
 
 ## Project Structure
 

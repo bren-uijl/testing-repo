@@ -114,6 +114,9 @@ The NVIDIA API key is 70 characters long - too long for comfortable single-field
 | meta/llama-3.1-70b-instruct | Meta's Llama 3.1 70B (higher quality) |
 | mistralai/mistral-7b-instruct-v0.2 | Mistral 7B |
 | google/gemma-2-9b-it | Google Gemma 2 9B |
+| openai/gpt-oss-120b | OpenAI GPT-OSS 120B |
+| openai/gpt-oss-20b | OpenAI GPT-OSS 20B |
+| mistralai/mistral-medium-3.5-128b | Mistral Medium 3.5 128B |
 
 ## Build Commands
 
