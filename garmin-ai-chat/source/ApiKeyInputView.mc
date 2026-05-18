@@ -49,7 +49,7 @@ class ApiKeyInputView extends WatchUi.View
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 18, Graphics.FONT_TINY, Lang.format("$1$", [Resources.getString(Resources.Strings.ApiKey)]), Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 18, Graphics.FONT_TINY, Rez.Strings.ApiKey, Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(0, 35, width, 35);
@@ -80,7 +80,6 @@ class ApiKeyInputView extends WatchUi.View
             }
 
             dc.setColor(i == selectedPart ? Graphics.COLOR_WHITE : Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            var label = Lang.format("$1$ $2$/10", [Lang.format("$1$", [Resources.getString(Resources.Strings.ApiKeySegment)]), (i + 1)]);
             dc.drawText(10, y + 8, Graphics.FONT_TINY, "Part " + (i + 1) + "/10", Graphics.TEXT_JUSTIFY_LEFT);
 
             var partValue = keyParts.get(i);
@@ -213,22 +212,23 @@ end
 
 class ApiKeyInputDelegate extends WatchUi.BehaviorDelegate
 
-    function initialize() {
+    var view;
+
+    function initialize(apiKeyView) {
         BehaviorDelegate.initialize();
+        view = apiKeyView;
     }
 
     function onTap(evt) {
-        var v = WatchUi.getView();
-        if (v has :onTap) {
-            v.onTap(evt);
+        if (view != null && view has :onTap) {
+            view.onTap(evt);
         }
         return true;
     }
 
     function onSwipe(evt) {
-        var v = WatchUi.getView();
-        if (v has :onSwipe) {
-            v.onSwipe(evt);
+        if (view != null && view has :onSwipe) {
+            view.onSwipe(evt);
         }
         return true;
     }

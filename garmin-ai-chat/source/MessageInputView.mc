@@ -4,6 +4,7 @@ using Toybox.Application;
 using Toybox.Communications;
 using Toybox.System;
 using Toybox.Lang;
+using Toybox.Json;
 
 class MessageInputView extends WatchUi.View
 
@@ -52,7 +53,7 @@ class MessageInputView extends WatchUi.View
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 20, Graphics.FONT_TINY, Lang.format("$1$", [Resources.getString(Resources.Strings.TypeMessage)]), Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 20, Graphics.FONT_TINY, Rez.Strings.TypeMessage, Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(10, 35, width - 10, 35);
@@ -75,7 +76,7 @@ class MessageInputView extends WatchUi.View
 
         if (isLoading) {
             dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, height - 60, Graphics.FONT_SMALL, Lang.format("$1$", [Resources.getString(Resources.Strings.Loading)]), Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, height - 60, Graphics.FONT_SMALL, Rez.Strings.Loading, Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         var sendBtnY = height - 45;
@@ -88,13 +89,13 @@ class MessageInputView extends WatchUi.View
             dc.fillRoundedRectangle(sendBtnX, sendBtnY, sendBtnWidth, sendBtnHeight, 8);
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, sendBtnY + 15, Graphics.FONT_SMALL, Lang.format("$1$", [Resources.getString(Resources.Strings.Send)]), Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, sendBtnY + 15, Graphics.FONT_SMALL, Rez.Strings.Send, Graphics.TEXT_JUSTIFY_CENTER);
         } else {
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
             dc.fillRoundedRectangle(sendBtnX, sendBtnY, sendBtnWidth, sendBtnHeight, 8);
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, sendBtnY + 15, Graphics.FONT_SMALL, Lang.format("$1$", [Resources.getString(Resources.Strings.Send)]), Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, sendBtnY + 15, Graphics.FONT_SMALL, Rez.Strings.Send, Graphics.TEXT_JUSTIFY_CENTER);
         }
     }
 
@@ -125,7 +126,7 @@ class MessageInputView extends WatchUi.View
 
     function openTextInput() {
         var options = {
-            :title => Lang.format("$1$", [Resources.getString(Resources.Strings.TypeMessage)]),
+            :title => Rez.Strings.TypeMessage,
             :maxSize => 500
         };
 
@@ -149,7 +150,7 @@ class MessageInputView extends WatchUi.View
 
         var storage = Application.getApp().getPropertyStore();
         if (!storage.isApiKeySet()) {
-            errorMessage = Lang.format("$1$", [Resources.getString(Resources.Strings.NoApiKey)]);
+            errorMessage = Rez.Strings.NoApiKey;
             View.requestUpdate();
             return;
         }
@@ -165,7 +166,7 @@ class MessageInputView extends WatchUi.View
         var userMsg = Message.userMessage(currentText);
         conversation.addMessage(userMsg);
 
-        var loadingMsg = Message.systemMessage(Lang.format("$1$", [Resources.getString(Resources.Strings.Loading)]));
+        var loadingMsg = Message.systemMessage(Rez.Strings.Loading);
         conversation.addMessage(loadingMsg);
 
         var messages = conversation.getApiMessages();
@@ -254,7 +255,9 @@ class MessageInputInputDelegate extends WatchUi.BehaviorDelegate
     }
 
     function onTap(evt) {
-        view.onTap(evt);
+        if (view != null) {
+            view.onTap(evt);
+        }
         return true;
     }
 

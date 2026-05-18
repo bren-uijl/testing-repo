@@ -1,6 +1,7 @@
 using Toybox.Communications;
 using Toybox.System;
 using Toybox.Lang;
+using Toybox.Json;
 
 class NviApiClient
 
@@ -56,7 +57,7 @@ class NviApiClient
         };
 
         try {
-            Communications.makeJsonRequest(baseUrl, options, new ApiResponseDelegate(self));
+            Communications.makeWebRequest(baseUrl, options, new ApiResponseDelegate(self));
         } catch (e) {
             if (callback != null) {
                 callback.onComplete(null, "Network error: " + e.toString());
@@ -71,7 +72,8 @@ class NviApiClient
 
         if (responseCode == 200 && data != null) {
             try {
-                var json = Json.decode(data);
+                var jsonData = data instanceof Blob ? data.toString() : data;
+                var json = Json.decode(jsonData);
                 var choices = json.get(:choices);
                 if (choices != null && choices.size() > 0) {
                     var choice = choices.get(0);
@@ -89,7 +91,8 @@ class NviApiClient
             var errorMsg = "HTTP " + responseCode.toString();
             if (data != null) {
                 try {
-                    var json = Json.decode(data);
+                    var jsonData = data instanceof Blob ? data.toString() : data;
+                    var json = Json.decode(jsonData);
                     var error = json.get(:error);
                     if (error != null) {
                         errorMsg = error.get(:message);
@@ -108,11 +111,12 @@ class NviApiClient
     }
 end
 
-class ApiResponseDelegate extends Communications.JsonResponseDelegate
+class ApiResponseDelegate extends Communications.WebResponseDelegate
 
     var client;
 
     function initialize(apiClient) {
+        WebResponseDelegate.initialize();
         client = apiClient;
     }
 

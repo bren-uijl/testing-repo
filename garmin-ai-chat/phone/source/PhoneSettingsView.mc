@@ -134,30 +134,30 @@ end
 
 class PhoneInputDelegate extends WatchUi.BehaviorDelegate
 
-    function initialize() {
+    var view;
+
+    function initialize(settingsView) {
         BehaviorDelegate.initialize();
+        view = settingsView;
     }
 
     function onTap(evt) {
-        var v = WatchUi.getView();
-        if (v has :onTap) {
-            v.onTap(evt);
+        if (view != null && view has :onTap) {
+            view.onTap(evt);
         }
         return true;
     }
 
     function onSwipe(evt) {
-        var v = WatchUi.getView();
-        if (v has :onSwipe) {
-            v.onSwipe(evt);
+        if (view != null && view has :onSwipe) {
+            view.onSwipe(evt);
         }
         return true;
     }
 
     function onMenu() {
-        var v = WatchUi.getView();
-        if (v has :onMenu) {
-            return v.onMenu();
+        if (view != null && view has :onMenu) {
+            return view.onMenu();
         }
         return false;
     }

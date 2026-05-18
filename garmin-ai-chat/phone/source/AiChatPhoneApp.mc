@@ -1,6 +1,7 @@
 using Toybox.Application;
 using Toybox.Communications;
 using Toybox.System;
+using Toybox.Json;
 
 class AiChatPhoneApp extends Application.AppBase
 
@@ -22,7 +23,9 @@ class AiChatPhoneApp extends Application.AppBase
     }
 
     function getInitialView() {
-        return [new PhoneSettingsView(), new PhoneInputDelegate()];
+        var view = new PhoneSettingsView();
+        var delegate = new PhoneInputDelegate(view);
+        return [view, delegate];
     }
 
     function getPropertyStore() {

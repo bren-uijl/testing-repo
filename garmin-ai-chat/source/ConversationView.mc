@@ -139,7 +139,7 @@ class ConversationView extends WatchUi.View
             dc.fillRoundedRectangle(replyBtnX, replyBtnY, replyBtnWidth, replyBtnHeight, 8);
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, replyBtnY + 14, Graphics.FONT_SMALL, Lang.format("$1$", [Resources.getString(Resources.Strings.Loading)]), Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, replyBtnY + 14, Graphics.FONT_SMALL, Rez.Strings.Loading, Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         if (errorMessage != null) {
@@ -183,7 +183,8 @@ class ConversationView extends WatchUi.View
 
     function openReplyInput() {
         var view = new MessageInputView(conversation);
-        WatchUi.pushView(view, new MessageInputInputDelegate(view), WatchUi.SLIDE_IMMEDIATE);
+        var delegate = new MessageInputInputDelegate(view);
+        WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE);
     }
 
     function onSwipe(evt) {
@@ -242,12 +243,16 @@ class ConversationViewInputDelegate extends WatchUi.BehaviorDelegate
     }
 
     function onTap(evt) {
-        view.onTap(evt);
+        if (view != null) {
+            view.onTap(evt);
+        }
         return true;
     }
 
     function onSwipe(evt) {
-        view.onSwipe(evt);
+        if (view != null) {
+            view.onSwipe(evt);
+        }
         return true;
     }
 

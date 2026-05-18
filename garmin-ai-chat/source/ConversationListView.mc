@@ -65,7 +65,7 @@ class ConversationListView extends WatchUi.View
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 18, Graphics.FONT_TINY, Lang.format("$1$", [Resources.getString(Resources.Strings.AppName)]), Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 18, Graphics.FONT_TINY, Rez.Strings.AppName, Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawText(width - 35, 18, Graphics.FONT_TINY, "?", Graphics.TEXT_JUSTIFY_RIGHT);
@@ -82,11 +82,11 @@ class ConversationListView extends WatchUi.View
         dc.fillRectangle(btnX, newBtnY, btnWidth, btnHeight);
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, newBtnY + 12, Graphics.FONT_TINY, Lang.format("$1$", [Resources.getString(Resources.Strings.NewConversation)]), Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, newBtnY + 12, Graphics.FONT_TINY, Rez.Strings.NewConversation, Graphics.TEXT_JUSTIFY_CENTER);
 
         if (conversations.size() == 0) {
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, height / 2, Graphics.FONT_SMALL, Lang.format("$1$", [Resources.getString(Resources.Strings.NoConversations)]), Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, height / 2, Graphics.FONT_SMALL, Rez.Strings.NoConversations, Graphics.TEXT_JUSTIFY_CENTER);
             return;
         }
 
@@ -176,21 +176,22 @@ end
 
 class ConversationListInputDelegate extends WatchUi.BehaviorDelegate
 
-    function initialize() {
+    var view;
+
+    function initialize(convListView) {
         BehaviorDelegate.initialize();
+        view = convListView;
     }
 
     function onTap(evt) {
-        var view = WatchUi.getView();
-        if (view has :onTap) {
+        if (view != null && view has :onTap) {
             view.onTap(evt);
         }
         return true;
     }
 
     function onSwipe(evt) {
-        var view = WatchUi.getView();
-        if (view has :onSwipe) {
+        if (view != null && view has :onSwipe) {
             view.onSwipe(evt);
         }
         return true;

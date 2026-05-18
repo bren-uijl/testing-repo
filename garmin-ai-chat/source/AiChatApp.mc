@@ -22,7 +22,9 @@ class AiChatApp extends Application.AppBase
     }
 
     function getInitialView() {
-        return [new ConversationListView()];
+        var view = new ConversationListView();
+        var delegate = new ConversationListInputDelegate(view);
+        return [view, delegate];
     }
 
     function getPropertyStore() {
@@ -33,25 +35,32 @@ class AiChatApp extends Application.AppBase
     }
 
     function showConversationList() {
-        WatchUi.popToDrawableView();
-        WatchUi.pushView(new ConversationListView(), new ConversationListInputDelegate(), WatchUi.SLIDE_IMMEDIATE);
+        var view = new ConversationListView();
+        var delegate = new ConversationListInputDelegate(view);
+        WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE);
     }
 
     function showNewConversation() {
         var view = new MessageInputView(null);
-        WatchUi.pushView(view, new MessageInputInputDelegate(view), WatchUi.SLIDE_IMMEDIATE);
+        var delegate = new MessageInputInputDelegate(view);
+        WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE);
     }
 
     function showConversation(convId) {
         var view = new ConversationView(convId);
-        WatchUi.pushView(view, new ConversationViewInputDelegate(view), WatchUi.SLIDE_IMMEDIATE);
+        var delegate = new ConversationViewInputDelegate(view);
+        WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE);
     }
 
     function showSettings() {
-        WatchUi.pushView(new SettingsView(), new SettingsInputDelegate(), WatchUi.SLIDE_IMMEDIATE);
+        var view = new SettingsView();
+        var delegate = new SettingsInputDelegate(view);
+        WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE);
     }
 
     function showApiKeyInput() {
-        WatchUi.pushView(new ApiKeyInputView(), new ApiKeyInputDelegate(), WatchUi.SLIDE_IMMEDIATE);
+        var view = new ApiKeyInputView();
+        var delegate = new ApiKeyInputDelegate(view);
+        WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE);
     }
 end

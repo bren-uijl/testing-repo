@@ -70,7 +70,7 @@ class SettingsView extends WatchUi.View
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 18, Graphics.FONT_TINY, Lang.format("$1$", [Resources.getString(Resources.Strings.Settings)]), Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 18, Graphics.FONT_TINY, Rez.Strings.Settings, Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(0, 35, width, 35);
@@ -196,27 +196,21 @@ class SettingsInputDelegate extends WatchUi.BehaviorDelegate
 
     var view;
 
-    function initialize() {
+    function initialize(settingsView) {
         BehaviorDelegate.initialize();
-        view = null;
-    }
-
-    function setView(v) {
-        view = v;
+        view = settingsView;
     }
 
     function onTap(evt) {
-        var v = WatchUi.getView();
-        if (v has :onTap) {
-            v.onTap(evt);
+        if (view != null && view has :onTap) {
+            view.onTap(evt);
         }
         return true;
     }
 
     function onSwipe(evt) {
-        var v = WatchUi.getView();
-        if (v has :onSwipe) {
-            v.onSwipe(evt);
+        if (view != null && view has :onSwipe) {
+            view.onSwipe(evt);
         }
         return true;
     }

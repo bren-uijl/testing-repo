@@ -1,5 +1,7 @@
 using Toybox.System;
 using Toybox.WatchUi;
+using Toybox.Time;
+using Toybox.Lang;
 
 class Message
 
@@ -28,8 +30,16 @@ class Message
     }
 
     function getDisplayTime() {
-        var time = new Time.Gregorian(timestamp);
-        return Lang.format("$1$:$2$", [time.hour.format("%02d"), time.min.format("%02d")]);
+        var elapsed = System.getTimer() - timestamp;
+        var minutes = elapsed / 60000;
+
+        if (minutes < 1) {
+            return "Now";
+        } else if (minutes < 60) {
+            return minutes.toString() + "m";
+        } else {
+            return (minutes / 60).toString() + "h";
+        }
     }
 
     function toDictionary() {
