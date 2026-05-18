@@ -149,7 +149,10 @@ class SettingsView extends WatchUi.View
             "meta/llama-3.1-8b-instruct",
             "meta/llama-3.1-70b-instruct",
             "mistralai/mistral-7b-instruct-v0.2",
-            "google/gemma-2-9b-it"
+            "google/gemma-2-9b-it",
+            "openai/gpt-oss-120b",
+            "openai/gpt-oss-20b",
+            "mistralai/mistral-medium-3.5-128b"
         ];
 
         var current = storage.getModel();
