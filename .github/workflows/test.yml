@@ -1,7 +1,7 @@
 name: Download + Share File (Stable)
 
 on:
-  workflow_dispatch:
+  workflow_dispatch
 
 jobs:
   share:
