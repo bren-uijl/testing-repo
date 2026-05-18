@@ -68,7 +68,7 @@ class SettingsView extends WatchUi.View
 
         items.add({
             :label => "About",
-            :value => "v1.1.0",
+            :value => "v1.2.0",
             :action => "about"
         });
     }
@@ -153,6 +153,7 @@ class SettingsView extends WatchUi.View
         } else if (action == "clear") {
             clearAllConversations();
         } else if (action == "about") {
+            Application.getApp().showAbout();
         }
     }
 

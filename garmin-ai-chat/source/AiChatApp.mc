@@ -63,4 +63,10 @@ class AiChatApp extends Application.AppBase
         var delegate = new ApiKeyInputDelegate(view);
         WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE);
     }
+
+    function showAbout() {
+        var view = new AboutView();
+        var delegate = new AboutInputDelegate(view);
+        WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE);
+    }
 end
