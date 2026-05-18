@@ -115,6 +115,7 @@ jobs:
           - Use conventional commit format when possible (feat:, fix:, refactor:, docs:, chore:)
           - Keep commits atomic - one logical change per commit
           - Write meaningful commit messages that explain WHAT and WHY
+          - Git config is already done.
 
           ERROR HANDLING:
           - If a tool fails, retry once with adjusted parameters
