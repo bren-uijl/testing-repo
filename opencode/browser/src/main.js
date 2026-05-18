@@ -377,3 +377,5 @@ app.on('window-all-closed', () => {
 app.commandLine.appendSwitch('enable-extensions');
 app.commandLine.appendSwitch('enable-features', 'WebComponentsV0Enabled');
 app.commandLine.appendSwitch('disable-site-isolation-trials');
+app.commandLine.appendSwitch('force-webrtc-ip-handling-policy', 'disable_non_proxied_udp');
+app.commandLine.appendSwitch('webrtc-ip-handling-policy', 'disable_non_proxied_udp');

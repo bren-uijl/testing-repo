@@ -15,6 +15,7 @@ class NexusBrowser {
     this.activeTabId = null;
     this.tabCounter = 0;
     this.bookmarks = JSON.parse(localStorage.getItem('nexus_bookmarks') || '[]');
+    this.history = JSON.parse(localStorage.getItem('nexus_history') || '[]');
     this.zoomLevel = 1.0;
 
     this.init();
@@ -48,6 +49,7 @@ class NexusBrowser {
     this.passwordsPanel = document.getElementById('passwords-panel');
     this.settingsPanel = document.getElementById('settings-panel');
     this.readingPanel = document.getElementById('reading-panel');
+    this.historyPanel = document.getElementById('history-panel');
 
     this.installedExtensions = document.getElementById('extensions-list');
     this.bookmarksList = document.getElementById('bookmarks-list');
@@ -129,6 +131,10 @@ class NexusBrowser {
       }
     });
 
+    document.getElementById('clear-history-btn').addEventListener('click', () => {
+      this.clearHistory();
+    });
+
     document.getElementById('export-passwords-btn').addEventListener('click', async () => {
       const masterPassword = prompt('Enter master password to export:');
       if (masterPassword && window.nexusAPI) {
@@ -192,7 +198,7 @@ class NexusBrowser {
       if (window.nexusAPI) window.nexusAPI.newWindow();
       this.closePanels();
     });
-    document.getElementById('menu-history').addEventListener('click', () => this.closePanels());
+    document.getElementById('menu-history').addEventListener('click', () => { this.togglePanel('history'); this.loadHistory(); this.closePanels(); });
 
     document.addEventListener('click', (e) => {
       if (!this.menuPanel.contains(e.target) && e.target.id !== 'menu-btn') {
@@ -459,6 +465,7 @@ class NexusBrowser {
         this.updateSecurityIcon(url);
         this.updateBookmarkDisplay();
       }
+      this.addToHistory(url, tab.title);
     }
   }
 
@@ -572,6 +579,7 @@ class NexusBrowser {
       passwords: this.passwordsPanel,
       settings: this.settingsPanel,
       reading: this.readingPanel,
+      history: this.historyPanel,
     };
 
     const targetPanel = panelMap[panel];
@@ -597,6 +605,7 @@ class NexusBrowser {
     this.passwordsPanel.classList.add('hidden');
     this.settingsPanel.classList.add('hidden');
     this.readingPanel.classList.add('hidden');
+    this.historyPanel.classList.add('hidden');
   }
 
   async loadExtensions() {
@@ -815,6 +824,58 @@ class NexusBrowser {
         this.updateBookmarkDisplay();
       });
     });
+  }
+
+  addToHistory(url, title) {
+    if (!url || url === DEFAULT_HOME_PAGE || url.startsWith('nexus://')) return;
+    this.history.unshift({ url, title, date: Date.now() });
+    if (this.history.length > 500) this.history = this.history.slice(0, 500);
+    localStorage.setItem('nexus_history', JSON.stringify(this.history));
+  }
+
+  loadHistory() {
+    const list = document.getElementById('history-list');
+    if (!list) return;
+    list.innerHTML = this.history.length > 0
+      ? this.history.slice(0, 50).map((h, i) => {
+          const date = new Date(h.date).toLocaleDateString();
+          return `
+            <div class="history-item" data-url="${h.url}">
+              <div class="history-icon">\uD83D\uDD50</div>
+              <div class="history-info">
+                <div class="history-title">${h.title || h.url}</div>
+                <div class="history-url">${h.url}</div>
+                <div class="history-date">${date}</div>
+              </div>
+              <button class="history-remove" data-index="${i}" title="Remove">&times;</button>
+            </div>
+          `;
+        }).join('')
+      : '<p style="color: var(--text-secondary); text-align: center; padding: 20px;">No history yet</p>';
+
+    list.querySelectorAll('.history-item').forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('history-remove')) {
+          this.navigate(el.dataset.url);
+          this.closePanels();
+        }
+      });
+    });
+
+    list.querySelectorAll('.history-remove').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.history.splice(parseInt(btn.dataset.index), 1);
+        localStorage.setItem('nexus_history', JSON.stringify(this.history));
+        this.loadHistory();
+      });
+    });
+  }
+
+  clearHistory() {
+    this.history = [];
+    localStorage.setItem('nexus_history', JSON.stringify(this.history));
+    this.loadHistory();
   }
 
   zoomIn() {

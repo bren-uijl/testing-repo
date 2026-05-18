@@ -949,6 +949,87 @@ input:checked + .slider:before {
   gap: 8px;
 }
 
+/* History Panel */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  gap: 10px;
+  cursor: pointer;
+}
+
+.history-item:hover {
+  background: var(--bg-hover);
+}
+
+.history-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.history-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.history-title {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-url {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-date {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.history-remove {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
+}
+
+.history-remove:hover {
+  background: var(--accent);
+  color: white;
+}
+
+#clear-history-btn {
+  width: calc(100% - 32px);
+  margin: 0 16px 16px;
+}
+
 .bookmark-item {
   display: flex;
   align-items: center;
