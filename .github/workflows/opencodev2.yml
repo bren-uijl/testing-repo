@@ -133,7 +133,7 @@ jobs:
           echo "=== Starting OpenCode Run ==="
           echo "Model: ${{ github.event.inputs.model }}"
           echo "Working directory: $TARGET_DIR"
-          echo "User prompt: ${{ github.event.inputs.prompt }}
+          echo "User prompt: ${{ github.event.inputs.prompt }}"
           echo "Prompt length: ${#FULL_PROMPT} characters"
           echo ""
 
