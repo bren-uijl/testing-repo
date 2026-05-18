@@ -1,33 +1,71 @@
-- name: Start tunnel
-  run: |
-    python3 -m http.server 8080 &
-    sleep 3
+name: File Share (Tunnel)
 
-    echo "Starting tunnel..."
+on:
+  workflow_dispatch:
 
-    for i in {1..5}; do
-      ./cloudflared tunnel --url http://localhost:8080 > cf.log 2>&1 &
-      sleep 8
+jobs:
+  share:
+    runs-on: ubuntu-latest
 
-      URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare.com' cf.log | head -n 1 || true)
+    steps:
+      - name: Install tools
+        run: |
+          sudo apt update
+          sudo apt install -y curl python3
 
-      if [ ! -z "$URL" ]; then
-        echo "✅ DOWNLOAD LINK:"
-        echo "$URL/file.rar"
-        break
-      fi
+      - name: Download file (direct link)
+        run: |
+          curl -L -o file.rar "https://files06.tchspt.com/down/macOSTransformationPack5.0.rar"
+          echo "Downloaded:"
+          ls -lh
+          file file.rar || true
 
-      echo "Retry $i failed"
-      killall cloudflared || true
-      sleep 3
-    done
+      - name: Install cloudflared
+        run: |
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+          chmod +x cloudflared
 
-    if [ -z "$URL" ]; then
-      echo "❌ Tunnel completely failed"
-      cat cf.log
-    fi
+      - name: Start server + tunnel
+        run: |
+          # Start local file server
+          python3 -m http.server 8080 &
+          sleep 3
 
-    while true; do
-      echo "alive $(date)"
-      sleep 60
-    done
+          echo "Starting Cloudflare tunnel..."
+
+          URL=""
+
+          # Retry tunnel (fixes 500 error problem)
+          for i in {1..5}; do
+            ./cloudflared tunnel --url http://localhost:8080 --no-autoupdate > cf.log 2>&1 &
+            sleep 8
+
+            URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare.com' cf.log | head -n 1 || true)
+
+            if [ ! -z "$URL" ]; then
+              echo "======================================"
+              echo "✅ DOWNLOAD LINK:"
+              echo "$URL/file.rar"
+              echo "======================================"
+              break
+            fi
+
+            echo "❌ Attempt $i failed, retrying..."
+            killall cloudflared || true
+            sleep 3
+          done
+
+          # If still failed → show debug
+          if [ -z "$URL" ]; then
+            echo "❌ Tunnel failed completely"
+            echo "===== DEBUG LOG ====="
+            cat cf.log
+            echo "====================="
+          fi
+
+          # Keepalive loop (prevents workflow exit)
+          echo "Keepalive started..."
+          while true; do
+            echo "alive $(date)"
+            sleep 60
+          done
