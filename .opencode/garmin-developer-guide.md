@@ -53,6 +53,11 @@ garmin-ai-chat/
 ### Commands
 
 ```bash
+# Using build script (recommended)
+./build.sh                    # Build watch app
+./build.sh vivoactive5 full   # Build with phone app
+./build.sh vivoactive5 watch run  # Build and run in simulator
+
 # Build watch app
 monkeyc -w -y developer_key.der -f monkey.jungle -o dist/AIChat.prg -d vivoactive5
 
@@ -112,23 +117,33 @@ monkeydo dist/AIChat.prg vivoactive5
 
 ### Conversation List
 - Shows all past conversations sorted by last updated
-- "+ New" button for starting new conversations
+- "+ New" button toggles quick prompt templates
+- 6 quick prompts: Translate, Summarize, Explain, Weather, Joke, Timer
 - Settings gear icon for configuration
+- Swipe-to-delete conversations
 
 ### Message Input
 - Uses watch native text input
 - Send button enabled only when text present
 - Shows loading state during API call
+- Pre-fill text from quick prompts
 
 ### Conversation View
 - Message bubbles: blue (user) on right, gray (assistant) on left
+- Tap title to rename conversation
+- Tap message count to clear conversation
 - Reply button to continue conversation
+- Retry button on failed requests
+- Cancel button during loading
 - Swipe to scroll through history
+- Haptic feedback on send/receive/error
 
 ### Settings
 - API Key: Multi-segment input (10 x 7 chars)
-- Model: Cycle through available models
+- Model: Cycle through available models (shows friendly names)
+- System Prompt: View and reset
 - Clear All Chats: Delete all conversations
+- About: App version, device, API info
 
 ---
 

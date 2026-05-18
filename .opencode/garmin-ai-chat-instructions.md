@@ -23,11 +23,12 @@ garmin-ai-chat/
 │   ├── Message.mc                    # Message data model (user/assistant/system)
 │   ├── Conversation.mc               # Conversation data model with message list
 │   ├── NviApiClient.mc               # NVIDIA API HTTP client
-│   ├── ConversationListView.mc       # Main screen: list of past conversations
+│   ├── ConversationListView.mc       # Main screen: list of past conversations + quick prompts
 │   ├── MessageInputView.mc           # Text input for new messages
 │   ├── ConversationView.mc           # Single conversation view with message bubbles
 │   ├── SettingsView.mc               # Settings menu (API key, model, clear)
-│   └── ApiKeyInputView.mc            # Multi-segment API key input (10 x 7 chars)
+│   ├── ApiKeyInputView.mc            # Multi-segment API key input (10 x 7 chars)
+│   └── AboutView.mc                  # About screen with app info
 └── phone/
     ├── manifest.xml                  # Phone app manifest
     ├── resources/
@@ -88,15 +89,28 @@ The NVIDIA API key is 70 characters long - too long for comfortable single-field
 
 ### 4. Settings
 - API Key: Opens multi-segment input view
-- Model: Cycles through available NVIDIA models
+- Model: Cycles through available NVIDIA models (shows friendly names)
+- System Prompt: View and reset system prompt
 - Clear All Chats: Deletes all stored conversations
-- About: Shows app version
+- About: Shows app version, device, API info
 
 ### 5. API Key Input (10 Segments)
 - 10 input fields, each accepting 7 characters
 - Character counter shows progress (X/70)
 - Green indicator when key is complete
 - Save button enabled when any characters entered
+
+### 6. Quick Prompts
+- Tap "+ New" button to show quick prompt templates
+- 6 templates: Translate, Summarize, Explain, Weather, Joke, Timer
+- Tap a template to start conversation with pre-filled text
+
+### 7. Conversation View Features
+- Tap title to rename conversation
+- Tap message count to clear conversation
+- Retry button on failed requests
+- Cancel button during loading
+- Haptic feedback on send/receive/error
 
 ### 6. NVIDIA API Integration
 - Endpoint: `https://integrate.api.nvidia.com/v1/chat/completions`
@@ -124,43 +138,60 @@ The NVIDIA API key is 70 characters long - too long for comfortable single-field
 # Requires Connect IQ SDK installed
 # Set CONNECTIQ_SDK_DIR environment variable
 
-monkeyc -w -y developer_key.der -m manifest.xml -z resources/ -o AIChat.prg source/*.mc
+# Using build script (recommended)
+./build.sh                    # Build watch app
+./build.sh vivoactive5 full   # Build with phone app
+./build.sh vivoactive5 watch run  # Build and run in simulator
+
+# Manual build
+monkeyc -w -y developer_key.der -f monkey.jungle -o dist/AIChat.prg -d vivoactive5
 
 # With phone app
-monkeyc -w -y developer_key.der -m manifest.xml -m phone/manifest.xml \
-  -z resources/ -z phone/resources/ -o AIChat.prg \
-  source/*.mc phone/source/*.mc
+monkeyc -w -y developer_key.der -f monkey.jungle -o dist/AIChat.prg \
+  -d vivoactive5 \
+  source/*.mc phone/source/*.mc \
+  -z resources/ -z phone/resources/
 ```
 
 ## Next Steps for Future Self
 
+### Completed Features (v1.2.0)
+- ~~Error Recovery~~: Retry button added for failed API requests
+- ~~Conversation Rename~~: Tap title in conversation view to rename
+- ~~Delete Single Conversation~~: Swipe-to-delete implemented
+- ~~System Prompt~~: Customizable system prompt in settings
+- ~~Haptic Feedback~~: Vibrate on send (100ms), receive (100ms), error (200ms)
+- ~~Conversation Stats~~: Message count displayed in header
+- ~~Quick Replies~~: 6 quick prompt templates (Translate, Summarize, Explain, etc.)
+- ~~Cancel Request~~: Cancel button during loading
+- ~~Clear Conversation~~: Tap message count to clear current conversation
+- ~~About View~~: App info screen with version, device, API details
+- ~~Phone API Key Input~~: Fixed broken text input in phone app
+- ~~Build Script~~: build.sh with watch/full/simulator modes
+- ~~Friendly Model Names~~: Settings shows "Llama 3.1 70B" instead of full ID
+
 ### Priority 1 - Must Have
 1. **Streaming Responses**: Implement streaming for faster perceived response time (SDK limitation may apply)
 2. **Proper Launcher Icon**: Create a 48x48 PNG icon for the app
-3. **Error Recovery**: Handle network timeouts gracefully with retry logic
-4. **Conversation Export**: Export conversations as text files
+3. **Conversation Export**: Export conversations as text files
 
 ### Priority 2 - Should Have
-5. **Conversation Search**: Search through past conversations
-6. **Message Editing**: Edit sent messages before resending
-7. **Copy Response**: Long-press to copy assistant responses
-8. **Conversation Rename**: Allow custom conversation titles
-9. **Delete Single Conversation**: Swipe-to-delete or context menu
+4. **Conversation Search**: Search through past conversations
+5. **Message Editing**: Edit sent messages before resending
+6. **Copy Response**: Long-press to copy assistant responses
+7. **Timeout Configuration**: Configurable request timeout
 
 ### Priority 3 - Nice to Have
-10. **System Prompt**: Customizable system prompt in settings
-11. **Temperature Control**: Adjust creativity/temperature per conversation
-12. **Max Tokens Setting**: Configurable response length
-13. **Voice Input**: Use watch microphone for voice-to-text
-14. **Offline Queue**: Queue messages when offline, send when connected
-15. **Response Caching**: Cache frequent responses
+8. **Temperature Control**: Adjust creativity/temperature per conversation
+9. **Max Tokens Setting**: Configurable response length
+10. **Voice Input**: Use watch microphone for voice-to-text
+11. **Offline Queue**: Queue messages when offline, send when connected
+12. **Response Caching**: Cache frequent responses
 
 ### Priority 4 - Polish
-16. **Animations**: Smooth transitions between views
-17. **Haptic Feedback**: Vibrate on send/receive
-18. **Dark/Light Theme**: Theme options
-19. **Conversation Stats**: Message count, token usage display
-20. **Quick Replies**: Pre-defined prompt templates
+13. **Animations**: Smooth transitions between views
+14. **Dark/Light Theme**: Theme options
+15. **Token Usage Display**: Show estimated token count
 
 ## Known Limitations
 

@@ -7,7 +7,7 @@ The Garmin AI Chat app was migrated to match the current Connect IQ SDK API. Thi
 **Migration Date:** May 18, 2026
 **Target SDK:** Connect IQ 4.x/5.x
 **Target Device:** vivoactive 5
-**Current Version:** v1.1.0
+**Current Version:** v1.2.0
 
 ---
 
