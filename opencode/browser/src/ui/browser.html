@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+  <title>Nexus Browser</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <div id="titlebar">
+      <div id="titlebar-drag"></div>
+      <div id="window-controls">
+        <button id="minimize-btn" class="window-btn" title="Minimize">
+          <svg width="12" height="12" viewBox="0 0 12 12"><line x1="0" y1="6" x2="12" y2="6" stroke="currentColor" stroke-width="1.5"/></svg>
+        </button>
+        <button id="maximize-btn" class="window-btn" title="Maximize">
+          <svg width="12" height="12" viewBox="0 0 12 12"><rect x="1" y="1" width="10" height="10" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        </button>
+        <button id="close-btn" class="window-btn close" title="Close">
+          <svg width="12" height="12" viewBox="0 0 12 12"><line x1="1" y1="1" x2="11" y2="11" stroke="currentColor" stroke-width="1.5"/><line x1="11" y1="1" x2="1" y2="11" stroke="currentColor" stroke-width="1.5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="tab-bar">
+      <div id="tabs" class="tabs"></div>
+      <button id="new-tab-btn" class="new-tab-btn" title="New Tab (Ctrl+T)">+</button>
+    </div>
+
+    <div id="nav-bar">
+      <div id="nav-buttons">
+        <button id="back-btn" class="nav-btn" title="Back" disabled>
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M10 2L4 8l6 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        </button>
+        <button id="forward-btn" class="nav-btn" title="Forward" disabled>
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M6 2l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        </button>
+        <button id="refresh-btn" class="nav-btn" title="Refresh (Ctrl+R)">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M14 8A6 6 0 1 1 2.5 3" stroke="currentColor" stroke-width="1.5" fill="none"/><polyline points="0,0 2.5,3 5.5,2" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        </button>
+        <button id="home-btn" class="nav-btn" title="Home">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M1 8l7-7 7 7M3 6v8h4v-5h2v5h4V6" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        </button>
+      </div>
+
+      <div id="url-bar-container">
+        <span id="security-icon" class="security-icon">&#128274;</span>
+        <input type="text" id="url-bar" placeholder="Search or enter URL" spellcheck="false">
+        <button id="star-btn" class="url-btn" title="Bookmark this page">&#9734;</button>
+        <button id="reading-mode-btn" class="nav-feature-btn" title="Reading Mode">
+          <svg width="16" height="16" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="5" y1="5" x2="11" y2="5" stroke="currentColor" stroke-width="1.5"/><line x1="5" y1="8" x2="11" y2="8" stroke="currentColor" stroke-width="1.5"/><line x1="5" y1="11" x2="8" y2="11" stroke="currentColor" stroke-width="1.5"/></svg>
+        </button>
+        <button id="privacy-btn" class="nav-feature-btn" title="Privacy Shield">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 1L2 4v4c0 4 6 7 6 7s6-3 6-7V4L8 1z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        </button>
+      </div>
+
+      <div id="feature-buttons">
+        <button id="extensions-btn" class="nav-feature-btn" title="Extensions">
+          <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        </button>
+        <button id="downloads-btn" class="nav-feature-btn" title="Downloads">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 1v10M4 8l4 4 4-4M2 14h12" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        </button>
+        <button id="passwords-btn" class="nav-feature-btn" title="Passwords">
+          <svg width="16" height="16" viewBox="0 0 16 16"><rect x="3" y="7" width="10" height="7" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" fill="none"/><circle cx="8" cy="10.5" r="1" fill="currentColor"/></svg>
+        </button>
+        <button id="bookmarks-btn" class="nav-feature-btn" title="Bookmarks">
+          <svg width="16" height="16" viewBox="0 0 16 16"><path d="M3 1h10v14l-5-3-5 3V1z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        </button>
+        <button id="menu-btn" class="nav-feature-btn" title="Menu">
+          <svg width="16" height="16" viewBox="0 0 16 16"><line x1="2" y1="4" x2="14" y2="4" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5"/><line x1="2" y1="12" x2="14" y2="12" stroke="currentColor" stroke-width="1.5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="content-area">
+      <div id="webview-container"></div>
+
+      <div id="home-page" class="home-page">
+        <div class="home-content">
+          <h1 class="logo">Nexus</h1>
+          <p class="tagline">Fast. Private. Extensible.</p>
+          <div class="search-box">
+            <input type="text" id="home-search" placeholder="Search the web or enter URL" class="home-search-input">
+          </div>
+          <div id="quick-links" class="quick-links"></div>
+        </div>
+      </div>
+
+      <div id="reading-panel" class="side-panel hidden">
+        <div class="panel-header">
+          <h3>Reading Mode</h3>
+          <button class="close-panel-btn">&times;</button>
+        </div>
+        <div id="reading-content"></div>
+        <div class="reading-controls">
+          <button id="reading-theme-light" class="theme-btn" data-theme="light">Light</button>
+          <button id="reading-theme-dark" class="theme-btn" data-theme="dark">Dark</button>
+          <button id="reading-theme-sepia" class="theme-btn" data-theme="sepia">Sepia</button>
+          <div class="font-size-control">
+            <button id="font-decrease">A-</button>
+            <button id="font-increase">A+</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="privacy-panel" class="side-panel hidden">
+        <div class="panel-header">
+          <h3>Privacy Shield</h3>
+          <button class="close-panel-btn">&times;</button>
+        </div>
+        <div class="privacy-toggle">
+          <label class="switch">
+            <input type="checkbox" id="privacy-toggle-input" checked>
+            <span class="slider"></span>
+          </label>
+          <span>Protection Active</span>
+        </div>
+        <div id="privacy-stats">
+          <div class="stat">
+            <span class="stat-value" id="blocked-count">0</span>
+            <span class="stat-label">Trackers Blocked</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="ads-blocked-count">0</span>
+            <span class="stat-label">Ads Blocked</span>
+          </div>
+        </div>
+        <div class="blocklist-section">
+          <h4>Custom Blocklist</h4>
+          <div class="add-domain">
+            <input type="text" id="new-domain" placeholder="Enter domain to block">
+            <button id="add-domain-btn">Add</button>
+          </div>
+          <ul id="blocked-domains-list"></ul>
+        </div>
+      </div>
+
+      <div id="downloads-panel" class="side-panel hidden">
+        <div class="panel-header">
+          <h3>Downloads</h3>
+          <button class="close-panel-btn">&times;</button>
+        </div>
+        <div id="downloads-list"></div>
+        <button id="clear-downloads-btn" class="secondary-btn">Clear All</button>
+      </div>
+
+      <div id="extensions-panel" class="side-panel hidden">
+        <div class="panel-header">
+          <h3>Extensions</h3>
+          <button class="close-panel-btn">&times;</button>
+        </div>
+        <div class="extension-actions">
+          <button id="install-extension-btn">Install from Web Store</button>
+          <button id="load-unpacked-btn">Load Unpacked</button>
+        </div>
+        <div id="extensions-list"></div>
+        <a href="https://chrome.google.com/webstore" target="_blank" class="chrome-web-store-link">
+          Browse Chrome Web Store &rarr;
+        </a>
+      </div>
+
+      <div id="passwords-panel" class="side-panel hidden">
+        <div class="panel-header">
+          <h3>Password Manager</h3>
+          <button class="close-panel-btn">&times;</button>
+        </div>
+        <div class="password-actions">
+          <button id="export-passwords-btn">Export CSV</button>
+          <button id="import-passwords-btn">Import CSV</button>
+        </div>
+        <div id="passwords-list"></div>
+      </div>
+
+      <div id="bookmarks-panel" class="side-panel hidden">
+        <div class="panel-header">
+          <h3>Bookmarks</h3>
+          <button class="close-panel-btn">&times;</button>
+        </div>
+        <div class="panel-content">
+          <div id="bookmarks-list" class="bookmarks-list"></div>
+        </div>
+      </div>
+
+      <div id="settings-panel" class="side-panel hidden">
+        <div class="panel-header">
+          <h3>Settings</h3>
+          <button class="close-panel-btn">&times;</button>
+        </div>
+        <div id="settings-content">
+          <div class="settings-section">
+            <h4>Privacy</h4>
+            <label class="setting-item">
+              <span>Block Trackers</span>
+              <input type="checkbox" id="setting-block-trackers" checked>
+            </label>
+            <label class="setting-item">
+              <span>Block Ads</span>
+              <input type="checkbox" id="setting-block-ads" checked>
+            </label>
+          </div>
+          <div class="settings-section">
+            <h4>Downloads</h4>
+            <label class="setting-item">
+              <span>Ask where to save</span>
+              <input type="checkbox" id="setting-ask-download-path">
+            </label>
+          </div>
+          <div class="settings-section">
+            <h4>Appearance</h4>
+            <label class="setting-item">
+              <span>Show Home Button</span>
+              <input type="checkbox" id="setting-show-home" checked>
+            </label>
+          </div>
+          <div class="settings-section">
+            <h4>Search Engine</h4>
+            <select id="setting-search-engine">
+              <option value="google">Google</option>
+              <option value="bing">Bing</option>
+              <option value="duckduckgo">DuckDuckGo</option>
+              <option value="brave">Brave Search</option>
+            </select>
+          </div>
+          <button id="save-settings-btn" class="primary-btn">Save Settings</button>
+        </div>
+      </div>
+
+      <div id="menu-panel" class="dropdown-panel hidden">
+        <div class="panel-content">
+          <button id="menu-new-tab" class="menu-item">New Tab</button>
+          <button id="menu-new-window" class="menu-item">New Window</button>
+          <div class="menu-divider"></div>
+          <button id="menu-bookmarks" class="menu-item">Bookmarks</button>
+          <button id="menu-history" class="menu-item">History</button>
+          <button id="menu-downloads" class="menu-item">Downloads</button>
+          <div class="menu-divider"></div>
+          <button id="menu-extensions" class="menu-item">Extensions</button>
+          <button id="menu-settings" class="menu-item">Settings</button>
+          <div class="menu-divider"></div>
+          <button id="menu-zoom-in" class="menu-item">Zoom In</button>
+          <button id="menu-zoom-out" class="menu-item">Zoom Out</button>
+          <button id="menu-reset-zoom" class="menu-item">Reset Zoom</button>
+          <div class="menu-divider"></div>
+          <button id="menu-about" class="menu-item">About Nexus Browser</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="status-bar">
+      <span id="status-text"></span>
+      <span id="zoom-level">100%</span>
+      <span id="privacy-indicator" class="indicator active">
+        <svg width="12" height="12" viewBox="0 0 16 16"><path d="M8 1L2 4v4c0 4 6 7 6 7s6-3 6-7V4L8 1z" fill="currentColor"/></svg>
+        Shield Active
+      </span>
+    </div>
+  </div>
+
+  <div id="extension-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Install Extension</h3>
+      <input type="text" id="extension-id-input" placeholder="Chrome Web Store Extension ID">
+      <p class="hint">Find the ID in the Chrome Web Store URL: chrome.google.com/webstore/detail/<strong>extension-id</strong></p>
+      <div class="modal-actions">
+        <button id="modal-cancel-btn" class="secondary-btn">Cancel</button>
+        <button id="modal-install-btn" class="primary-btn">Install</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading-indicator" class="loading-indicator hidden"></div>
+
+  <script src="browser.js"></script>
+</body>
+</html>
