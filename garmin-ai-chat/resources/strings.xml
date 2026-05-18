@@ -23,4 +23,9 @@
     <string id="ApiKeySegment">Key Part %d/10</string>
     <string id="ApiKeyComplete">Key Complete</string>
     <string id="ApiKeyIncomplete">Key Incomplete</string>
+    <string id="QuickPrompts">Quick Prompts</string>
+    <string id="Rename">Rename</string>
+    <string id="ClearConversation">Clear</string>
+    <string id="Retry">Retry</string>
+    <string id="Cancel">Cancel</string>
 </resources>

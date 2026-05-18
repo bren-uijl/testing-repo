@@ -147,8 +147,16 @@ class PropertyStore
             oldestId = ids.get(0);
         }
 
-        deleteConversation(oldestId);
-        ids.remove(0);
+        var key = "conv_" + oldestId;
+        store.put(key, null);
+
+        var newIds = [];
+        for (var i = 0; i < ids.size(); i++) {
+            if (ids.get(i) != oldestId) {
+                newIds.add(ids.get(i));
+            }
+        }
+        store.put(:conversations, newIds);
     }
 
     function deleteConversation(id) {
