@@ -48,7 +48,6 @@ class ConversationView extends WatchUi.View
         if (storage == null) {
             storage = Application.getApp().getPropertyStore();
         }
-        startLoadingAnimation();
     }
 
     function onExit() {
@@ -179,6 +178,16 @@ class ConversationView extends WatchUi.View
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
             dc.drawText(width / 2, replyBtnY + 14, Graphics.FONT_SMALL, Rez.Strings.Loading + loadingDots, Graphics.TEXT_JUSTIFY_CENTER);
+
+            var cancelBtnWidth = 60;
+            var cancelBtnX = replyBtnX + replyBtnWidth + 10;
+            if (cancelBtnX + cancelBtnWidth < width - 10) {
+                dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_RED);
+                dc.fillRoundedRectangle(cancelBtnX, replyBtnY, cancelBtnWidth, replyBtnHeight, 8);
+
+                dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+                dc.drawText(cancelBtnX + cancelBtnWidth / 2, replyBtnY + 14, Graphics.FONT_SMALL, "Cancel", Graphics.TEXT_JUSTIFY_CENTER);
+            }
         }
 
         if (errorMessage != null) {
@@ -218,6 +227,27 @@ class ConversationView extends WatchUi.View
             }
             return;
         }
+
+        if (isLoading) {
+            var cancelBtnWidth = 60;
+            var cancelBtnX = replyBtnX + replyBtnWidth + 10;
+            if (x >= cancelBtnX && x <= cancelBtnX + cancelBtnWidth && y >= replyBtnY && y <= replyBtnY + replyBtnHeight) {
+                onCancelRequest();
+                return;
+            }
+        }
+    }
+
+    function onCancelRequest() {
+        isLoading = false;
+        if (loadingTimer != null) {
+            System.cancelTimer(loadingTimer);
+            loadingTimer = null;
+        }
+        loadingDots = "";
+        conversation.removeLastMessage();
+        errorMessage = "Request cancelled";
+        View.requestUpdate();
     }
 
     function openReplyInput() {
@@ -245,9 +275,18 @@ class ConversationView extends WatchUi.View
 
     function onSendComplete(response, error) {
         isLoading = false;
+        if (loadingTimer != null) {
+            System.cancelTimer(loadingTimer);
+            loadingTimer = null;
+        }
+        loadingDots = "";
 
         if (error != null) {
             errorMessage = error;
+            try {
+                System.vibrate(200);
+            } catch (e) {
+            }
         } else if (response != null) {
             conversation.removeLastMessage();
 
@@ -255,6 +294,11 @@ class ConversationView extends WatchUi.View
             conversation.addMessage(assistantMsg);
 
             storage.setLastConversationId(conversation.id);
+
+            try {
+                System.vibrate(100);
+            } catch (e) {
+            }
         }
 
         View.requestUpdate();

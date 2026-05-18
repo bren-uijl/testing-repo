@@ -176,6 +176,11 @@ class MessageInputView extends WatchUi.View
         var loadingMsg = Message.systemMessage(Rez.Strings.Loading);
         conversation.addMessage(loadingMsg);
 
+        try {
+            System.vibrate(100);
+        } catch (e) {
+        }
+
         var messages = conversation.getApiMessages();
 
         var client = new NviApiClient();
@@ -204,6 +209,10 @@ class MessageInputView extends WatchUi.View
 
         if (error != null) {
             errorMessage = error;
+            try {
+                System.vibrate(200);
+            } catch (e) {
+            }
         } else if (response != null) {
             conversation.removeLastMessage();
 
@@ -211,6 +220,11 @@ class MessageInputView extends WatchUi.View
             conversation.addMessage(assistantMsg);
 
             storage.setLastConversationId(conversation.id);
+
+            try {
+                System.vibrate(100);
+            } catch (e) {
+            }
 
             Application.getApp().showConversation(conversation.id);
             return;
