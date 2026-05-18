@@ -95,6 +95,10 @@ class ConversationView extends WatchUi.View
         }
         dc.drawText(width / 2, 18, Graphics.FONT_TINY, title, Graphics.TEXT_JUSTIFY_CENTER);
 
+        var msgCount = conversation.getMessageCount();
+        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(width / 2, 28, Graphics.FONT_TINY, msgCount.toString() + " msgs", Graphics.TEXT_JUSTIFY_CENTER);
+
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(0, 30, width, 30);
 
@@ -193,6 +197,17 @@ class ConversationView extends WatchUi.View
         if (errorMessage != null) {
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
             dc.drawText(width / 2, height - 12, Graphics.FONT_TINY, errorMessage, Graphics.TEXT_JUSTIFY_CENTER);
+
+            var retryBtnWidth = 50;
+            var retryBtnHeight = 20;
+            var retryBtnX = (width - retryBtnWidth) / 2;
+            var retryBtnY = height - 30;
+
+            dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_RED);
+            dc.fillRoundedRectangle(retryBtnX, retryBtnY, retryBtnWidth, retryBtnHeight, 6);
+
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(width / 2, retryBtnY + 10, Graphics.FONT_TINY, "Retry", Graphics.TEXT_JUSTIFY_CENTER);
         }
     }
 
@@ -220,6 +235,11 @@ class ConversationView extends WatchUi.View
             return;
         }
 
+        if (y >= 28 && y < 35 && conversation != null) {
+            clearConversation();
+            return;
+        }
+
         var footerHeight = 45;
         var replyBtnY = height - footerHeight + 10;
         var replyBtnWidth = 100;
@@ -241,6 +261,18 @@ class ConversationView extends WatchUi.View
                 return;
             }
         }
+
+        if (errorMessage != null) {
+            var retryBtnWidth = 50;
+            var retryBtnHeight = 20;
+            var retryBtnX = (width - retryBtnWidth) / 2;
+            var retryBtnY = height - 30;
+
+            if (x >= retryBtnX && x <= retryBtnX + retryBtnWidth && y >= retryBtnY && y <= retryBtnY + retryBtnHeight) {
+                onRetryRequest();
+                return;
+            }
+        }
     }
 
     function openRenameInput() {
@@ -257,6 +289,26 @@ class ConversationView extends WatchUi.View
         }
     }
 
+    function clearConversation() {
+        if (conversation == null || isLoading) {
+            return;
+        }
+
+        var messages = conversation.getMessages();
+        if (messages.size() == 0) {
+            return;
+        }
+
+        var title = conversation.title;
+        conversation.messages = [];
+        conversation.updatedAt = System.getTimer();
+        conversation.save();
+
+        scrollOffset = 0;
+        errorMessage = null;
+        View.requestUpdate();
+    }
+
     function onCancelRequest() {
         isLoading = false;
         if (loadingTimer != null) {
@@ -267,6 +319,30 @@ class ConversationView extends WatchUi.View
         conversation.removeLastMessage();
         errorMessage = "Request cancelled";
         View.requestUpdate();
+    }
+
+    function onRetryRequest() {
+        if (errorMessage == null || conversation == null) {
+            return;
+        }
+
+        var messages = conversation.getApiMessages();
+        if (messages.size() == 0) {
+            return;
+        }
+
+        errorMessage = null;
+        isLoading = true;
+        loadingDots = ".";
+        startLoadingAnimation();
+        View.requestUpdate();
+
+        var client = new NviApiClient();
+        client.setApiKey(storage.getApiKey());
+        client.setModel(storage.getModel());
+        client.setCallback(new ConversationSendCallback(self, conversation));
+
+        client.sendMessage(messages, null);
     }
 
     function openReplyInput() {
@@ -342,6 +418,21 @@ class ConversationView extends WatchUi.View
         errorMessage = msg;
         isLoading = false;
         View.requestUpdate();
+    }
+end
+
+class ConversationSendCallback
+
+    var view;
+    var conv;
+
+    function initialize(convView, conversation) {
+        view = convView;
+        conv = conversation;
+    }
+
+    function onComplete(response, error) {
+        view.onSendComplete(response, error);
     }
 end
 
