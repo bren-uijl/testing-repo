@@ -135,7 +135,7 @@ jobs:
           echo "Prompt length: ${#FULL_PROMPT} characters"
           echo ""
 
-          opencode run "$FULL_PROMPT" --model "${{ github.event.inputs.model }}"
+          opencode run "$FULL_PROMPT" --model "${{ github.event.inputs.model }}" --thinking --dangerously-skip-permissions
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
