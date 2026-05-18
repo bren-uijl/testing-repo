@@ -168,7 +168,7 @@ class ExtensionManager {
       }
     } else {
       try {
-        this.session.removeExtension(ext.path);
+        this.session.removeExtension(ext.id);
       } catch (error) {
         console.error('Failed to disable extension:', error);
       }
@@ -182,7 +182,7 @@ class ExtensionManager {
     if (!ext) return false;
 
     try {
-      this.session.removeExtension(ext.path);
+      this.session.removeExtension(ext.id);
     } catch (error) {
       console.error('Failed to remove extension from session:', error);
     }
