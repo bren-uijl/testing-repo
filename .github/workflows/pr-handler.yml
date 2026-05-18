@@ -1,8 +1,12 @@
-name: OpenCode PR Auto Fixer
+name: OpenCode PR Auto Solver
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
 
 permissions:
   contents: write
@@ -10,66 +14,96 @@ permissions:
 
 jobs:
   opencode:
-    # ✅ Prevent infinite loops from bot commits
-    if: |
-      github.actor != 'github-actions[bot]' &&
-      github.actor != 'opencode-agent[bot]'
-
+    name: Fix and close PR
     runs-on: ubuntu-latest
     timeout-minutes: 360
 
+    # Prevent loops caused by commits made by GitHub Actions / OpenCode.
+    if: |
+      github.actor != 'github-actions[bot]' &&
+      github.actor != 'opencode-agent[bot]' &&
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+
     env:
       MODEL: "opencode/qwen3.6-plus-free"
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+      BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
 
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}   # ✅ checkout PR branch directly
+          ref: ${{ env.PR_BRANCH }}
           fetch-depth: 0
+          persist-credentials: true
 
-      - name: Install dependencies
+      - name: Install system dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y curl git jq
+          sudo apt-get install -y --no-install-recommends curl git jq
 
       - name: Install OpenCode
         run: |
           curl -fsSL https://opencode.ai/install | bash
-          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+          echo "$HOME/.opencode/bin" >> "$GITHUB_PATH"
+
+      - name: Verify OpenCode
+        run: |
+          opencode --version
 
       - name: Configure git bot
         run: |
           git config user.name "opencode-agent[bot]"
           git config user.email "opencode-agent@users.noreply.github.com"
 
-      - name: Run OpenCode (PR fixer mode)
+      - name: Show PR context
         run: |
-          SYSTEM_PROMPT="You are an AI code reviewer that FIXES pull requests.
+          echo "PR number: #$PR_NUMBER"
+          echo "PR branch: $PR_BRANCH"
+          echo "Base branch: $BASE_BRANCH"
+          echo ""
+          echo "Recent commits:"
+          git log --oneline -10
+
+      - name: Run OpenCode PR solver
+        id: opencode
+        run: |
+          SYSTEM_PROMPT="You are an autonomous AI software engineer solving an existing GitHub Pull Request.
 
           CONTEXT:
-          You are running inside an active Pull Request branch.
+          - You are inside the current PR branch.
+          - This PR already exists.
+          - Your job is to solve it completely.
 
-          YOUR JOB:
-          - Review the PR changes
-          - Fix bugs or mistakes
-          - Improve code quality
-          - Keep changes SMALL and SAFE
-          - Only modify files related to this PR
+          PRIMARY GOAL:
+          Fix, improve, and finalize this PR so it can be merged safely.
 
           STRICT RULES:
-          - DO NOT create new branches
-          - DO NOT create new PRs
-          - ONLY commit to the current PR branch
-          - ALWAYS commit after each change
-          - Use conventional commit messages
-          - NEVER break existing functionality
+          - DO NOT create a new branch.
+          - DO NOT create a new pull request.
+          - DO NOT ask for user input.
+          - DO NOT wait for instructions.
+          - Commit directly to the current PR branch.
+          - Stay within the scope of this PR.
+          - Avoid unrelated rewrites.
+          - Prefer safe, minimal fixes.
+          - Run tests or checks if available.
+          - If you change files, commit the changes.
+          - Use conventional commit messages.
 
-          BEHAVIOR:
-          - Think like a senior reviewer who also fixes things
-          - Stay strictly within PR scope
-          - Avoid large rewrites
-          - Prioritize correctness and clarity"
+          WHAT TO DO:
+          1. Inspect the PR changes.
+          2. Understand the purpose of the PR.
+          3. Find bugs, broken logic, bad patterns, missing docs, or test issues.
+          4. Fix what is needed.
+          5. Keep the project functional.
+          6. Commit each logical fix.
+          7. Leave the branch ready to merge.
+
+          IMPORTANT:
+          After your work, the GitHub Actions workflow will push your commits and attempt to merge/close the PR automatically."
 
           opencode run "$SYSTEM_PROMPT" \
             --model "$MODEL" \
@@ -78,21 +112,64 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Final commit (if needed)
+      - name: Final commit if OpenCode left changes
         run: |
           if ! git diff --quiet || ! git diff --cached --quiet; then
             git add -A
-            git commit -m "fix(opencode): improve PR changes"
+            git commit -m "fix(opencode): finalize PR solution"
           else
-            echo "No changes to commit"
+            echo "No uncommitted changes."
           fi
 
-      - name: Push fixes to PR
+      - name: Push fixes to existing PR branch
         run: |
-          git push origin HEAD:${{ github.head_ref }}
+          git push origin HEAD:"$PR_BRANCH"
+
+      - name: Try merge and close PR
+        id: merge
+        run: |
+          echo "Trying to merge PR #$PR_NUMBER"
+
+          gh pr merge "$PR_NUMBER" \
+            --squash \
+            --delete-branch \
+            --subject "Merge PR #$PR_NUMBER after OpenCode fixes" \
+            --body "Automatically solved and merged by OpenCode." \
+          && echo "merged=true" >> "$GITHUB_OUTPUT" \
+          || echo "merged=false" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable auto-merge if direct merge was blocked
+        if: steps.merge.outputs.merged == 'false'
+        run: |
+          echo "Direct merge failed. Trying to enable auto-merge."
+
+          gh pr merge "$PR_NUMBER" \
+            --squash \
+            --auto \
+            --delete-branch \
+            --subject "Merge PR #$PR_NUMBER after OpenCode fixes" \
+            --body "Automatically solved by OpenCode. GitHub will merge once required checks pass." \
+          || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment if PR could not be closed immediately
+        if: steps.merge.outputs.merged == 'false'
+        run: |
+          gh pr comment "$PR_NUMBER" \
+            --body "OpenCode pushed fixes to this PR. Direct merge was blocked, so auto-merge was attempted. If repository rules prevent auto-merge, required checks or branch protection may still need to pass."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Summary
         if: always()
         run: |
-          echo "=== Updated PR commits ==="
+          echo "=== PR Solver Summary ==="
+          echo "PR: #$PR_NUMBER"
+          echo "Branch: $PR_BRANCH"
+          echo "Base: $BASE_BRANCH"
+          echo ""
+          echo "=== Recent commits ==="
           git log --oneline -10 || true
