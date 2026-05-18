@@ -11,6 +11,7 @@
     "build:mac": "electron-builder --mac",
     "build:linux": "electron-builder --linux",
     "build:all": "electron-builder --win --mac --linux",
+    "build:offline": "electron-builder --win --config.nsis.differentialPackage=false --config.nsis.perMachine=true",
     "package": "electron-builder --publish never",
     "installer": "node scripts/create-installer.js",
     "test": "jest",
@@ -37,33 +38,50 @@
     "appId": "com.nexusbrowser.app",
     "productName": "Nexus Browser",
     "directories": {
-      "output": "dist"
+      "output": "dist",
+      "buildResources": "assets"
     },
     "files": [
       "src/**/*",
       "assets/**/*",
-      "package.json"
+      "package.json",
+      "LICENSE"
     ],
     "win": {
-      "target": ["nsis", "portable"],
-      "icon": "assets/icon.ico"
-    },
-    "mac": {
-      "target": ["dmg", "zip"],
-      "icon": "assets/icon.icns",
-      "category": "public.app-category.utilities"
-    },
-    "linux": {
-      "target": ["AppImage", "deb", "rpm"],
-      "icon": "assets/",
-      "category": "Network"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.svg",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "nsis": {
       "oneClick": false,
+      "perMachine": true,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
-    }
+      "createStartMenuShortcut": true,
+      "shortcutName": "Nexus Browser",
+      "installerIcon": "assets/icon.svg",
+      "uninstallerIcon": "assets/icon.svg",
+      "installerHeaderIcon": "assets/icon.svg",
+      "include": "build/installer.nsh",
+      "license": "LICENSE",
+      "differentialPackage": false
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "icon": "assets/icon.svg",
+      "category": "public.app-category.utilities"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "icon": "assets/",
+      "category": "Network"
+    },
+    "publish": null
   },
   "devDependencies": {
     "electron": "^28.0.0",
