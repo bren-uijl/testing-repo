@@ -607,7 +607,7 @@ class NexusBrowser {
       this.installedExtensions.innerHTML = extensions.length > 0
         ? extensions.map(ext => `
           <div class="extension-item">
-            <div class="extension-icon">${ext.icon || '\uD83E\uDD'}</div>
+            <div class="extension-icon">${ext.icon || '\uD83E\uDDE9'}</div>
             <div class="extension-info">
               <div class="extension-name">${ext.name}</div>
               <div class="extension-version">v${ext.version}</div>

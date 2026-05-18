@@ -121,17 +121,6 @@ function applyPrivacyShield() {
       callback({});
     }
   });
-
-  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-    const headers = { ...details.requestHeaders };
-    const trackingHeaders = ['X-Do-Not-Track', 'DNT', 'Sec-GPC'];
-    trackingHeaders.forEach(header => {
-      if (headers[header]) {
-        delete headers[header];
-      }
-    });
-    callback({ requestHeaders: headers });
-  });
 }
 
 async function loadInstalledExtensions() {
@@ -239,20 +228,8 @@ function setupIpcHandlers(window) {
     return extensionManager.analyzePermissions(manifest);
   });
 
-  ipcMain.handle('privacy-stats', () => {
-    return privacyShield.getStats();
-  });
-
   ipcMain.handle('get-privacy-stats', () => {
     return privacyShield.getStats();
-  });
-
-  ipcMain.handle('privacy-toggle', (_, enabled) => {
-    privacyShield.setEnabled(enabled);
-    if (enabled) {
-      applyPrivacyShield();
-    }
-    return privacyShield.isEnabled();
   });
 
   ipcMain.handle('toggle-privacy', (_, enabled) => {

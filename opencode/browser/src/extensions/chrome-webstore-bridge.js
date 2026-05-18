@@ -43,7 +43,7 @@ class ChromeWebStoreBridge {
 
       const file = fs.createWriteStream(outputPath);
 
-      protocol.get(url, { followRedirects: true }, (response) => {
+      protocol.get(url, (response) => {
         if (response.statusCode === 301 || response.statusCode === 302) {
           this.downloadFile(response.headers.location, outputPath).then(resolve).catch(reject);
           return;
