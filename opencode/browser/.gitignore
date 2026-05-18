@@ -38,7 +38,7 @@ privacy-settings.json
 reading-settings.json
 download-settings.json
 
-# Installer outputs
+# Installer outputs (keep source configs)
 *.exe
 *.dmg
 *.AppImage
@@ -50,5 +50,7 @@ download-settings.json
 coverage/
 .nyc_output/
 
-# Electron builder
-electron-builder.yml
+# Generated icons
+assets/*.ico
+assets/*.icns
+assets/*.png

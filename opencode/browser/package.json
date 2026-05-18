@@ -13,6 +13,7 @@
     "build:all": "electron-builder --win --mac --linux",
     "build:offline": "electron-builder --win --config.nsis.differentialPackage=false --config.nsis.perMachine=true",
     "package": "electron-builder --publish never",
+    "build-installer": "node scripts/build-installer.js",
     "installer": "node scripts/create-installer.js",
     "test": "jest",
     "test:watch": "jest --watch",
