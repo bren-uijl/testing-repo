@@ -1,46 +1,64 @@
-name: Download + Share File (Keepalive)
+name: Download + Share File (Stable)
 
 on:
   workflow_dispatch:
 
 jobs:
-  download:
+  share:
     runs-on: ubuntu-latest
 
     steps:
       - name: Install dependencies
         run: |
+          sudo apt update
           sudo apt install -y curl python3
 
       - name: Download file
         run: |
           curl -L -o file.exe "https://www.techspot.com/downloads/downloadnowfile/6263/?evp=ade18730bca83a75dc399311646f81ff&file=7608"
+          echo "Downloaded file:"
           ls -lh
 
-      - name: Install cloudflared
+      - name: Install Cloudflare tunnel
         run: |
           curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
           chmod +x cloudflared
 
-      - name: Start server + tunnel + keepalive
+      - name: Start server and tunnel
         run: |
           # Start HTTP server
           python3 -m http.server 8080 &
-
-          # Small delay so server is ready
           sleep 2
 
-          # Start cloudflare tunnel in background
+          # Start Cloudflare tunnel
           ./cloudflared tunnel --url http://localhost:8080 > cf.log 2>&1 &
 
-          # Wait until URL appears
-          sleep 5
-          echo "==== YOUR DOWNLOAD LINK ===="
-          cat cf.log | grep -o 'https://[-a-z0-9]*\.trycloudflare.com'
-          echo "============================"
+          echo "Waiting for Cloudflare URL..."
 
-          # ✅ KEEPALIVE LOOP (prevents job from stopping)
+          # Retry loop to get URL (prevents crash)
+          for i in {1..30}; do
+            URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare.com' cf.log | head -n 1 || true)
+
+            if [ ! -z "$URL" ]; then
+              echo "======================================"
+              echo "✅ YOUR DOWNLOAD LINK:"
+              echo "$URL/file.exe"
+              echo "======================================"
+              break
+            fi
+
+            sleep 3
+          done
+
+          # If URL not found, show logs
+          if [ -z "$URL" ]; then
+            echo "❌ Tunnel failed. Dumping logs:"
+            cat cf.log
+          fi
+
+          # Keepalive loop (prevents workflow exit)
+          echo "Keepalive started..."
           while true; do
-            echo "Still alive at $(date)"
             sleep 60
           done
+``
