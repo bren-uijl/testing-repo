@@ -1,0 +1,166 @@
+name: OpenCode Issue Solver
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  opencode:
+    name: Solve Issue
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    # ✅ prevent bot loops
+    if: |
+      github.actor != 'github-actions[bot]' &&
+      github.actor != 'opencode-agent[bot]'
+
+    env:
+      MODEL: "opencode/qwen3.6-plus-free"
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+      ISSUE_TITLE: ${{ github.event.issue.title }}
+      ISSUE_BODY: ${{ github.event.issue.body }}
+      BASE_BRANCH: "main"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BASE_BRANCH }}
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y curl git jq
+
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Configure git bot
+        run: |
+          git config user.name "opencode-agent[bot]"
+          git config user.email "opencode-agent@users.noreply.github.com"
+
+      # ✅ Create working branch for the issue
+      - name: Create issue branch
+        id: branch
+        run: |
+          BRANCH="opencode/issue-${ISSUE_NUMBER}"
+          git checkout -b "$BRANCH"
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+
+      # ✅ Add initial comment (visible trace)
+      - name: Comment: starting work
+        run: |
+          gh issue comment "$ISSUE_NUMBER" \
+            --body "🤖 OpenCode started working on this issue..."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run OpenCode (Issue Solver)
+        run: |
+          SYSTEM_PROMPT="You are an autonomous AI developer solving a GitHub Issue.
+
+          ISSUE:
+          Title: $ISSUE_TITLE
+          Description:
+          $ISSUE_BODY
+
+          YOUR JOB:
+          - Understand the issue completely
+          - Reproduce the problem if needed
+          - Implement a correct fix or feature
+          - Keep changes small and safe
+          - Improve code quality if needed
+
+          RULES:
+          - ALWAYS commit after each logical change
+          - Use clear commit messages
+          - Stay focused on this issue only
+          - DO NOT introduce breaking changes
+          - Prefer fixing over rewriting
+
+          OUTPUT:
+          - Code changes in the repo
+          - Ready-to-merge solution
+
+          IMPORTANT:
+          - You are working in a dedicated issue branch"
+
+          opencode run "$SYSTEM_PROMPT" \
+            --model "$MODEL" \
+            --thinking \
+            --dangerously-skip-permissions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Final commit if needed
+        run: |
+          if ! git diff --quiet || ! git diff --cached --quiet; then
+            git add -A
+            git commit -m "fix(issue #$ISSUE_NUMBER): finalize solution"
+          else
+            echo "No changes"
+          fi
+
+      - name: Push branch
+        run: |
+          git push origin ${{ steps.branch.outputs.branch }}
+
+      # ✅ Create PR linked to issue
+      - name: Create PR
+        id: pr
+        run: |
+          URL=$(gh pr create \
+            --title "Fix: $ISSUE_TITLE" \
+            --body "Closes #$ISSUE_NUMBER\n\nAutomated fix by OpenCode." \
+            --base $BASE_BRANCH \
+            --head ${{ steps.branch.outputs.branch }} \
+            --json url \
+            --jq .url)
+
+          echo "pr_url=$URL" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ✅ Comment progress with PR link
+      - name: Comment PR created
+        run: |
+          gh issue comment "$ISSUE_NUMBER" \
+            --body "✅ Fix implemented: ${{ steps.pr.outputs.pr_url }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ✅ Merge PR automatically
+      - name: Merge PR
+        run: |
+          gh pr merge "${{ steps.pr.outputs.pr_url }}" \
+            --squash \
+            --delete-branch \
+            --auto \
+            --body "Auto-merged by OpenCode"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ✅ Close issue
+      - name: Close issue
+        run: |
+          gh issue close "$ISSUE_NUMBER" \
+            --comment "✅ Issue solved and merged automatically by OpenCode."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "=== Issue solved ==="
+          echo "Issue: #$ISSUE_NUMBER"
+          git log --oneline -10 || true
