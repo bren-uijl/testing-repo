@@ -70,9 +70,9 @@ class DownloadManager {
         title: 'Save Download',
         defaultPath: savePath,
       });
-      if (result) {
-        downloadItem.setSavePath(result);
-        downloadInfo.savePath = result;
+      if (result && !result.canceled && result.filePath) {
+        downloadItem.setSavePath(result.filePath);
+        downloadInfo.savePath = result.filePath;
       } else {
         downloadItem.setSavePath(savePath);
       }
