@@ -19,6 +19,7 @@ class PropertyStore
             store.put(:apiKeyParts, []);
             store.put(:model, "nvidia/nemotron-nano-9b-v2");
             store.put(:lastConversationId, null);
+            store.put(:systemPrompt, "You are a helpful assistant on a Garmin watch. Keep responses concise and under 200 characters.");
         }
     }
 
@@ -187,6 +188,19 @@ class PropertyStore
 
     function getMaxMessagesPerConversation() {
         return MAX_MESSAGES_PER_CONVERSATION;
+    }
+
+    function getSystemPrompt() {
+        var prompt = store.get(:systemPrompt);
+        if (prompt == null || prompt.length() == 0) {
+            return "You are a helpful assistant.";
+        }
+        return prompt;
+    }
+
+    function setSystemPrompt(prompt) {
+        store.put(:systemPrompt, prompt);
+        save();
     }
 
     function save() {

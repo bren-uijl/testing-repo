@@ -49,6 +49,17 @@ class SettingsView extends WatchUi.View
             :action => "model"
         });
 
+        var prompt = storage.getSystemPrompt();
+        var promptPreview = prompt;
+        if (promptPreview != null && promptPreview.length() > 25) {
+            promptPreview = promptPreview.substring(0, 22) + "...";
+        }
+        items.add({
+            :label => "System Prompt",
+            :value => promptPreview != null ? promptPreview : "Default",
+            :action => "systemPrompt"
+        });
+
         items.add({
             :label => "Clear All Chats",
             :value => "",
@@ -57,7 +68,7 @@ class SettingsView extends WatchUi.View
 
         items.add({
             :label => "About",
-            :value => "v1.0.0",
+            :value => "v1.1.0",
             :action => "about"
         });
     }
@@ -137,10 +148,18 @@ class SettingsView extends WatchUi.View
             Application.getApp().showApiKeyInput();
         } else if (action == "model") {
             cycleModel();
+        } else if (action == "systemPrompt") {
+            resetSystemPrompt();
         } else if (action == "clear") {
             clearAllConversations();
         } else if (action == "about") {
         }
+    }
+
+    function resetSystemPrompt() {
+        storage.setSystemPrompt("You are a helpful assistant on a Garmin watch. Keep responses concise and under 200 characters.");
+        buildItems();
+        View.requestUpdate();
     }
 
     function cycleModel() {

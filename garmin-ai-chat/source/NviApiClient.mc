@@ -107,25 +107,47 @@ class NviApiClient
                 callback.onComplete(null, "Parse error: " + e.toString());
             }
         } else {
-            var errorMsg = "HTTP " + responseCode.toString();
-            if (data != null) {
-                try {
-                    var jsonData = parseDataToString(data);
-                    if (jsonData != null && jsonData.length() > 0) {
-                        var json = Json.decode(jsonData);
-                        var error = json.get(:error);
-                        if (error != null) {
-                            var message = error.get(:message);
-                            if (message != null) {
-                                errorMsg = message;
-                            }
-                        }
-                    }
-                } catch (e) {
-                }
-            }
+            var errorMsg = getErrorMessage(responseCode, data);
             callback.onComplete(null, errorMsg);
         }
+    }
+
+    function getErrorMessage(responseCode, data) {
+        var baseMsg = "HTTP " + responseCode.toString();
+
+        if (responseCode == 401) {
+            baseMsg = "Invalid API key";
+        } else if (responseCode == 403) {
+            baseMsg = "Access denied";
+        } else if (responseCode == 429) {
+            baseMsg = "Rate limited, try later";
+        } else if (responseCode == 500) {
+            baseMsg = "Server error";
+        } else if (responseCode == 503) {
+            baseMsg = "Service unavailable";
+        }
+
+        if (data != null) {
+            try {
+                var jsonData = parseDataToString(data);
+                if (jsonData != null && jsonData.length() > 0) {
+                    var json = Json.decode(jsonData);
+                    var error = json.get(:error);
+                    if (error != null) {
+                        var message = error.get(:message);
+                        if (message != null && message.length() > 0) {
+                            if (message.length() > 50) {
+                                message = message.substring(0, 47) + "...";
+                            }
+                            return message;
+                        }
+                    }
+                }
+            } catch (e) {
+            }
+        }
+
+        return baseMsg;
     }
 
     function onError(error) {

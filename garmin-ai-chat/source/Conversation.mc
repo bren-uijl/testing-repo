@@ -88,10 +88,20 @@ class Conversation
     }
 
     function getApiMessages() {
+        var storage = Application.getApp().getPropertyStore();
+        var systemPrompt = storage.getSystemPrompt();
         var apiMsgs = [];
+
+        if (systemPrompt != null && systemPrompt.length() > 0) {
+            apiMsgs.add({
+                :role => "system",
+                :content => systemPrompt
+            });
+        }
+
         for (var i = 0; i < messages.size(); i++) {
             var msg = messages.get(i);
-            if (!msg.isSystem()) {
+            if (msg.role != "system" || i == 0) {
                 apiMsgs.add({
                     :role => msg.role,
                     :content => msg.content
