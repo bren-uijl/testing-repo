@@ -12,6 +12,8 @@ class ConversationListView extends WatchUi.View
     var headerHeight;
     var selectedIdx;
     var storage;
+    var deleteMode;
+    var deleteTargetIdx;
 
     function initialize() {
         View.initialize();
@@ -21,6 +23,8 @@ class ConversationListView extends WatchUi.View
         headerHeight = 50;
         selectedIdx = -1;
         storage = null;
+        deleteMode = false;
+        deleteTargetIdx = -1;
     }
 
     function onLayout(dc) {
@@ -76,8 +80,13 @@ class ConversationListView extends WatchUi.View
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         dc.drawText(width / 2, 18, Graphics.FONT_TINY, Rez.Strings.AppName, Graphics.TEXT_JUSTIFY_CENTER);
 
-        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width - 35, 18, Graphics.FONT_TINY, "?", Graphics.TEXT_JUSTIFY_RIGHT);
+        if (deleteMode) {
+            dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(width - 35, 18, Graphics.FONT_TINY, "X", Graphics.TEXT_JUSTIFY_RIGHT);
+        } else {
+            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(width - 35, 18, Graphics.FONT_TINY, "?", Graphics.TEXT_JUSTIFY_RIGHT);
+        }
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(0, 38, width, 38);
@@ -99,6 +108,11 @@ class ConversationListView extends WatchUi.View
             return;
         }
 
+        if (deleteMode) {
+            dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(width / 2, newBtnY + 12, Graphics.FONT_TINY, "Delete Mode", Graphics.TEXT_JUSTIFY_CENTER);
+        }
+
         var listTop = headerHeight + 30;
         var availableHeight = height - listTop - 20;
         var maxVisible = availableHeight / itemHeight;
@@ -113,12 +127,16 @@ class ConversationListView extends WatchUi.View
             var conv = conversations.get(i);
             var y = listTop + (i - scrollOffset) * itemHeight;
 
-            if (i == selectedIdx) {
+            if (deleteMode && i == deleteTargetIdx) {
+                dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_RED);
+                dc.fillRectangle(5, y, width - 10, itemHeight - 4);
+            } else if (i == selectedIdx) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
                 dc.fillRectangle(5, y, width - 10, itemHeight - 4);
             }
 
-            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+            var titleColor = deleteMode && i == deleteTargetIdx ? Graphics.COLOR_WHITE : Graphics.COLOR_WHITE;
+            dc.setColor(titleColor, Graphics.COLOR_TRANSPARENT);
             dc.drawText(15, y + 8, Graphics.FONT_SMALL, conv.title, Graphics.TEXT_JUSTIFY_LEFT);
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
@@ -126,6 +144,11 @@ class ConversationListView extends WatchUi.View
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
             dc.drawText(15, y + 26, Graphics.FONT_TINY, conv.getPreview(), Graphics.TEXT_JUSTIFY_LEFT);
+
+            if (deleteMode) {
+                dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
+                dc.drawText(width - 25, y + 24, Graphics.FONT_TINY, "X", Graphics.TEXT_JUSTIFY_RIGHT);
+            }
 
             if (i < conversations.size() - 1) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
@@ -147,12 +170,22 @@ class ConversationListView extends WatchUi.View
         var btnX = (width - btnWidth) / 2;
 
         if (x >= btnX && x <= btnX + btnWidth && y >= newBtnY && y <= newBtnY + btnHeight) {
-            Application.getApp().showNewConversation();
+            if (deleteMode) {
+                deleteSelectedConversation();
+            } else {
+                Application.getApp().showNewConversation();
+            }
             return;
         }
 
         if (x > width - 40 && y < 25) {
-            Application.getApp().showSettings();
+            if (deleteMode) {
+                deleteMode = false;
+                deleteTargetIdx = -1;
+                View.requestUpdate();
+            } else {
+                Application.getApp().showSettings();
+            }
             return;
         }
 
@@ -160,8 +193,13 @@ class ConversationListView extends WatchUi.View
         if (y >= listTop) {
             var idx = scrollOffset + (y - listTop) / itemHeight;
             if (idx >= 0 && idx < conversations.size()) {
-                var conv = conversations.get(idx);
-                Application.getApp().showConversation(conv.id);
+                if (deleteMode) {
+                    deleteTargetIdx = idx;
+                    View.requestUpdate();
+                } else {
+                    var conv = conversations.get(idx);
+                    Application.getApp().showConversation(conv.id);
+                }
             }
         }
     }
@@ -169,7 +207,19 @@ class ConversationListView extends WatchUi.View
     function onSwipe(evt) {
         var direction = evt.getDirection();
 
-        if (direction == WatchUi.SWIPE_DIRECTION_UP) {
+        if (direction == WatchUi.SWIPE_DIRECTION_LEFT) {
+            if (!deleteMode && conversations.size() > 0) {
+                deleteMode = true;
+                deleteTargetIdx = -1;
+                View.requestUpdate();
+            }
+        } else if (direction == WatchUi.SWIPE_DIRECTION_RIGHT) {
+            if (deleteMode) {
+                deleteMode = false;
+                deleteTargetIdx = -1;
+                View.requestUpdate();
+            }
+        } else if (direction == WatchUi.SWIPE_DIRECTION_UP) {
             if (scrollOffset + (getHeight() - headerHeight - 50) / itemHeight < conversations.size()) {
                 scrollOffset += 1;
                 View.requestUpdate();
@@ -179,6 +229,16 @@ class ConversationListView extends WatchUi.View
                 scrollOffset -= 1;
                 View.requestUpdate();
             }
+        }
+    }
+
+    function deleteSelectedConversation() {
+        if (deleteTargetIdx >= 0 && deleteTargetIdx < conversations.size()) {
+            var conv = conversations.get(deleteTargetIdx);
+            conv.delete();
+            conversations.remove(deleteTargetIdx);
+            deleteTargetIdx = -1;
+            View.requestUpdate();
         }
     }
 end
