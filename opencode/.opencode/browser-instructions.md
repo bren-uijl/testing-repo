@@ -2,7 +2,9 @@
 
 ## Project Overview
 
-Nexus Browser is a next-generation web browser built on Electron/Chromium with full Chrome Web Store extension compatibility. This merged version combines the best features from two previous implementations into a single, unified codebase located at `/opencode/browser/`.
+Nexus Browser is a next-generation web browser built on Electron/Chromium with full Chrome Web Store extension compatibility. The unified codebase is located at `/opencode/browser/`.
+
+**Last Updated:** May 18, 2026
 
 ## Quick Start
 
@@ -16,9 +18,13 @@ npm start
 
 ```
 opencode/browser/
-├── package.json                    # Project configuration
+├── package.json                    # Project configuration with electron-builder
+├── electron-builder.yml            # Standalone electron-builder config
 ├── README.md                       # User-facing documentation
+├── LICENSE                         # MIT License
 ├── .gitignore                      # Git ignore rules
+├── assets/
+│   └── icon.svg                    # Application icon (SVG source)
 ├── src/
 │   ├── main.js                     # Electron main process entry point
 │   ├── preload.js                  # Preload script for secure IPC bridge
@@ -36,9 +42,13 @@ opencode/browser/
 │       ├── download-manager.js     # Download handling with pause/resume
 │       ├── reading-mode.js         # Distraction-free reading view
 │       └── password-manager.js     # Encrypted password vault
+├── build/
+│   └── installer.nsh               # NSIS custom installer script
+├── scripts/
+│   └── build-installer.js          # Automated offline installer build script
 └── installers/
-    ├── windows/                    # Windows installer scripts
-    └── linux/                      # Linux installer scripts
+    ├── windows/                    # Windows installer scripts (legacy)
+    └── linux/                      # Linux installer scripts (legacy)
 ```
 
 ## Architecture Decisions
@@ -50,16 +60,17 @@ opencode/browser/
 - Same approach used by Brave, Vivaldi, Arc
 
 ### Tab/Webview Model
-The merged browser uses a **per-tab webview** approach:
+The browser uses a **per-tab webview** approach:
 - Each tab gets its own `<webview>` element
 - More robust isolation between tabs
 - Better memory management for inactive tabs
 - Individual zoom levels per tab
 
 ### UI Architecture
-- **Side panels** for features (privacy, downloads, extensions, passwords, settings, reading)
+- **Side panels** for features (privacy, downloads, extensions, passwords, settings, reading, history)
 - **Dropdown menu** for quick access to common actions
 - **Bookmarks panel** with localStorage persistence
+- **History panel** with localStorage persistence (500 entry limit)
 - **SVG icons** throughout for crisp rendering
 
 ### IPC Design
@@ -86,9 +97,10 @@ Unified `window.nexusAPI` with namespaced methods:
 - Blocks 45+ tracker domains by default
 - Blocks 20+ ad networks by default
 - Custom blocklist and whitelist support
-- Header manipulation (remove tracking headers, modify cookies)
+- Header manipulation (modify cookies for privacy)
 - Request blocking statistics with persistence
 - Toggle protection on/off
+- **WebRTC leak prevention** via command-line switches
 
 ### 3. Tab Management
 - Multiple tab support with tab bar
@@ -126,7 +138,15 @@ Unified `window.nexusAPI` with namespaced methods:
 - Bookmark panel with click-to-navigate
 - Keyboard shortcut Ctrl+D
 
-### 8. Zoom Controls
+### 8. Browsing History
+- Automatic history tracking on navigation
+- History panel with click-to-navigate
+- Individual entry removal
+- Clear all history option
+- 500 entry limit with FIFO eviction
+- Keyboard accessible
+
+### 9. Zoom Controls
 - Zoom in/out/reset (Ctrl++, Ctrl+-, Ctrl+0)
 - Zoom display in status bar
 - Applied to all active webviews
@@ -142,11 +162,60 @@ npm run build:win        # Build for Windows
 npm run build:mac        # Build for macOS
 npm run build:linux      # Build for Linux
 npm run build:all        # Build for all platforms
+npm run build:offline    # Build Windows offline installer (.exe)
+npm run build-installer  # Run full automated installer build
 npm run package          # Build without publishing
 npm test                 # Run test suite
 npm run lint             # Run ESLint
 npm run lint:fix         # Fix ESLint issues
 npm run format           # Format with Prettier
+```
+
+## Offline Windows Installer
+
+### Building the Installer
+
+```bash
+# Quick build (requires Windows or Wine for cross-compilation)
+npm run build:offline
+
+# Full automated build with verification
+npm run build-installer
+```
+
+### Installer Configuration
+
+The offline installer is configured via `electron-builder.yml` and `package.json`:
+
+- **Format**: NSIS (Nullsoft Scriptable Install System)
+- **Architecture**: x64
+- **Output**: `dist/Nexus Browser-Setup-<version>.exe`
+- **Features**:
+  - Fully offline - no internet required during installation
+  - All dependencies bundled in asar archive
+  - Custom installation directory selection
+  - Desktop and Start Menu shortcuts
+  - Per-machine installation (requires admin)
+  - Built-in uninstaller
+  - Registry entries for Windows Add/Remove Programs
+
+### NSIS Customization
+
+Custom installer behavior is defined in `build/installer.nsh`:
+- `preInit` macro: Sets default install location to `$PROGRAMFILES\Nexus Browser`
+- `customInstall` macro: Writes uninstall registry entries
+- `customUnInstall` macro: Cleans up registry on uninstall
+
+### Cross-Platform Building
+
+To build the Windows installer on Linux/macOS:
+```bash
+# Install wine (required for Windows builds on non-Windows)
+sudo apt install wine  # Ubuntu/Debian
+brew install wine      # macOS
+
+# Build
+npm run build:win
 ```
 
 ## Keyboard Shortcuts
@@ -162,37 +231,13 @@ npm run format           # Format with Prettier
 | Ctrl+0 | Reset zoom |
 | Ctrl+D | Bookmark page |
 
-## Merge Strategy
+## Bugs Fixed
 
-This merged browser combines two previous implementations:
-
-### From Root `nexus-browser/`:
-- Window state persistence (saves/restores position and size)
-- Per-tab webview architecture
-- Bookmark system with localStorage
-- Zoom controls with display
-- `nexus://home` protocol handling
-- Security icon in URL bar
-- Loading animation indicator
-- In-page reading mode injection
-- Master password vault with PBKDF2
-- Download notification system
-- Command-line switches for extensions
-- `shell.openExternal` for popup windows
-- Test/lint/format scripts
-
-### From `opencode/nexus-browser/`:
-- SVG icons throughout UI
-- Side panel architecture for all features
-- Window controls (minimize/maximize/close) wired to IPC
-- Namespaced `nexusAPI` with ~30 methods
-- Per-password random key encryption
-- Download pause/resume support
-- jsdom-based article extraction
-- Settings persistence per feature module
-- Platform-native CRX extraction
-- 4 installer scripts (Windows/Linux basic/full)
-- Comprehensive permission analysis (~40 permissions)
+1. **Invalid Unicode escape** (`browser.js:610`): Fixed broken emoji surrogate pair `'\uD83E\uDD'` to `'\uD83E\uDDE9'` (puzzle piece)
+2. **Duplicate IPC handlers** (`main.js`): Removed duplicate `privacy-stats`/`get-privacy-stats` and `privacy-toggle`/`toggle-privacy` handlers
+3. **Duplicate request handlers** (`main.js` + `privacy-shield.js`): Removed redundant `onBeforeSendHeaders` from `applyPrivacyShield()` since `PrivacyShield` constructor already registers all handlers
+4. **Invalid redirect option** (`chrome-webstore-bridge.js:46`): Removed unsupported `followRedirects` option from `https.get()` (Node.js http module doesn't support it; manual redirect handling already exists)
+5. **WebRTC IP leaks**: Added `force-webrtc-ip-handling-policy` and `webrtc-ip-handling-policy` command-line switches to disable non-proxied UDP
 
 ## Known Limitations
 
@@ -201,6 +246,7 @@ This merged browser combines two previous implementations:
 3. **DRM Content**: Widevine DRM not configured. Netflix/Spotify may not work.
 4. **Service Workers**: Some sites may have issues with Electron's service worker support.
 5. **WebAssembly**: Performance may differ from Chrome.
+6. **Icon format**: SVG icons work for electron-builder but Windows .ico files provide better taskbar integration. Convert SVG to ICO for production releases.
 
 ## Testing Checklist
 
@@ -216,6 +262,11 @@ This merged browser combines two previous implementations:
 - [ ] Window state saves/restores
 - [ ] Zoom controls work correctly
 - [ ] Extension toggle enable/disable works
+- [ ] History tracks visited pages
+- [ ] History panel displays entries correctly
+- [ ] Clear history removes all entries
+- [ ] Offline installer builds successfully
+- [ ] Installer runs on clean Windows machine
 
 ## Dependencies
 
@@ -234,19 +285,37 @@ This merged browser combines two previous implementations:
 1. Update version in package.json
 2. Run full test suite (`npm test`)
 3. Run linting (`npm run lint`)
-4. Build for all platforms (`npm run build:all`)
-5. Test on Windows 10/11, macOS 13+, Ubuntu 22.04+
-6. Verify Chrome Web Store extension compatibility
-7. Sign binaries (macOS: notarize, Windows: code sign)
-8. Create release notes
-9. Publish to GitHub Releases
+4. Build offline installer (`npm run build:offline`)
+5. Build for all platforms (`npm run build:all`)
+6. Test installer on Windows 10/11 clean machine
+7. Test on macOS 13+, Ubuntu 22.04+
+8. Verify Chrome Web Store extension compatibility
+9. Sign binaries (macOS: notarize, Windows: code sign)
+10. Convert SVG icon to .ico/.icns for production
+11. Create release notes
+12. Publish to GitHub Releases
 
 ## Resources
 
 - Chrome Extension Docs: https://developer.chrome.com/docs/extensions
 - Electron Docs: https://www.electronjs.org/docs
+- Electron Builder: https://www.electron.build/
+- NSIS Docs: https://nsis.sourceforge.io/Docs/
 - Chromium Source: https://chromium.googlesource.com
 - Chrome Web Store: https://chrome.google.com/webstore
+
+## Commit History Pattern
+
+Each feature should be committed separately:
+1. Initialize project structure
+2. Add browser UI
+3. Add extension support
+4. Add unique features (privacy, reading mode, passwords, downloads)
+5. Add settings/config
+6. Add history feature
+7. Add offline installer configuration
+8. Add tests
+9. Add documentation
 
 ---
 
