@@ -128,6 +128,13 @@ class Conversation
         storage.setConversation(id, convData);
     }
 
+    function setTitle(newTitle) {
+        if (newTitle != null && newTitle.length() > 0) {
+            title = newTitle;
+            save();
+        }
+    }
+
     function delete() {
         var storage = Application.getApp().getPropertyStore();
         storage.deleteConversation(id);

@@ -215,6 +215,11 @@ class ConversationView extends WatchUi.View
         var width = getWidth();
         var height = getHeight();
 
+        if (y < 30 && conversation != null) {
+            openRenameInput();
+            return;
+        }
+
         var footerHeight = 45;
         var replyBtnY = height - footerHeight + 10;
         var replyBtnWidth = 100;
@@ -235,6 +240,20 @@ class ConversationView extends WatchUi.View
                 onCancelRequest();
                 return;
             }
+        }
+    }
+
+    function openRenameInput() {
+        WatchUi.invokeTextInput(
+            new RenameTextInputDelegate(self),
+            { :title => "Rename conversation", :maxSize => 40 }
+        );
+    }
+
+    function onRenameSubmitted(text) {
+        if (text != null && text.length() > 0 && conversation != null) {
+            conversation.setTitle(text);
+            View.requestUpdate();
         }
     }
 
@@ -323,6 +342,20 @@ class ConversationView extends WatchUi.View
         errorMessage = msg;
         isLoading = false;
         View.requestUpdate();
+    }
+end
+
+class RenameTextInputDelegate extends WatchUi.TextConfirmationDelegate
+
+    var view;
+
+    function initialize(convView) {
+        TextConfirmationDelegate.initialize();
+        view = convView;
+    }
+
+    function onConfirmed(text) {
+        view.onRenameSubmitted(text);
     }
 end
 

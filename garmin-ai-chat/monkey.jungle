@@ -1,1 +1,18 @@
-project.manifest = manifest.xml
+[
+    @section = watch_app
+    project.manifest = manifest.xml
+    source.dir = source/
+    resources.dir = resources/
+    output.bin = AIChat.prg
+    device = vivoactive5
+
+    @section = phone_app
+    phone.manifest = phone/manifest.xml
+    phone.source.dir = phone/source/
+    phone.resources.dir = phone/resources/
+
+    @section = common
+    signing.key = developer_key.der
+    build.target = device
+    output.dir = dist/
+]
