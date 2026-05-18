@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<devices>
+    <device id="vivoactive5" name="vívoactive 5" partNumber="006-B2498-00">
+        <screen width="260" height="260" shape="round" bpp="24" memoryInPixel="false"/>
+        <apiLevel value="3.3.0"/>
+        <appTypes>
+            <appType id="watch-app" memory="65536"/>
+            <appType id="watchface" memory="65536"/>
+            <appType id="widget" memory="65536"/>
+            <appType id="datafield" memory="65536"/>
+        </appTypes>
+        <has value="Communications"/>
+        <has value="Position"/>
+        <has value="Sensor"/>
+        <has value="UserProfile"/>
+        <has value="Background"/>
+        <has value="Notifications"/>
+        <has value="BluetoothLowEnergy"/>
+    </device>
+</devices>
