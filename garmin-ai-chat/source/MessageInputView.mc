@@ -204,32 +204,8 @@ class MessageInputView extends WatchUi.View
         View.requestUpdate();
     }
 
-    function onSendComplete(response, error) {
-        isLoading = false;
-
-        if (error != null) {
-            errorMessage = error;
-            try {
-                System.vibrate(200);
-            } catch (e) {
-            }
-        } else if (response != null) {
-            conversation.removeLastMessage();
-
-            var assistantMsg = Message.assistantMessage(response);
-            conversation.addMessage(assistantMsg);
-
-            storage.setLastConversationId(conversation.id);
-
-            try {
-                System.vibrate(100);
-            } catch (e) {
-            }
-
-            Application.getApp().showConversation(conversation.id);
-            return;
-        }
-
+    function setInitialText(text) {
+        currentText = text;
         View.requestUpdate();
     }
 end
