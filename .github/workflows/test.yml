@@ -1,54 +1,33 @@
-name: File Share
+- name: Start tunnel
+  run: |
+    python3 -m http.server 8080 &
+    sleep 3
 
-on:
-  workflow_dispatch:
+    echo "Starting tunnel..."
 
-jobs:
-  share:
-    runs-on: ubuntu-latest
+    for i in {1..5}; do
+      ./cloudflared tunnel --url http://localhost:8080 > cf.log 2>&1 &
+      sleep 8
 
-    steps:
-      - name: Install tools
-        run: |
-          sudo apt update
-          sudo apt install -y curl python3
+      URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare.com' cf.log | head -n 1 || true)
 
-      - name: Download REAL file
-        run: |
-          curl -L -o file.rar "https://files06.tchspt.com/down/macOSTransformationPack5.0.rar"
-          ls -lh
+      if [ ! -z "$URL" ]; then
+        echo "✅ DOWNLOAD LINK:"
+        echo "$URL/file.rar"
+        break
+      fi
 
-      - name: Install cloudflared
-        run: |
-          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
-          chmod +x cloudflared
+      echo "Retry $i failed"
+      killall cloudflared || true
+      sleep 3
+    done
 
-      - name: Start tunnel
-        run: |
-          # Start file server
-          python3 -m http.server 8080 &
-          sleep 3
+    if [ -z "$URL" ]; then
+      echo "❌ Tunnel completely failed"
+      cat cf.log
+    fi
 
-          # Start tunnel
-          ./cloudflared tunnel --url http://localhost:8080 > cf.log 2>&1 &
-          sleep 8
-
-          echo "===== DEBUG ====="
-          cat cf.log
-          echo "================="
-
-          URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare.com' cf.log | head -n 1 || true)
-
-          echo "===== LINK ====="
-          if [ -z "$URL" ]; then
-            echo "Tunnel failed"
-          else
-            echo "$URL/file.rar"
-          fi
-          echo "================"
-
-          # Keepalive
-          while true; do
-            echo "alive $(date)"
-            sleep 60
-          done
+    while true; do
+      echo "alive $(date)"
+      sleep 60
+    done
