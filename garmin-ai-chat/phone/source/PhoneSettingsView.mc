@@ -3,7 +3,7 @@ using Toybox.Graphics;
 using Toybox.Application;
 using Toybox.Lang;
 
-class PhoneSettingsView extends WatchUi.View
+class PhoneSettingsView extends WatchUi.View {
 
     var storage;
     var apiKeyInput;
@@ -142,9 +142,9 @@ class PhoneSettingsView extends WatchUi.View
         View.requestUpdate();
         return true;
     }
-end
+}
 
-class PhoneTextInputDelegate extends WatchUi.TextConfirmationDelegate
+class PhoneTextInputDelegate extends WatchUi.TextConfirmationDelegate {
 
     var view;
 
@@ -156,9 +156,9 @@ class PhoneTextInputDelegate extends WatchUi.TextConfirmationDelegate
     function onConfirmed(text) {
         view.onApiKeyEntered(text);
     }
-end
+}
 
-class PhoneInputDelegate extends WatchUi.BehaviorDelegate
+class PhoneInputDelegate extends WatchUi.BehaviorDelegate {
 
     var view;
 
@@ -187,4 +187,4 @@ class PhoneInputDelegate extends WatchUi.BehaviorDelegate
         }
         return false;
     }
-end
+}

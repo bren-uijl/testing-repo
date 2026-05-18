@@ -4,7 +4,7 @@ using Toybox.Application;
 using Toybox.Lang;
 using Toybox.System;
 
-class ApiKeyInputView extends WatchUi.View
+class ApiKeyInputView extends WatchUi.View {
 
     var storage;
     var keyParts;
@@ -192,9 +192,9 @@ class ApiKeyInputView extends WatchUi.View
             }
         }
     }
-end
+}
 
-class ApiKeyTextInputDelegate extends WatchUi.TextConfirmationDelegate
+class ApiKeyTextInputDelegate extends WatchUi.TextConfirmationDelegate {
 
     var view;
     var segmentIdx;
@@ -208,9 +208,9 @@ class ApiKeyTextInputDelegate extends WatchUi.TextConfirmationDelegate
     function onConfirmed(text) {
         view.onSegmentSubmitted(segmentIdx, text);
     }
-end
+}
 
-class ApiKeyInputDelegate extends WatchUi.BehaviorDelegate
+class ApiKeyInputDelegate extends WatchUi.BehaviorDelegate {
 
     var view;
 
@@ -237,4 +237,4 @@ class ApiKeyInputDelegate extends WatchUi.BehaviorDelegate
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
-end
+}

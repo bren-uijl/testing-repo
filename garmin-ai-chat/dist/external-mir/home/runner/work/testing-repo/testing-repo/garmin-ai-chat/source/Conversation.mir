@@ -1,0 +1,1110 @@
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 1; @symbol_usingdef<0> = [Toybox,1,6,12]; @symbol_usingdef<1> = [System,1,13,19]; ]
+using Toybox.System;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 2; @symbol_usingdef<0> = [Toybox,2,6,12]; @symbol_usingdef<1> = [Application,2,13,24]; ]
+using Toybox.Application;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 4; @symbol_classdef = [Conversation,4,6,18]; ]
+class Conversation {
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 4; ]
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 4; ]
+    static
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 6; @position = 8; @symbol_vardef = [id,6,8,10]; ]
+    var id;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 7; @position = 8; @symbol_vardef = [title,7,8,13]; ]
+    var title;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 8; @position = 8; @symbol_vardef = [messages,8,8,16]; ]
+    var messages;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 9; @position = 8; @symbol_vardef = [createdAt,9,8,17]; ]
+    var createdAt;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 10; @position = 8; @symbol_vardef = [updatedAt,10,8,17]; ]
+    var updatedAt;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 12; @symbol_functiondef = [initialize,12,13,23]; @symbol_param<0> = [convId,12,24,30]; @symbol_param<1> = [convTitle,12,32,41]; ]
+    function initialize(convId, convTitle) as Void {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_12_43_18_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 13 8 ]
+        %tmp.1 = lgetv %convId;
+        symbol [ convId %tmp.1 13 13 19 ];
+        symbol [ id ? 13 8 10 ];
+        putv self :id %tmp.1;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 14 8 ]
+        %tmp.2 = lgetv %convTitle;
+        symbol [ convTitle %tmp.2 14 16 25 ];
+        symbol [ title ? 14 8 13 ];
+        putv self :title %tmp.2;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 15 8 ]
+        %tmp.3 = newa 0;
+        symbol [ messages ? 15 8 16 ];
+        putv self :messages %tmp.3;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 16 8 ]
+        symbol [ System %tmp.4 16 20 26 ];
+        %tmp.4 = getm $.Toybox.System;
+        symbol [ getTimer %tmp.5 16 27 35 ];
+        %tmp.5 = getv function %tmp.4 :getTimer;
+        %tmp.6 = invoke %tmp.4 %tmp.5();
+        symbol [ createdAt ? 16 8 17 ];
+        putv self :createdAt %tmp.6;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 17 8 ]
+        symbol [ System %tmp.7 17 20 26 ];
+        %tmp.7 = getm $.Toybox.System;
+        symbol [ getTimer %tmp.8 17 27 35 ];
+        %tmp.8 = getv function %tmp.7 :getTimer;
+        %tmp.9 = invoke %tmp.7 %tmp.8();
+        symbol [ updatedAt ? 17 8 17 ];
+        putv self :updatedAt %tmp.9;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_12_43_18_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 20; @symbol_functiondef = [addMessage,20,13,23]; @symbol_param<0> = [msg,20,24,27]; ]
+    function addMessage(msg) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_20_29_40_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 21 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_20_29_40_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_20_29_40_4_stop" ]
+        %storage.1 = local;
+        symbol [ storage %storage.1 21 12 19 ];
+        symbol [ Application %tmp.1 21 22 33 ];
+        %tmp.1 = getm $.Toybox.Application;
+        symbol [ getApp %tmp.2 21 34 40 ];
+        %tmp.2 = getv function %tmp.1 :getApp;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        symbol [ getPropertyStore %tmp.4 21 43 59 ];
+        %tmp.4 = getv function %tmp.3 :getPropertyStore;
+        %tmp.5 = invoke %tmp.3 %tmp.4();
+        lputv %storage.1 %tmp.5;
+        symbol [ storage %storage.1 21 12 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 22 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_20_29_40_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_20_29_40_4_stop" ]
+        %maxMessages.2 = local;
+        symbol [ maxMessages %maxMessages.2 22 12 23 ];
+        %tmp.6 = lgetv %storage.1;
+        symbol [ storage %tmp.6 22 26 33 ];
+        symbol [ getMaxMessagesPerConversation %tmp.7 22 34 63 ];
+        %tmp.7 = getv function %tmp.6 :getMaxMessagesPerConversation;
+        %tmp.8 = invoke %tmp.6 %tmp.7();
+        lputv %maxMessages.2 %tmp.8;
+        symbol [ maxMessages %maxMessages.2 22 12 23 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 24 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_24_8_26_8_if_stmt:
+        symbol [ messages %tmp.10 24 12 20 ];
+        %tmp.10 = getv ? :messages;
+        symbol [ size %tmp.11 24 21 25 ];
+        %tmp.11 = getv function %tmp.10 :size;
+        %tmp.12 = invoke %tmp.10 %tmp.11();
+        %tmp.13 = lgetv %maxMessages.2;
+        symbol [ maxMessages %tmp.13 24 31 42 ];
+        %tmp.14 = gte %tmp.12 %tmp.13;
+        bf %tmp.14 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_24_8_26_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_24_8_26_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_24_44_26_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 25 12 ]
+        symbol [ messages %tmp.16 25 12 20 ];
+        %tmp.16 = getv ? :messages;
+        symbol [ remove %tmp.17 25 21 27 ];
+        %tmp.17 = getv function %tmp.16 :remove;
+        %tmp.18 = 0;
+        invoke %tmp.16 %tmp.17(%tmp.18);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_24_44_26_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_24_8_26_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_24_8_26_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 28 8 ]
+        symbol [ messages %tmp.20 28 8 16 ];
+        %tmp.20 = getv ? :messages;
+        symbol [ add %tmp.21 28 17 20 ];
+        %tmp.21 = getv function %tmp.20 :add;
+        %tmp.22 = lgetv %msg;
+        symbol [ msg %tmp.22 28 21 24 ];
+        invoke %tmp.20 %tmp.21(%tmp.22);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 29 8 ]
+        symbol [ System %tmp.23 29 20 26 ];
+        %tmp.23 = getm $.Toybox.System;
+        symbol [ getTimer %tmp.24 29 27 35 ];
+        %tmp.24 = getv function %tmp.23 :getTimer;
+        %tmp.25 = invoke %tmp.23 %tmp.24();
+        symbol [ updatedAt ? 29 8 17 ];
+        putv self :updatedAt %tmp.25;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 31 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_8_37_8_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_12_31_47_begin:
+        symbol [ messages %tmp.27 31 12 20 ];
+        %tmp.27 = getv ? :messages;
+        symbol [ size %tmp.28 31 21 25 ];
+        %tmp.28 = getv function %tmp.27 :size;
+        %tmp.29 = invoke %tmp.27 %tmp.28();
+        %tmp.30 = 1;
+        %tmp.31 = eq %tmp.29 %tmp.30;
+        bf %tmp.31 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_8_37_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_36_31_47_true:
+        %tmp.32 = lgetv %msg;
+        symbol [ msg %tmp.32 31 36 39 ];
+        symbol [ isUser %tmp.33 31 40 46 ];
+        %tmp.33 = getv function %tmp.32 :isUser;
+        %tmp.34 = invoke %tmp.32 %tmp.33();
+        push %tmp.34;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_36_31_47_end:
+        %tmp.35 = phi [%tmp.31 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_12_31_47_begin] [%tmp.34 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_36_31_47_true] [%tmp.35 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_36_31_47_end];
+        bf %tmp.35 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_8_37_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_8_37_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_50_37_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 32 12 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_50_37_8_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_50_37_8_stop" ]
+        %preview.3 = local;
+        symbol [ preview %preview.3 32 16 23 ];
+        %tmp.36 = lgetv %msg;
+        symbol [ msg %tmp.36 32 26 29 ];
+        symbol [ content %tmp.37 32 30 37 ];
+        %tmp.37 = getv %tmp.36 :content;
+        lputv %preview.3 %tmp.37;
+        symbol [ preview %preview.3 32 16 23 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 33 12 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_33_12_35_12_if_stmt:
+        %tmp.38 = lgetv %preview.3;
+        symbol [ preview %tmp.38 33 16 23 ];
+        symbol [ length %tmp.39 33 24 30 ];
+        %tmp.39 = getv function %tmp.38 :length;
+        %tmp.40 = invoke %tmp.38 %tmp.39();
+        %tmp.41 = 40;
+        %tmp.42 = gt %tmp.40 %tmp.41;
+        bf %tmp.42 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_33_12_35_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_33_12_35_12_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_33_39_35_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 34 16 ]
+        %tmp.43 = lgetv %preview.3;
+        symbol [ preview %tmp.43 34 26 33 ];
+        symbol [ substring %tmp.44 34 34 43 ];
+        %tmp.44 = getv function %tmp.43 :substring;
+        %tmp.45 = 0;
+        %tmp.46 = 37;
+        %tmp.47 = invoke %tmp.43 %tmp.44(%tmp.45, %tmp.46);
+        %tmp.48 = "...";
+        %tmp.49 = add %tmp.47 %tmp.48;
+        lputv %preview.3 %tmp.49;
+        symbol [ preview %preview.3 34 16 23 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_33_39_35_12_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_33_12_35_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_33_12_35_12_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 36 12 ]
+        %tmp.50 = lgetv %preview.3;
+        symbol [ preview %tmp.50 36 20 27 ];
+        symbol [ title ? 36 12 17 ];
+        putv self :title %tmp.50;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_50_37_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_8_37_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_31_8_37_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 39 8 ]
+        %tmp.51 = self;
+        symbol [ save %tmp.52 39 8 12 ];
+        %tmp.52 = getv function %tmp.51 :save;
+        invoke %tmp.51 %tmp.52();
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_20_29_40_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 42; @symbol_functiondef = [removeLastMessage,42,13,30]; ]
+    function removeLastMessage() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_42_33_46_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 43 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_43_8_45_8_if_stmt:
+        symbol [ messages %tmp.2 43 12 20 ];
+        %tmp.2 = getv ? :messages;
+        symbol [ size %tmp.3 43 21 25 ];
+        %tmp.3 = getv function %tmp.2 :size;
+        %tmp.4 = invoke %tmp.2 %tmp.3();
+        %tmp.5 = 0;
+        %tmp.6 = gt %tmp.4 %tmp.5;
+        bf %tmp.6 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_43_8_45_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_43_8_45_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_43_33_45_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 44 12 ]
+        symbol [ messages %tmp.8 44 12 20 ];
+        %tmp.8 = getv ? :messages;
+        symbol [ remove %tmp.9 44 21 27 ];
+        %tmp.9 = getv function %tmp.8 :remove;
+        symbol [ messages %tmp.11 44 28 36 ];
+        %tmp.11 = getv ? :messages;
+        symbol [ size %tmp.12 44 37 41 ];
+        %tmp.12 = getv function %tmp.11 :size;
+        %tmp.13 = invoke %tmp.11 %tmp.12();
+        %tmp.14 = 1;
+        %tmp.15 = sub %tmp.13 %tmp.14;
+        invoke %tmp.8 %tmp.9(%tmp.15);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_43_33_45_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_43_8_45_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_43_8_45_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_42_33_46_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 48; @symbol_functiondef = [getMessages,48,13,24]; ]
+    function getMessages() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_48_27_50_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 49 8 ]
+        symbol [ messages %tmp.2 49 15 23 ];
+        %tmp.2 = getv ? :messages;
+        ret %tmp.2;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_48_27_50_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 52; @symbol_functiondef = [getMessageCount,52,13,28]; ]
+    function getMessageCount() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_52_31_54_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 53 8 ]
+        symbol [ messages %tmp.2 53 15 23 ];
+        %tmp.2 = getv ? :messages;
+        symbol [ size %tmp.3 53 24 28 ];
+        %tmp.3 = getv function %tmp.2 :size;
+        %tmp.4 = invoke %tmp.2 %tmp.3();
+        ret %tmp.4;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_52_31_54_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 56; @symbol_functiondef = [getLastMessage,56,13,27]; ]
+    function getLastMessage() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_56_30_61_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 57 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_57_8_59_8_if_stmt:
+        symbol [ messages %tmp.2 57 12 20 ];
+        %tmp.2 = getv ? :messages;
+        symbol [ size %tmp.3 57 21 25 ];
+        %tmp.3 = getv function %tmp.2 :size;
+        %tmp.4 = invoke %tmp.2 %tmp.3();
+        %tmp.5 = 0;
+        %tmp.6 = gt %tmp.4 %tmp.5;
+        bf %tmp.6 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_57_8_59_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_57_8_59_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_57_33_59_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 58 12 ]
+        symbol [ messages %tmp.8 58 19 27 ];
+        %tmp.8 = getv ? :messages;
+        symbol [ get %tmp.9 58 28 31 ];
+        %tmp.9 = getv function %tmp.8 :get;
+        symbol [ messages %tmp.11 58 32 40 ];
+        %tmp.11 = getv ? :messages;
+        symbol [ size %tmp.12 58 41 45 ];
+        %tmp.12 = getv function %tmp.11 :size;
+        %tmp.13 = invoke %tmp.11 %tmp.12();
+        %tmp.14 = 1;
+        %tmp.15 = sub %tmp.13 %tmp.14;
+        %tmp.16 = invoke %tmp.8 %tmp.9(%tmp.15);
+        ret %tmp.16;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_57_33_59_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_57_8_59_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_57_8_59_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 60 8 ]
+        %tmp.17 = null;
+        ret %tmp.17;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_56_30_61_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 63; @symbol_functiondef = [getPreview,63,13,23]; ]
+    function getPreview() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_63_26_73_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 64 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_63_26_73_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_63_26_73_4_stop" ]
+        %last.1 = local;
+        symbol [ last %last.1 64 12 16 ];
+        %tmp.1 = self;
+        symbol [ getLastMessage %tmp.2 64 19 33 ];
+        %tmp.2 = getv function %tmp.1 :getLastMessage;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        lputv %last.1 %tmp.3;
+        symbol [ last %last.1 64 12 16 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 65 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_65_8_67_8_if_stmt:
+        %tmp.4 = lgetv %last.1;
+        symbol [ last %tmp.4 65 12 16 ];
+        %tmp.5 = null;
+        %tmp.6 = eq %tmp.4 %tmp.5;
+        bf %tmp.6 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_65_8_67_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_65_8_67_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_65_26_67_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 66 12 ]
+        %tmp.7 = "Empty";
+        ret %tmp.7;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_65_26_67_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_65_8_67_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_65_8_67_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 68 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_63_26_73_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_63_26_73_4_stop" ]
+        %text.2 = local;
+        symbol [ text %text.2 68 12 16 ];
+        %tmp.8 = lgetv %last.1;
+        symbol [ last %tmp.8 68 19 23 ];
+        symbol [ content %tmp.9 68 24 31 ];
+        %tmp.9 = getv %tmp.8 :content;
+        lputv %text.2 %tmp.9;
+        symbol [ text %text.2 68 12 16 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 69 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_69_8_71_8_if_stmt:
+        %tmp.10 = lgetv %text.2;
+        symbol [ text %tmp.10 69 12 16 ];
+        symbol [ length %tmp.11 69 17 23 ];
+        %tmp.11 = getv function %tmp.10 :length;
+        %tmp.12 = invoke %tmp.10 %tmp.11();
+        %tmp.13 = 50;
+        %tmp.14 = gt %tmp.12 %tmp.13;
+        bf %tmp.14 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_69_8_71_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_69_8_71_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_69_32_71_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 70 12 ]
+        %tmp.15 = lgetv %text.2;
+        symbol [ text %tmp.15 70 19 23 ];
+        symbol [ substring %tmp.16 70 24 33 ];
+        %tmp.16 = getv function %tmp.15 :substring;
+        %tmp.17 = 0;
+        %tmp.18 = 47;
+        %tmp.19 = invoke %tmp.15 %tmp.16(%tmp.17, %tmp.18);
+        %tmp.20 = "...";
+        %tmp.21 = add %tmp.19 %tmp.20;
+        lputv %text.2 %tmp.21;
+        symbol [ text %text.2 70 12 16 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_69_32_71_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_69_8_71_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_69_8_71_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 72 8 ]
+        %tmp.22 = lgetv %text.2;
+        symbol [ text %tmp.22 72 15 19 ];
+        ret %tmp.22;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_63_26_73_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 75; @symbol_functiondef = [getDisplayTime,75,13,27]; ]
+    function getDisplayTime() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_75_30_88_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 76 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_75_30_88_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_75_30_88_4_stop" ]
+        %elapsed.1 = local;
+        symbol [ elapsed %elapsed.1 76 12 19 ];
+        symbol [ System %tmp.1 76 22 28 ];
+        %tmp.1 = getm $.Toybox.System;
+        symbol [ getTimer %tmp.2 76 29 37 ];
+        %tmp.2 = getv function %tmp.1 :getTimer;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        symbol [ updatedAt %tmp.5 76 42 51 ];
+        %tmp.5 = getv ? :updatedAt;
+        %tmp.6 = sub %tmp.3 %tmp.5;
+        lputv %elapsed.1 %tmp.6;
+        symbol [ elapsed %elapsed.1 76 12 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 77 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_75_30_88_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_75_30_88_4_stop" ]
+        %minutes.2 = local;
+        symbol [ minutes %minutes.2 77 12 19 ];
+        %tmp.7 = lgetv %elapsed.1;
+        symbol [ elapsed %tmp.7 77 22 29 ];
+        %tmp.8 = 60000;
+        %tmp.9 = div %tmp.7 %tmp.8;
+        lputv %minutes.2 %tmp.9;
+        symbol [ minutes %minutes.2 77 12 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 79 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_79_8_87_8_if_stmt:
+        %tmp.10 = lgetv %minutes.2;
+        symbol [ minutes %tmp.10 79 12 19 ];
+        %tmp.11 = 1;
+        %tmp.12 = lt %tmp.10 %tmp.11;
+        bf %tmp.12 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_79_8_87_8_if_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_79_8_87_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_79_25_81_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 80 12 ]
+        %tmp.13 = "Now";
+        ret %tmp.13;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_79_25_81_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_79_8_87_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_79_8_87_8_if_false:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 81 15 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_81_15_87_8_if_stmt:
+        %tmp.14 = lgetv %minutes.2;
+        symbol [ minutes %tmp.14 81 19 26 ];
+        %tmp.15 = 60;
+        %tmp.16 = lt %tmp.14 %tmp.15;
+        bf %tmp.16 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_81_15_87_8_if_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_81_15_87_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_81_33_83_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 82 12 ]
+        %tmp.17 = lgetv %minutes.2;
+        symbol [ minutes %tmp.17 82 19 26 ];
+        symbol [ toString %tmp.18 82 27 35 ];
+        %tmp.18 = getv function %tmp.17 :toString;
+        %tmp.19 = invoke %tmp.17 %tmp.18();
+        %tmp.20 = "m ago";
+        %tmp.21 = add %tmp.19 %tmp.20;
+        ret %tmp.21;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_81_33_83_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_81_15_87_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_81_15_87_8_if_false:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 83 15 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_83_15_87_8_if_stmt:
+        %tmp.22 = lgetv %minutes.2;
+        symbol [ minutes %tmp.22 83 19 26 ];
+        %tmp.23 = 1440;
+        %tmp.24 = lt %tmp.22 %tmp.23;
+        bf %tmp.24 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_83_15_87_8_if_else_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_83_15_87_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_83_35_85_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 84 12 ]
+        %tmp.25 = lgetv %minutes.2;
+        symbol [ minutes %tmp.25 84 20 27 ];
+        %tmp.26 = 60;
+        %tmp.27 = div %tmp.25 %tmp.26;
+        symbol [ toString %tmp.28 84 34 42 ];
+        %tmp.28 = getv function %tmp.27 :toString;
+        %tmp.29 = invoke %tmp.27 %tmp.28();
+        %tmp.30 = "h ago";
+        %tmp.31 = add %tmp.29 %tmp.30;
+        ret %tmp.31;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_83_35_85_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_83_15_87_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_83_15_87_8_if_else_false:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_85_15_87_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 86 12 ]
+        %tmp.32 = lgetv %minutes.2;
+        symbol [ minutes %tmp.32 86 20 27 ];
+        %tmp.33 = 1440;
+        %tmp.34 = div %tmp.32 %tmp.33;
+        symbol [ toString %tmp.35 86 36 44 ];
+        %tmp.35 = getv function %tmp.34 :toString;
+        %tmp.36 = invoke %tmp.34 %tmp.35();
+        %tmp.37 = "d ago";
+        %tmp.38 = add %tmp.36 %tmp.37;
+        ret %tmp.38;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_85_15_87_8_stop:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_83_15_87_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_81_15_87_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_79_8_87_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_75_30_88_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 90; @symbol_functiondef = [getApiMessages,90,13,27]; ]
+    function getApiMessages() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_90_30_112_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 91 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_90_30_112_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_90_30_112_4_stop" ]
+        %storage.1 = local;
+        symbol [ storage %storage.1 91 12 19 ];
+        symbol [ Application %tmp.1 91 22 33 ];
+        %tmp.1 = getm $.Toybox.Application;
+        symbol [ getApp %tmp.2 91 34 40 ];
+        %tmp.2 = getv function %tmp.1 :getApp;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        symbol [ getPropertyStore %tmp.4 91 43 59 ];
+        %tmp.4 = getv function %tmp.3 :getPropertyStore;
+        %tmp.5 = invoke %tmp.3 %tmp.4();
+        lputv %storage.1 %tmp.5;
+        symbol [ storage %storage.1 91 12 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 92 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_90_30_112_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_90_30_112_4_stop" ]
+        %systemPrompt.2 = local;
+        symbol [ systemPrompt %systemPrompt.2 92 12 24 ];
+        %tmp.6 = lgetv %storage.1;
+        symbol [ storage %tmp.6 92 27 34 ];
+        symbol [ getSystemPrompt %tmp.7 92 35 50 ];
+        %tmp.7 = getv function %tmp.6 :getSystemPrompt;
+        %tmp.8 = invoke %tmp.6 %tmp.7();
+        lputv %systemPrompt.2 %tmp.8;
+        symbol [ systemPrompt %systemPrompt.2 92 12 24 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 93 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_90_30_112_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_90_30_112_4_stop" ]
+        %apiMsgs.3 = local;
+        symbol [ apiMsgs %apiMsgs.3 93 12 19 ];
+        %tmp.9 = newa 0;
+        lputv %apiMsgs.3 %tmp.9;
+        symbol [ apiMsgs %apiMsgs.3 93 12 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 95 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_8_100_8_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_12_95_60_begin:
+        %tmp.10 = lgetv %systemPrompt.2;
+        symbol [ systemPrompt %tmp.10 95 12 24 ];
+        %tmp.11 = null;
+        %tmp.12 = ne %tmp.10 %tmp.11;
+        bf %tmp.12 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_8_100_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_36_95_60_true:
+        %tmp.13 = lgetv %systemPrompt.2;
+        symbol [ systemPrompt %tmp.13 95 36 48 ];
+        %tmp.14 = as %tmp.13 { (!Null) };
+        symbol [ length %tmp.15 95 49 55 ];
+        %tmp.15 = getv function %tmp.14 :length;
+        %tmp.16 = invoke %tmp.14 %tmp.15();
+        %tmp.17 = 0;
+        %tmp.18 = gt %tmp.16 %tmp.17;
+        push %tmp.18;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_36_95_60_end:
+        %tmp.19 = phi [%tmp.12 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_12_95_60_begin] [%tmp.18 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_36_95_60_true] [%tmp.19 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_36_95_60_end];
+        bf %tmp.19 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_8_100_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_8_100_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_63_100_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 96 12 ]
+        %tmp.20 = lgetv %apiMsgs.3;
+        symbol [ apiMsgs %tmp.20 96 12 19 ];
+        symbol [ add %tmp.21 96 20 23 ];
+        %tmp.21 = getv function %tmp.20 :add;
+        %tmp.22 = newd 2;
+        %tmp.24 = const :role;
+        symbol [ role %tmp.24 97 17 21 const ];
+        %tmp.25 = "system";
+        %tmp.26 = dup %tmp.22;
+        %tmp.27 = aputv %tmp.26 %tmp.24 %tmp.25;
+        %tmp.29 = const :content;
+        symbol [ content %tmp.29 98 17 24 const ];
+        %tmp.30 = lgetv %systemPrompt.2;
+        symbol [ systemPrompt %tmp.30 98 28 40 ];
+        %tmp.31 = as %tmp.30 { (!Null) };
+        %tmp.32 = dup %tmp.27;
+        %tmp.33 = aputv %tmp.32 %tmp.29 %tmp.31;
+        invoke %tmp.20 %tmp.21(%tmp.33);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_63_100_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_8_100_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_95_8_100_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 102 8 ]
+        for @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_8_110_8_for_test @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_8_110_8_for_incr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_8_110_8_for_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_8_110_8_for_init:
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_8_110_8_for_begin" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_8_110_8_for_end" ]
+        %i.4 = local;
+        symbol [ i %i.4 102 17 18 ];
+        %tmp.34 = 0;
+        lputv %i.4 %tmp.34;
+        symbol [ i %i.4 102 17 18 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_8_110_8_for_test:
+        %tmp.35 = lgetv %i.4;
+        symbol [ i %tmp.35 102 24 25 ];
+        symbol [ messages %tmp.37 102 28 36 ];
+        %tmp.37 = getv ? :messages;
+        symbol [ size %tmp.38 102 37 41 ];
+        %tmp.38 = getv function %tmp.37 :size;
+        %tmp.39 = invoke %tmp.37 %tmp.38();
+        %tmp.40 = lt %tmp.35 %tmp.39;
+        bf %tmp.40 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_8_110_8_for_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_8_110_8_for_begin:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_50_110_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 103 12 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_50_110_8_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_50_110_8_stop" ]
+        %msg.5 = local;
+        symbol [ msg %msg.5 103 16 19 ];
+        symbol [ messages %tmp.42 103 22 30 ];
+        %tmp.42 = getv ? :messages;
+        symbol [ get %tmp.43 103 31 34 ];
+        %tmp.43 = getv function %tmp.42 :get;
+        %tmp.44 = lgetv %i.4;
+        symbol [ i %tmp.44 103 35 36 ];
+        %tmp.45 = invoke %tmp.42 %tmp.43(%tmp.44);
+        lputv %msg.5 %tmp.45;
+        symbol [ msg %msg.5 103 16 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 104 12 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_12_109_12_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_16_104_45_begin:
+        %tmp.46 = lgetv %msg.5;
+        symbol [ msg %tmp.46 104 16 19 ];
+        symbol [ role %tmp.47 104 20 24 ];
+        %tmp.47 = getv %tmp.46 :role;
+        %tmp.48 = "system";
+        %tmp.49 = ne %tmp.47 %tmp.48;
+        bt %tmp.49 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_12_109_12_if_true;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_40_104_45_false:
+        %tmp.50 = lgetv %i.4;
+        symbol [ i %tmp.50 104 40 41 ];
+        %tmp.51 = 0;
+        %tmp.52 = eq %tmp.50 %tmp.51;
+        push %tmp.52;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_40_104_45_end:
+        %tmp.53 = phi [%tmp.49 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_16_104_45_begin] [%tmp.52 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_40_104_45_false] [%tmp.53 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_40_104_45_end];
+        bf %tmp.53 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_12_109_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_12_109_12_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_48_109_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 105 16 ]
+        %tmp.54 = lgetv %apiMsgs.3;
+        symbol [ apiMsgs %tmp.54 105 16 23 ];
+        symbol [ add %tmp.55 105 24 27 ];
+        %tmp.55 = getv function %tmp.54 :add;
+        %tmp.56 = newd 2;
+        %tmp.58 = const :role;
+        symbol [ role %tmp.58 106 21 25 const ];
+        %tmp.59 = lgetv %msg.5;
+        symbol [ msg %tmp.59 106 29 32 ];
+        symbol [ role %tmp.60 106 33 37 ];
+        %tmp.60 = getv %tmp.59 :role;
+        %tmp.61 = dup %tmp.56;
+        %tmp.62 = aputv %tmp.61 %tmp.58 %tmp.60;
+        %tmp.64 = const :content;
+        symbol [ content %tmp.64 107 21 28 const ];
+        %tmp.65 = lgetv %msg.5;
+        symbol [ msg %tmp.65 107 32 35 ];
+        symbol [ content %tmp.66 107 36 43 ];
+        %tmp.66 = getv %tmp.65 :content;
+        %tmp.67 = dup %tmp.62;
+        %tmp.68 = aputv %tmp.67 %tmp.64 %tmp.66;
+        invoke %tmp.54 %tmp.55(%tmp.68);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_48_109_12_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_12_109_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_104_12_109_12_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_50_110_8_stop:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_8_110_8_for_incr:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 102 ]
+        %tmp.71 = lgetv %i.4;
+        symbol [ i %tmp.71 102 45 46 ];
+        %tmp.72 = add %tmp.71 1;
+        lputv %i.4 %tmp.72;
+        symbol [ i %i.4 102 45 46 ];
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_8_110_8_for_test;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_102_8_110_8_for_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 111 8 ]
+        %tmp.73 = lgetv %apiMsgs.3;
+        symbol [ apiMsgs %tmp.73 111 15 22 ];
+        ret %tmp.73;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_90_30_112_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 114; @symbol_functiondef = [save,114,13,17]; ]
+    function save() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_114_20_129_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 115 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_114_20_129_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_114_20_129_4_stop" ]
+        %storage.1 = local;
+        symbol [ storage %storage.1 115 12 19 ];
+        symbol [ Application %tmp.1 115 22 33 ];
+        %tmp.1 = getm $.Toybox.Application;
+        symbol [ getApp %tmp.2 115 34 40 ];
+        %tmp.2 = getv function %tmp.1 :getApp;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        symbol [ getPropertyStore %tmp.4 115 43 59 ];
+        %tmp.4 = getv function %tmp.3 :getPropertyStore;
+        %tmp.5 = invoke %tmp.3 %tmp.4();
+        lputv %storage.1 %tmp.5;
+        symbol [ storage %storage.1 115 12 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 116 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_114_20_129_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_114_20_129_4_stop" ]
+        %convData.2 = local;
+        symbol [ convData %convData.2 116 12 20 ];
+        %tmp.6 = newd 5;
+        %tmp.8 = const :id;
+        symbol [ id %tmp.8 117 13 15 const ];
+        symbol [ id %tmp.10 117 19 21 ];
+        %tmp.10 = getv ? :id;
+        %tmp.11 = dup %tmp.6;
+        %tmp.12 = aputv %tmp.11 %tmp.8 %tmp.10;
+        %tmp.14 = const :title;
+        symbol [ title %tmp.14 118 13 18 const ];
+        symbol [ title %tmp.16 118 22 27 ];
+        %tmp.16 = getv ? :title;
+        %tmp.17 = dup %tmp.12;
+        %tmp.18 = aputv %tmp.17 %tmp.14 %tmp.16;
+        %tmp.20 = const :createdAt;
+        symbol [ createdAt %tmp.20 119 13 22 const ];
+        symbol [ createdAt %tmp.22 119 26 35 ];
+        %tmp.22 = getv ? :createdAt;
+        %tmp.23 = dup %tmp.18;
+        %tmp.24 = aputv %tmp.23 %tmp.20 %tmp.22;
+        %tmp.26 = const :updatedAt;
+        symbol [ updatedAt %tmp.26 120 13 22 const ];
+        symbol [ updatedAt %tmp.28 120 26 35 ];
+        %tmp.28 = getv ? :updatedAt;
+        %tmp.29 = dup %tmp.24;
+        %tmp.30 = aputv %tmp.29 %tmp.26 %tmp.28;
+        %tmp.32 = const :messages;
+        symbol [ messages %tmp.32 121 13 21 const ];
+        %tmp.33 = newa 0;
+        %tmp.34 = dup %tmp.30;
+        %tmp.35 = aputv %tmp.34 %tmp.32 %tmp.33;
+        lputv %convData.2 %tmp.35;
+        symbol [ convData %convData.2 116 12 20 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 124 8 ]
+        for @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_8_126_8_for_test @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_8_126_8_for_incr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_8_126_8_for_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_8_126_8_for_init:
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_8_126_8_for_begin" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_8_126_8_for_end" ]
+        %i.3 = local;
+        symbol [ i %i.3 124 17 18 ];
+        %tmp.36 = 0;
+        lputv %i.3 %tmp.36;
+        symbol [ i %i.3 124 17 18 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_8_126_8_for_test:
+        %tmp.37 = lgetv %i.3;
+        symbol [ i %tmp.37 124 24 25 ];
+        symbol [ messages %tmp.39 124 28 36 ];
+        %tmp.39 = getv ? :messages;
+        symbol [ size %tmp.40 124 37 41 ];
+        %tmp.40 = getv function %tmp.39 :size;
+        %tmp.41 = invoke %tmp.39 %tmp.40();
+        %tmp.42 = lt %tmp.37 %tmp.41;
+        bf %tmp.42 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_8_126_8_for_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_8_126_8_for_begin:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_50_126_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 125 12 ]
+        %tmp.43 = lgetv %convData.2;
+        symbol [ convData %tmp.43 125 12 20 ];
+        symbol [ get %tmp.44 125 21 24 ];
+        %tmp.44 = getv function %tmp.43 :get;
+        %tmp.46 = const :messages;
+        symbol [ messages %tmp.46 125 26 34 const ];
+        %tmp.47 = invoke %tmp.43 %tmp.44(%tmp.46);
+        symbol [ add %tmp.48 125 36 39 ];
+        %tmp.48 = getv function %tmp.47 :add;
+        symbol [ messages %tmp.50 125 40 48 ];
+        %tmp.50 = getv ? :messages;
+        symbol [ get %tmp.51 125 49 52 ];
+        %tmp.51 = getv function %tmp.50 :get;
+        %tmp.52 = lgetv %i.3;
+        symbol [ i %tmp.52 125 53 54 ];
+        %tmp.53 = invoke %tmp.50 %tmp.51(%tmp.52);
+        symbol [ toDictionary %tmp.54 125 56 68 ];
+        %tmp.54 = getv function %tmp.53 :toDictionary;
+        %tmp.55 = invoke %tmp.53 %tmp.54();
+        invoke %tmp.47 %tmp.48(%tmp.55);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_50_126_8_stop:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_8_126_8_for_incr:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 124 ]
+        %tmp.58 = lgetv %i.3;
+        symbol [ i %tmp.58 124 45 46 ];
+        %tmp.59 = add %tmp.58 1;
+        lputv %i.3 %tmp.59;
+        symbol [ i %i.3 124 45 46 ];
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_8_126_8_for_test;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_124_8_126_8_for_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 128 8 ]
+        %tmp.60 = lgetv %storage.1;
+        symbol [ storage %tmp.60 128 8 15 ];
+        symbol [ setConversation %tmp.61 128 16 31 ];
+        %tmp.61 = getv function %tmp.60 :setConversation;
+        symbol [ id %tmp.63 128 32 34 ];
+        %tmp.63 = getv ? :id;
+        %tmp.64 = lgetv %convData.2;
+        symbol [ convData %tmp.64 128 36 44 ];
+        invoke %tmp.60 %tmp.61(%tmp.63, %tmp.64);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_114_20_129_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 131; @symbol_functiondef = [setTitle,131,13,21]; @symbol_param<0> = [newTitle,131,22,30]; ]
+    function setTitle(newTitle) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_131_32_136_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 132 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_8_135_8_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_12_132_52_begin:
+        %tmp.1 = lgetv %newTitle;
+        symbol [ newTitle %tmp.1 132 12 20 ];
+        %tmp.2 = null;
+        %tmp.3 = ne %tmp.1 %tmp.2;
+        bf %tmp.3 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_8_135_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_32_132_52_true:
+        %tmp.4 = lgetv %newTitle;
+        symbol [ newTitle %tmp.4 132 32 40 ];
+        %tmp.5 = as %tmp.4 { (!Null) };
+        symbol [ length %tmp.6 132 41 47 ];
+        %tmp.6 = getv function %tmp.5 :length;
+        %tmp.7 = invoke %tmp.5 %tmp.6();
+        %tmp.8 = 0;
+        %tmp.9 = gt %tmp.7 %tmp.8;
+        push %tmp.9;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_32_132_52_end:
+        %tmp.10 = phi [%tmp.3 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_12_132_52_begin] [%tmp.9 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_32_132_52_true] [%tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_32_132_52_end];
+        bf %tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_8_135_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_8_135_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_55_135_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 133 12 ]
+        %tmp.11 = lgetv %newTitle;
+        symbol [ newTitle %tmp.11 133 20 28 ];
+        %tmp.12 = as %tmp.11 { (!Null) };
+        symbol [ title ? 133 12 17 ];
+        putv self :title %tmp.12;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 134 12 ]
+        %tmp.13 = self;
+        symbol [ save %tmp.14 134 12 16 ];
+        %tmp.14 = getv function %tmp.13 :save;
+        invoke %tmp.13 %tmp.14();
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_55_135_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_8_135_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_132_8_135_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_131_32_136_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 138; @symbol_functiondef = [delete,138,13,19]; ]
+    function delete() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_138_22_141_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 139 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_138_22_141_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_138_22_141_4_stop" ]
+        %storage.1 = local;
+        symbol [ storage %storage.1 139 12 19 ];
+        symbol [ Application %tmp.1 139 22 33 ];
+        %tmp.1 = getm $.Toybox.Application;
+        symbol [ getApp %tmp.2 139 34 40 ];
+        %tmp.2 = getv function %tmp.1 :getApp;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        symbol [ getPropertyStore %tmp.4 139 43 59 ];
+        %tmp.4 = getv function %tmp.3 :getPropertyStore;
+        %tmp.5 = invoke %tmp.3 %tmp.4();
+        lputv %storage.1 %tmp.5;
+        symbol [ storage %storage.1 139 12 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 140 8 ]
+        %tmp.6 = lgetv %storage.1;
+        symbol [ storage %tmp.6 140 8 15 ];
+        symbol [ deleteConversation %tmp.7 140 16 34 ];
+        %tmp.7 = getv function %tmp.6 :deleteConversation;
+        symbol [ id %tmp.9 140 35 37 ];
+        %tmp.9 = getv ? :id;
+        invoke %tmp.6 %tmp.7(%tmp.9);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_138_22_141_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 143; @symbol_functiondef = [load,143,20,24]; @symbol_param<0> = [convId,143,25,31]; @symbol_param<1> = [convData,143,33,41]; ]
+    static
+    function load(convId, convData) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_143_43_165_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 144 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_144_8_146_8_if_stmt:
+        %tmp.1 = lgetv %convData;
+        symbol [ convData %tmp.1 144 12 20 ];
+        %tmp.2 = null;
+        %tmp.3 = eq %tmp.1 %tmp.2;
+        bf %tmp.3 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_144_8_146_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_144_8_146_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_144_30_146_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 145 12 ]
+        symbol [ Conversation %tmp.7 145 23 35 ];
+        %tmp.7 = getv ? :Conversation;
+        %tmp.8 = lgetv %convId;
+        symbol [ convId %tmp.8 145 36 42 ];
+        %tmp.9 = "Unknown";
+        %tmp.4 = newc %tmp.7 (%tmp.8, %tmp.9);
+        ret %tmp.4;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_144_30_146_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_144_8_146_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_144_8_146_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 147 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_143_43_165_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_143_43_165_4_stop" ]
+        %title.1 = local;
+        symbol [ title %title.1 147 12 17 ];
+        %tmp.10 = lgetv %convData;
+        symbol [ convData %tmp.10 147 20 28 ];
+        symbol [ get %tmp.11 147 29 32 ];
+        %tmp.11 = getv function %tmp.10 :get;
+        %tmp.13 = const :title;
+        symbol [ title %tmp.13 147 34 39 const ];
+        %tmp.14 = invoke %tmp.10 %tmp.11(%tmp.13);
+        lputv %title.1 %tmp.14;
+        symbol [ title %title.1 147 12 17 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 148 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_143_43_165_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_143_43_165_4_stop" ]
+        %conv.2 = local;
+        symbol [ conv %conv.2 148 12 16 ];
+        symbol [ Conversation %tmp.18 148 23 35 ];
+        %tmp.18 = getv ? :Conversation;
+        %tmp.19 = lgetv %convId;
+        symbol [ convId %tmp.19 148 36 42 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_148_44_148_68_begin:
+        %tmp.20 = lgetv %title.1;
+        symbol [ title %tmp.20 148 44 49 ];
+        %tmp.21 = null;
+        %tmp.22 = ne %tmp.20 %tmp.21;
+        bf %tmp.22 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_148_44_148_68_else_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_148_44_148_68_true:
+        %tmp.23 = lgetv %title.1;
+        symbol [ title %tmp.23 148 60 65 ];
+        %tmp.24 = as %tmp.23 { (!Null) };
+        push %tmp.24;
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_148_44_148_68_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_148_44_148_68_else_false:
+        %tmp.25 = "Unknown";
+        push %tmp.25;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_148_44_148_68_end:
+        %tmp.26 = phi [%tmp.22 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_148_44_148_68_begin] [%tmp.24 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_148_44_148_68_true] [%tmp.25 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_148_44_148_68_else_false] [%tmp.26 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_148_44_148_68_end];
+        %tmp.15 = newc %tmp.18 (%tmp.19, %tmp.26);
+        lputv %conv.2 %tmp.15;
+        symbol [ conv %conv.2 148 12 16 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 149 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_143_43_165_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_143_43_165_4_stop" ]
+        %created.3 = local;
+        symbol [ created %created.3 149 12 19 ];
+        %tmp.27 = lgetv %convData;
+        symbol [ convData %tmp.27 149 22 30 ];
+        symbol [ get %tmp.28 149 31 34 ];
+        %tmp.28 = getv function %tmp.27 :get;
+        %tmp.30 = const :createdAt;
+        symbol [ createdAt %tmp.30 149 36 45 const ];
+        %tmp.31 = invoke %tmp.27 %tmp.28(%tmp.30);
+        lputv %created.3 %tmp.31;
+        symbol [ created %created.3 149 12 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 150 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_143_43_165_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_143_43_165_4_stop" ]
+        %updated.4 = local;
+        symbol [ updated %updated.4 150 12 19 ];
+        %tmp.32 = lgetv %convData;
+        symbol [ convData %tmp.32 150 22 30 ];
+        symbol [ get %tmp.33 150 31 34 ];
+        %tmp.33 = getv function %tmp.32 :get;
+        %tmp.35 = const :updatedAt;
+        symbol [ updatedAt %tmp.35 150 36 45 const ];
+        %tmp.36 = invoke %tmp.32 %tmp.33(%tmp.35);
+        lputv %updated.4 %tmp.36;
+        symbol [ updated %updated.4 150 12 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 151 8 ]
+        %tmp.37 = lgetv %conv.2;
+        symbol [ conv %tmp.37 151 8 12 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_151_25_151_69_begin:
+        %tmp.38 = lgetv %created.3;
+        symbol [ created %tmp.38 151 25 32 ];
+        %tmp.39 = null;
+        %tmp.40 = ne %tmp.38 %tmp.39;
+        bf %tmp.40 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_151_25_151_69_else_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_151_25_151_69_true:
+        %tmp.41 = lgetv %created.3;
+        symbol [ created %tmp.41 151 43 50 ];
+        %tmp.42 = as %tmp.41 { (!Null) };
+        push %tmp.42;
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_151_25_151_69_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_151_25_151_69_else_false:
+        symbol [ System %tmp.43 151 53 59 ];
+        %tmp.43 = getm $.Toybox.System;
+        symbol [ getTimer %tmp.44 151 60 68 ];
+        %tmp.44 = getv function %tmp.43 :getTimer;
+        %tmp.45 = invoke %tmp.43 %tmp.44();
+        push %tmp.45;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_151_25_151_69_end:
+        %tmp.46 = phi [%tmp.40 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_151_25_151_69_begin] [%tmp.42 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_151_25_151_69_true] [%tmp.45 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_151_25_151_69_else_false] [%tmp.46 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_151_25_151_69_end];
+        symbol [ createdAt ? 151 13 22 ];
+        putv %tmp.37 :createdAt %tmp.46;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 152 8 ]
+        %tmp.47 = lgetv %conv.2;
+        symbol [ conv %tmp.47 152 8 12 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_152_25_152_69_begin:
+        %tmp.48 = lgetv %updated.4;
+        symbol [ updated %tmp.48 152 25 32 ];
+        %tmp.49 = null;
+        %tmp.50 = ne %tmp.48 %tmp.49;
+        bf %tmp.50 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_152_25_152_69_else_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_152_25_152_69_true:
+        %tmp.51 = lgetv %updated.4;
+        symbol [ updated %tmp.51 152 43 50 ];
+        %tmp.52 = as %tmp.51 { (!Null) };
+        push %tmp.52;
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_152_25_152_69_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_152_25_152_69_else_false:
+        symbol [ System %tmp.53 152 53 59 ];
+        %tmp.53 = getm $.Toybox.System;
+        symbol [ getTimer %tmp.54 152 60 68 ];
+        %tmp.54 = getv function %tmp.53 :getTimer;
+        %tmp.55 = invoke %tmp.53 %tmp.54();
+        push %tmp.55;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_152_25_152_69_end:
+        %tmp.56 = phi [%tmp.50 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_152_25_152_69_begin] [%tmp.52 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_152_25_152_69_true] [%tmp.55 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_152_25_152_69_else_false] [%tmp.56 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_152_25_152_69_end];
+        symbol [ updatedAt ? 152 13 22 ];
+        putv %tmp.47 :updatedAt %tmp.56;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 154 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_143_43_165_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_143_43_165_4_stop" ]
+        %msgList.5 = local;
+        symbol [ msgList %msgList.5 154 12 19 ];
+        %tmp.57 = lgetv %convData;
+        symbol [ convData %tmp.57 154 22 30 ];
+        symbol [ get %tmp.58 154 31 34 ];
+        %tmp.58 = getv function %tmp.57 :get;
+        %tmp.60 = const :messages;
+        symbol [ messages %tmp.60 154 36 44 const ];
+        %tmp.61 = invoke %tmp.57 %tmp.58(%tmp.60);
+        lputv %msgList.5 %tmp.61;
+        symbol [ msgList %msgList.5 154 12 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 155 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_155_8_162_8_if_stmt:
+        %tmp.62 = lgetv %msgList.5;
+        symbol [ msgList %tmp.62 155 12 19 ];
+        %tmp.63 = null;
+        %tmp.64 = ne %tmp.62 %tmp.63;
+        bf %tmp.64 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_155_8_162_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_155_8_162_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_155_29_162_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 156 12 ]
+        for @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_12_161_12_for_test @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_12_161_12_for_incr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_12_161_12_for_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_12_161_12_for_init:
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_12_161_12_for_begin" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_12_161_12_for_end" ]
+        %i.6 = local;
+        symbol [ i %i.6 156 21 22 ];
+        %tmp.65 = 0;
+        lputv %i.6 %tmp.65;
+        symbol [ i %i.6 156 21 22 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_12_161_12_for_test:
+        %tmp.66 = lgetv %i.6;
+        symbol [ i %tmp.66 156 28 29 ];
+        %tmp.67 = lgetv %msgList.5;
+        symbol [ msgList %tmp.67 156 32 39 ];
+        %tmp.68 = as %tmp.67 { (!Null) };
+        symbol [ size %tmp.69 156 40 44 ];
+        %tmp.69 = getv function %tmp.68 :size;
+        %tmp.70 = invoke %tmp.68 %tmp.69();
+        %tmp.71 = lt %tmp.66 %tmp.70;
+        bf %tmp.71 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_12_161_12_for_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_12_161_12_for_begin:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_53_161_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 157 16 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_53_161_12_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_53_161_12_stop" ]
+        %msgData.7 = local;
+        symbol [ msgData %msgData.7 157 20 27 ];
+        %tmp.72 = lgetv %msgList.5;
+        symbol [ msgList %tmp.72 157 30 37 ];
+        %tmp.73 = as %tmp.72 { (!Null) };
+        symbol [ get %tmp.74 157 38 41 ];
+        %tmp.74 = getv function %tmp.73 :get;
+        %tmp.75 = lgetv %i.6;
+        symbol [ i %tmp.75 157 42 43 ];
+        %tmp.76 = invoke %tmp.73 %tmp.74(%tmp.75);
+        lputv %msgData.7 %tmp.76;
+        symbol [ msgData %msgData.7 157 20 27 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 158 16 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_158_16_160_16_if_stmt:
+        %tmp.77 = lgetv %msgData.7;
+        symbol [ msgData %tmp.77 158 20 27 ];
+        %tmp.78 = null;
+        %tmp.79 = ne %tmp.77 %tmp.78;
+        bf %tmp.79 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_158_16_160_16_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_158_16_160_16_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_158_37_160_16_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 159 20 ]
+        %tmp.80 = lgetv %conv.2;
+        symbol [ conv %tmp.80 159 20 24 ];
+        symbol [ messages %tmp.81 159 25 33 ];
+        %tmp.81 = getv %tmp.80 :messages;
+        symbol [ add %tmp.82 159 34 37 ];
+        %tmp.82 = getv function %tmp.81 :add;
+        symbol [ Message %tmp.84 159 38 45 ];
+        %tmp.84 = getv ? :Message;
+        symbol [ fromDictionary %tmp.85 159 46 60 ];
+        %tmp.85 = getv function %tmp.84 :fromDictionary;
+        %tmp.86 = lgetv %msgData.7;
+        symbol [ msgData %tmp.86 159 61 68 ];
+        %tmp.87 = as %tmp.86 { (!Null) };
+        %tmp.88 = invoke %tmp.84 %tmp.85(%tmp.87);
+        invoke %tmp.81 %tmp.82(%tmp.88);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_158_37_160_16_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_158_16_160_16_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_158_16_160_16_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_53_161_12_stop:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_12_161_12_for_incr:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 156 ]
+        %tmp.91 = lgetv %i.6;
+        symbol [ i %tmp.91 156 48 49 ];
+        %tmp.92 = add %tmp.91 1;
+        lputv %i.6 %tmp.92;
+        symbol [ i %i.6 156 48 49 ];
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_12_161_12_for_test;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_156_12_161_12_for_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_155_29_162_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_155_8_162_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_155_8_162_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 164 8 ]
+        %tmp.93 = lgetv %conv.2;
+        symbol [ conv %tmp.93 164 15 19 ];
+        ret %tmp.93;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_143_43_165_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 167; @symbol_functiondef = [create,167,20,26]; @symbol_param<0> = [title,167,27,32]; ]
+    static
+    function create(title) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_167_34_170_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 168 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_167_34_170_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_167_34_170_4_stop" ]
+        %convId.1 = local;
+        symbol [ convId %convId.1 168 12 18 ];
+        symbol [ System %tmp.1 168 21 27 ];
+        %tmp.1 = getm $.Toybox.System;
+        symbol [ getTimer %tmp.2 168 28 36 ];
+        %tmp.2 = getv function %tmp.1 :getTimer;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        symbol [ toString %tmp.4 168 39 47 ];
+        %tmp.4 = getv function %tmp.3 :toString;
+        %tmp.5 = invoke %tmp.3 %tmp.4();
+        lputv %convId.1 %tmp.5;
+        symbol [ convId %convId.1 168 12 18 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc" 169 8 ]
+        symbol [ Conversation %tmp.9 169 19 31 ];
+        %tmp.9 = getv ? :Conversation;
+        %tmp.10 = lgetv %convId.1;
+        symbol [ convId %tmp.10 169 32 38 ];
+        %tmp.11 = lgetv %title;
+        symbol [ title %tmp.11 169 40 45 ];
+        %tmp.6 = newc %tmp.9 (%tmp.10, %tmp.11);
+        ret %tmp.6;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_Conversation_mc_167_34_170_4_stop:
+    }
+}
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/Conversation.mc"; @line = 1; ]
+<init> {
+}

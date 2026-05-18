@@ -1,7 +1,7 @@
 using Toybox.System;
 using Toybox.Application;
 
-class Conversation
+class Conversation {
 
     var id;
     var title;
@@ -168,4 +168,4 @@ class Conversation
         var convId = System.getTimer().toString();
         return new Conversation(convId, title);
     }
-end
+}

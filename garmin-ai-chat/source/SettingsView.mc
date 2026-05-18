@@ -4,7 +4,7 @@ using Toybox.Application;
 using Toybox.Lang;
 using Toybox.System;
 
-class SettingsView extends WatchUi.View
+class SettingsView extends WatchUi.View {
 
     var storage;
     var selectedIdx;
@@ -240,9 +240,9 @@ class SettingsView extends WatchUi.View
             }
         }
     }
-end
+}
 
-class SettingsInputDelegate extends WatchUi.BehaviorDelegate
+class SettingsInputDelegate extends WatchUi.BehaviorDelegate {
 
     var view;
 
@@ -269,4 +269,4 @@ class SettingsInputDelegate extends WatchUi.BehaviorDelegate
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
-end
+}

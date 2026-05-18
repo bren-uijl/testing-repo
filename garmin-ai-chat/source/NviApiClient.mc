@@ -3,7 +3,7 @@ using Toybox.System;
 using Toybox.Lang;
 using Toybox.Json;
 
-class NviApiClient
+class NviApiClient {
 
     var baseUrl;
     var apiKey;
@@ -173,9 +173,9 @@ class NviApiClient
         }
         return data.toString();
     }
-end
+}
 
-class ApiResponseDelegate extends Communications.WebResponseDelegate
+class ApiResponseDelegate extends Communications.WebResponseDelegate {
 
     var client;
 
@@ -191,4 +191,4 @@ class ApiResponseDelegate extends Communications.WebResponseDelegate
     function onError(error) {
         client.onError(error);
     }
-end
+}

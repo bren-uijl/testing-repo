@@ -4,7 +4,7 @@ using Toybox.Application;
 using Toybox.Lang;
 using Toybox.System;
 
-class ConversationView extends WatchUi.View
+class ConversationView extends WatchUi.View {
 
     var conversation;
     var scrollOffset;
@@ -419,9 +419,9 @@ class ConversationView extends WatchUi.View
         isLoading = false;
         View.requestUpdate();
     }
-end
+}
 
-class ConversationSendCallback
+class ConversationSendCallback {
 
     var view;
     var conv;
@@ -434,9 +434,9 @@ class ConversationSendCallback
     function onComplete(response, error) {
         view.onSendComplete(response, error);
     }
-end
+}
 
-class RenameTextInputDelegate extends WatchUi.TextConfirmationDelegate
+class RenameTextInputDelegate extends WatchUi.TextConfirmationDelegate {
 
     var view;
 
@@ -448,9 +448,9 @@ class RenameTextInputDelegate extends WatchUi.TextConfirmationDelegate
     function onConfirmed(text) {
         view.onRenameSubmitted(text);
     }
-end
+}
 
-class ConversationViewInputDelegate extends WatchUi.BehaviorDelegate
+class ConversationViewInputDelegate extends WatchUi.BehaviorDelegate {
 
     var view;
 
@@ -477,4 +477,4 @@ class ConversationViewInputDelegate extends WatchUi.BehaviorDelegate
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
-end
+}

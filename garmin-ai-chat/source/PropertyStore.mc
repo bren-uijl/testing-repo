@@ -2,7 +2,7 @@ using Toybox.Application;
 using Toybox.Lang;
 using Toybox.System;
 
-class PropertyStore
+class PropertyStore {
 
     var store;
 
@@ -214,4 +214,4 @@ class PropertyStore
     function save() {
         Application.getApp().setAppProperty("AiChatStore", store);
     }
-end
+}

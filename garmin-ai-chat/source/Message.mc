@@ -3,7 +3,7 @@ using Toybox.WatchUi;
 using Toybox.Time;
 using Toybox.Lang;
 
-class Message
+class Message {
 
     var id;
     var role;
@@ -81,4 +81,4 @@ class Message
     static function assistantMessage(text) {
         return new Message(System.getTimer().toString(), "assistant", text);
     }
-end
+}

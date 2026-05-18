@@ -6,7 +6,7 @@ using Toybox.System;
 using Toybox.Lang;
 using Toybox.Json;
 
-class MessageInputView extends WatchUi.View
+class MessageInputView extends WatchUi.View {
 
     var currentText;
     var isLoading;
@@ -208,9 +208,9 @@ class MessageInputView extends WatchUi.View
         currentText = text;
         View.requestUpdate();
     }
-end
+}
 
-class SendCallback
+class SendCallback {
 
     var view;
     var conv;
@@ -226,9 +226,9 @@ class SendCallback
         System.println("SendCallback.onComplete");
         view.onSendComplete(response, error);
     }
-end
+}
 
-class TextInputDelegate extends WatchUi.TextConfirmationDelegate
+class TextInputDelegate extends WatchUi.TextConfirmationDelegate {
 
     var view;
 
@@ -240,9 +240,9 @@ class TextInputDelegate extends WatchUi.TextConfirmationDelegate
     function onConfirmed(text) {
         view.onTextSubmitted(text);
     }
-end
+}
 
-class MessageInputInputDelegate extends WatchUi.BehaviorDelegate
+class MessageInputInputDelegate extends WatchUi.BehaviorDelegate {
 
     var view;
 
@@ -262,4 +262,4 @@ class MessageInputInputDelegate extends WatchUi.BehaviorDelegate
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
-end
+}

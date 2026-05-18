@@ -4,7 +4,7 @@ using Toybox.Application;
 using Toybox.Lang;
 using Toybox.System;
 
-class ConversationListView extends WatchUi.View
+class ConversationListView extends WatchUi.View {
 
     var conversations;
     var scrollOffset;
@@ -310,9 +310,9 @@ class ConversationListView extends WatchUi.View
         var delegate = new MessageInputInputDelegate(view);
         WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE);
     }
-end
+}
 
-class ConversationListInputDelegate extends WatchUi.BehaviorDelegate
+class ConversationListInputDelegate extends WatchUi.BehaviorDelegate {
 
     var view;
 
@@ -334,4 +334,4 @@ class ConversationListInputDelegate extends WatchUi.BehaviorDelegate
         }
         return true;
     }
-end
+}

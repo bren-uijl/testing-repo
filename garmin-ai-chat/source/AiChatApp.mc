@@ -2,7 +2,7 @@ using Toybox.Application;
 using Toybox.WatchUi;
 using Toybox.System;
 
-class AiChatApp extends Application.AppBase
+class AiChatApp extends Application.AppBase {
 
     var propertyStore;
 
@@ -69,4 +69,4 @@ class AiChatApp extends Application.AppBase
         var delegate = new AboutInputDelegate(view);
         WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE);
     }
-end
+}

@@ -1,0 +1,1216 @@
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 1; @symbol_usingdef<0> = [Toybox,1,6,12]; @symbol_usingdef<1> = [WatchUi,1,13,20]; ]
+using Toybox.WatchUi;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 2; @symbol_usingdef<0> = [Toybox,2,6,12]; @symbol_usingdef<1> = [Graphics,2,13,21]; ]
+using Toybox.Graphics;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 3; @symbol_usingdef<0> = [Toybox,3,6,12]; @symbol_usingdef<1> = [Application,3,13,24]; ]
+using Toybox.Application;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 4; @symbol_usingdef<0> = [Toybox,4,6,12]; @symbol_usingdef<1> = [Lang,4,13,17]; ]
+using Toybox.Lang;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 6; @symbol_classdef = [PhoneSettingsView,6,6,23]; @symbol_extends<0> = [WatchUi,6,32,39]; @symbol_extends<1> = [View,6,40,44]; ]
+class PhoneSettingsView extends WatchUi.View {
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 6; ]
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 6; ]
+    static
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 8; @position = 8; @symbol_vardef = [storage,8,8,15]; ]
+    var storage;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 9; @position = 8; @symbol_vardef = [apiKeyInput,9,8,19]; ]
+    var apiKeyInput;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 10; @position = 8; @symbol_vardef = [modelSelected,10,8,21]; ]
+    var modelSelected;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 11; @position = 8; @symbol_vardef = [statusMessage,11,8,21]; ]
+    var statusMessage;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 12; @position = 8; @symbol_vardef = [models,12,8,14]; ]
+    var models;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 14; @symbol_functiondef = [initialize,14,13,23]; ]
+    function initialize() as Void {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_14_26_30_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 15 8 ]
+        symbol [ View %tmp.2 15 8 12 ];
+        %tmp.2 = getv ? :View;
+        symbol [ initialize %tmp.3 15 13 23 ];
+        %tmp.3 = getv function %tmp.2 :initialize;
+        invoke %tmp.2 %tmp.3();
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 16 8 ]
+        %tmp.4 = null;
+        symbol [ storage ? 16 8 15 ];
+        putv self :storage %tmp.4;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 17 8 ]
+        %tmp.5 = "";
+        symbol [ apiKeyInput ? 17 8 19 ];
+        putv self :apiKeyInput %tmp.5;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 18 8 ]
+        %tmp.6 = 0;
+        symbol [ modelSelected ? 18 8 21 ];
+        putv self :modelSelected %tmp.6;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 19 8 ]
+        %tmp.7 = "";
+        symbol [ statusMessage ? 19 8 21 ];
+        putv self :statusMessage %tmp.7;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 20 8 ]
+        %tmp.8 = newa 8;
+        %tmp.9 = "nvidia/nemotron-nano-9b-v2";
+        %tmp.10 = dup %tmp.8;
+        %tmp.11 = aputv %tmp.10 0 %tmp.9;
+        %tmp.12 = "meta/llama-3.1-8b-instruct";
+        %tmp.13 = dup %tmp.11;
+        %tmp.14 = aputv %tmp.13 1 %tmp.12;
+        %tmp.15 = "meta/llama-3.1-70b-instruct";
+        %tmp.16 = dup %tmp.14;
+        %tmp.17 = aputv %tmp.16 2 %tmp.15;
+        %tmp.18 = "mistralai/mistral-7b-instruct-v0.2";
+        %tmp.19 = dup %tmp.17;
+        %tmp.20 = aputv %tmp.19 3 %tmp.18;
+        %tmp.21 = "google/gemma-2-9b-it";
+        %tmp.22 = dup %tmp.20;
+        %tmp.23 = aputv %tmp.22 4 %tmp.21;
+        %tmp.24 = "openai/gpt-oss-120b";
+        %tmp.25 = dup %tmp.23;
+        %tmp.26 = aputv %tmp.25 5 %tmp.24;
+        %tmp.27 = "openai/gpt-oss-20b";
+        %tmp.28 = dup %tmp.26;
+        %tmp.29 = aputv %tmp.28 6 %tmp.27;
+        %tmp.30 = "mistralai/mistral-medium-3.5-128b";
+        %tmp.31 = dup %tmp.29;
+        %tmp.32 = aputv %tmp.31 7 %tmp.30;
+        symbol [ models ? 20 8 14 ];
+        putv self :models %tmp.32;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_14_26_30_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 32; @symbol_functiondef = [onLayout,32,13,21]; @symbol_param<0> = [dc,32,22,24]; ]
+    function onLayout(dc) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_32_26_42_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 33 8 ]
+        symbol [ Application %tmp.1 33 18 29 ];
+        %tmp.1 = getm $.Toybox.Application;
+        symbol [ getApp %tmp.2 33 30 36 ];
+        %tmp.2 = getv function %tmp.1 :getApp;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        symbol [ getPropertyStore %tmp.4 33 39 55 ];
+        %tmp.4 = getv function %tmp.3 :getPropertyStore;
+        %tmp.5 = invoke %tmp.3 %tmp.4();
+        symbol [ storage ? 33 8 15 ];
+        putv self :storage %tmp.5;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 34 8 ]
+        symbol [ storage %tmp.7 34 22 29 ];
+        %tmp.7 = getv ? :storage;
+        symbol [ getApiKey %tmp.8 34 30 39 ];
+        %tmp.8 = getv function %tmp.7 :getApiKey;
+        %tmp.9 = invoke %tmp.7 %tmp.8();
+        symbol [ apiKeyInput ? 34 8 19 ];
+        putv self :apiKeyInput %tmp.9;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 35 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_32_26_42_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_32_26_42_4_stop" ]
+        %currentModel.1 = local;
+        symbol [ currentModel %currentModel.1 35 12 24 ];
+        symbol [ storage %tmp.11 35 27 34 ];
+        %tmp.11 = getv ? :storage;
+        symbol [ getModel %tmp.12 35 35 43 ];
+        %tmp.12 = getv function %tmp.11 :getModel;
+        %tmp.13 = invoke %tmp.11 %tmp.12();
+        lputv %currentModel.1 %tmp.13;
+        symbol [ currentModel %currentModel.1 35 12 24 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 36 8 ]
+        for @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_8_41_8_for_test @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_8_41_8_for_incr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_8_41_8_for_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_8_41_8_for_init:
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_8_41_8_for_begin" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_8_41_8_for_end" ]
+        %i.2 = local;
+        symbol [ i %i.2 36 17 18 ];
+        %tmp.14 = 0;
+        lputv %i.2 %tmp.14;
+        symbol [ i %i.2 36 17 18 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_8_41_8_for_test:
+        %tmp.15 = lgetv %i.2;
+        symbol [ i %tmp.15 36 24 25 ];
+        symbol [ models %tmp.17 36 28 34 ];
+        %tmp.17 = getv ? :models;
+        symbol [ size %tmp.18 36 35 39 ];
+        %tmp.18 = getv function %tmp.17 :size;
+        %tmp.19 = invoke %tmp.17 %tmp.18();
+        %tmp.20 = lt %tmp.15 %tmp.19;
+        bf %tmp.20 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_8_41_8_for_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_8_41_8_for_begin:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_48_41_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 37 12 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_37_12_40_12_if_stmt:
+        symbol [ models %tmp.22 37 16 22 ];
+        %tmp.22 = getv ? :models;
+        symbol [ get %tmp.23 37 23 26 ];
+        %tmp.23 = getv function %tmp.22 :get;
+        %tmp.24 = lgetv %i.2;
+        symbol [ i %tmp.24 37 27 28 ];
+        %tmp.25 = invoke %tmp.22 %tmp.23(%tmp.24);
+        %tmp.26 = lgetv %currentModel.1;
+        symbol [ currentModel %tmp.26 37 33 45 ];
+        %tmp.27 = eq %tmp.25 %tmp.26;
+        bf %tmp.27 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_37_12_40_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_37_12_40_12_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_37_47_40_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 38 16 ]
+        %tmp.28 = lgetv %i.2;
+        symbol [ i %tmp.28 38 32 33 ];
+        symbol [ modelSelected ? 38 16 29 ];
+        putv self :modelSelected %tmp.28;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 39 16 ]
+        goto break @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_8_41_8_for_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_37_47_40_12_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_37_12_40_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_37_12_40_12_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_48_41_8_stop:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_8_41_8_for_incr:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 36 ]
+        %tmp.31 = lgetv %i.2;
+        symbol [ i %tmp.31 36 43 44 ];
+        %tmp.32 = add %tmp.31 1;
+        lputv %i.2 %tmp.32;
+        symbol [ i %i.2 36 43 44 ];
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_8_41_8_for_test;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_36_8_41_8_for_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_32_26_42_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 44; @symbol_functiondef = [onUpdate,44,13,21]; @symbol_param<0> = [dc,44,22,24]; ]
+    function onUpdate(dc) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 45 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_stop" ]
+        %width.1 = local;
+        symbol [ width %width.1 45 12 17 ];
+        %tmp.1 = lgetv %dc;
+        symbol [ dc %tmp.1 45 20 22 ];
+        symbol [ getWidth %tmp.2 45 23 31 ];
+        %tmp.2 = getv function %tmp.1 :getWidth;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        lputv %width.1 %tmp.3;
+        symbol [ width %width.1 45 12 17 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 46 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_stop" ]
+        %height.2 = local;
+        symbol [ height %height.2 46 12 18 ];
+        %tmp.4 = lgetv %dc;
+        symbol [ dc %tmp.4 46 21 23 ];
+        symbol [ getHeight %tmp.5 46 24 33 ];
+        %tmp.5 = getv function %tmp.4 :getHeight;
+        %tmp.6 = invoke %tmp.4 %tmp.5();
+        lputv %height.2 %tmp.6;
+        symbol [ height %height.2 46 12 18 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 48 8 ]
+        %tmp.7 = lgetv %dc;
+        symbol [ dc %tmp.7 48 8 10 ];
+        symbol [ setColor %tmp.8 48 11 19 ];
+        %tmp.8 = getv function %tmp.7 :setColor;
+        symbol [ Graphics %tmp.9 48 20 28 ];
+        %tmp.9 = getm $.Toybox.Graphics;
+        symbol [ COLOR_BLACK %tmp.10 48 29 40 ];
+        %tmp.10 = getv %tmp.9 :COLOR_BLACK;
+        symbol [ Graphics %tmp.11 48 42 50 ];
+        %tmp.11 = getm $.Toybox.Graphics;
+        symbol [ COLOR_BLACK %tmp.12 48 51 62 ];
+        %tmp.12 = getv %tmp.11 :COLOR_BLACK;
+        invoke %tmp.7 %tmp.8(%tmp.10, %tmp.12);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 49 8 ]
+        %tmp.13 = lgetv %dc;
+        symbol [ dc %tmp.13 49 8 10 ];
+        symbol [ clear %tmp.14 49 11 16 ];
+        %tmp.14 = getv function %tmp.13 :clear;
+        invoke %tmp.13 %tmp.14();
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 51 8 ]
+        %tmp.15 = lgetv %dc;
+        symbol [ dc %tmp.15 51 8 10 ];
+        symbol [ setColor %tmp.16 51 11 19 ];
+        %tmp.16 = getv function %tmp.15 :setColor;
+        symbol [ Graphics %tmp.17 51 20 28 ];
+        %tmp.17 = getm $.Toybox.Graphics;
+        symbol [ COLOR_WHITE %tmp.18 51 29 40 ];
+        %tmp.18 = getv %tmp.17 :COLOR_WHITE;
+        symbol [ Graphics %tmp.19 51 42 50 ];
+        %tmp.19 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.20 51 51 68 ];
+        %tmp.20 = getv %tmp.19 :COLOR_TRANSPARENT;
+        invoke %tmp.15 %tmp.16(%tmp.18, %tmp.20);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 52 8 ]
+        %tmp.21 = lgetv %dc;
+        symbol [ dc %tmp.21 52 8 10 ];
+        symbol [ drawText %tmp.22 52 11 19 ];
+        %tmp.22 = getv function %tmp.21 :drawText;
+        %tmp.23 = lgetv %width.1;
+        symbol [ width %tmp.23 52 20 25 ];
+        %tmp.24 = 2;
+        %tmp.25 = div %tmp.23 %tmp.24;
+        %tmp.26 = 30;
+        symbol [ Graphics %tmp.27 52 35 43 ];
+        %tmp.27 = getm $.Toybox.Graphics;
+        symbol [ FONT_MEDIUM %tmp.28 52 44 55 ];
+        %tmp.28 = getv %tmp.27 :FONT_MEDIUM;
+        %tmp.29 = "AI Chat Settings";
+        symbol [ Graphics %tmp.30 52 77 85 ];
+        %tmp.30 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_CENTER %tmp.31 52 86 105 ];
+        %tmp.31 = getv %tmp.30 :TEXT_JUSTIFY_CENTER;
+        invoke %tmp.21 %tmp.22(%tmp.25, %tmp.26, %tmp.28, %tmp.29, %tmp.31);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 54 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_stop" ]
+        %y.3 = local;
+        symbol [ y %y.3 54 12 13 ];
+        %tmp.32 = 80;
+        lputv %y.3 %tmp.32;
+        symbol [ y %y.3 54 12 13 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 56 8 ]
+        %tmp.33 = lgetv %dc;
+        symbol [ dc %tmp.33 56 8 10 ];
+        symbol [ setColor %tmp.34 56 11 19 ];
+        %tmp.34 = getv function %tmp.33 :setColor;
+        symbol [ Graphics %tmp.35 56 20 28 ];
+        %tmp.35 = getm $.Toybox.Graphics;
+        symbol [ COLOR_WHITE %tmp.36 56 29 40 ];
+        %tmp.36 = getv %tmp.35 :COLOR_WHITE;
+        symbol [ Graphics %tmp.37 56 42 50 ];
+        %tmp.37 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.38 56 51 68 ];
+        %tmp.38 = getv %tmp.37 :COLOR_TRANSPARENT;
+        invoke %tmp.33 %tmp.34(%tmp.36, %tmp.38);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 57 8 ]
+        %tmp.39 = lgetv %dc;
+        symbol [ dc %tmp.39 57 8 10 ];
+        symbol [ drawText %tmp.40 57 11 19 ];
+        %tmp.40 = getv function %tmp.39 :drawText;
+        %tmp.41 = 20;
+        %tmp.42 = lgetv %y.3;
+        symbol [ y %tmp.42 57 24 25 ];
+        symbol [ Graphics %tmp.43 57 27 35 ];
+        %tmp.43 = getm $.Toybox.Graphics;
+        symbol [ FONT_SMALL %tmp.44 57 36 46 ];
+        %tmp.44 = getv %tmp.43 :FONT_SMALL;
+        %tmp.45 = "NVIDIA API Key:";
+        symbol [ Graphics %tmp.46 57 67 75 ];
+        %tmp.46 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_LEFT %tmp.47 57 76 93 ];
+        %tmp.47 = getv %tmp.46 :TEXT_JUSTIFY_LEFT;
+        invoke %tmp.39 %tmp.40(%tmp.41, %tmp.42, %tmp.44, %tmp.45, %tmp.47);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 59 8 ]
+        %tmp.48 = lgetv %y.3;
+        symbol [ y %tmp.48 59 8 9 ];
+        %tmp.49 = 30;
+        %tmp.50 = add %tmp.48 %tmp.49;
+        lputv %y.3 %tmp.50;
+        symbol [ y %y.3 59 8 9 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 60 8 ]
+        %tmp.51 = lgetv %dc;
+        symbol [ dc %tmp.51 60 8 10 ];
+        symbol [ setColor %tmp.52 60 11 19 ];
+        %tmp.52 = getv function %tmp.51 :setColor;
+        symbol [ Graphics %tmp.53 60 20 28 ];
+        %tmp.53 = getm $.Toybox.Graphics;
+        symbol [ COLOR_DK_GRAY %tmp.54 60 29 42 ];
+        %tmp.54 = getv %tmp.53 :COLOR_DK_GRAY;
+        symbol [ Graphics %tmp.55 60 44 52 ];
+        %tmp.55 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.56 60 53 70 ];
+        %tmp.56 = getv %tmp.55 :COLOR_TRANSPARENT;
+        invoke %tmp.51 %tmp.52(%tmp.54, %tmp.56);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 61 8 ]
+        %tmp.57 = lgetv %dc;
+        symbol [ dc %tmp.57 61 8 10 ];
+        symbol [ drawRectangle %tmp.58 61 11 24 ];
+        %tmp.58 = getv function %tmp.57 :drawRectangle;
+        %tmp.59 = 20;
+        %tmp.60 = lgetv %y.3;
+        symbol [ y %tmp.60 61 29 30 ];
+        %tmp.61 = lgetv %width.1;
+        symbol [ width %tmp.61 61 32 37 ];
+        %tmp.62 = 40;
+        %tmp.63 = sub %tmp.61 %tmp.62;
+        %tmp.64 = 40;
+        invoke %tmp.57 %tmp.58(%tmp.59, %tmp.60, %tmp.63, %tmp.64);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 63 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_stop" ]
+        %displayKey.4 = local;
+        symbol [ displayKey %displayKey.4 63 12 22 ];
+        symbol [ apiKeyInput %tmp.66 63 25 36 ];
+        %tmp.66 = getv ? :apiKeyInput;
+        lputv %displayKey.4 %tmp.66;
+        symbol [ displayKey %displayKey.4 63 12 22 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 64 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_64_8_66_8_if_stmt:
+        %tmp.67 = lgetv %displayKey.4;
+        symbol [ displayKey %tmp.67 64 12 22 ];
+        symbol [ length %tmp.68 64 23 29 ];
+        %tmp.68 = getv function %tmp.67 :length;
+        %tmp.69 = invoke %tmp.67 %tmp.68();
+        %tmp.70 = 30;
+        %tmp.71 = gt %tmp.69 %tmp.70;
+        bf %tmp.71 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_64_8_66_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_64_8_66_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_64_38_66_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 65 12 ]
+        %tmp.72 = lgetv %displayKey.4;
+        symbol [ displayKey %tmp.72 65 25 35 ];
+        symbol [ substring %tmp.73 65 36 45 ];
+        %tmp.73 = getv function %tmp.72 :substring;
+        %tmp.74 = 0;
+        %tmp.75 = 27;
+        %tmp.76 = invoke %tmp.72 %tmp.73(%tmp.74, %tmp.75);
+        %tmp.77 = "...";
+        %tmp.78 = add %tmp.76 %tmp.77;
+        lputv %displayKey.4 %tmp.78;
+        symbol [ displayKey %displayKey.4 65 12 22 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_64_38_66_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_64_8_66_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_64_8_66_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 67 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_67_8_72_8_if_stmt:
+        %tmp.79 = lgetv %displayKey.4;
+        symbol [ displayKey %tmp.79 67 12 22 ];
+        symbol [ length %tmp.80 67 23 29 ];
+        %tmp.80 = getv function %tmp.79 :length;
+        %tmp.81 = invoke %tmp.79 %tmp.80();
+        %tmp.82 = 0;
+        %tmp.83 = eq %tmp.81 %tmp.82;
+        bf %tmp.83 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_67_8_72_8_if_else_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_67_8_72_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_67_38_70_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 68 12 ]
+        %tmp.84 = "Tap to enter API key";
+        lputv %displayKey.4 %tmp.84;
+        symbol [ displayKey %displayKey.4 68 12 22 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 69 12 ]
+        %tmp.85 = lgetv %dc;
+        symbol [ dc %tmp.85 69 12 14 ];
+        symbol [ setColor %tmp.86 69 15 23 ];
+        %tmp.86 = getv function %tmp.85 :setColor;
+        symbol [ Graphics %tmp.87 69 24 32 ];
+        %tmp.87 = getm $.Toybox.Graphics;
+        symbol [ COLOR_DK_GRAY %tmp.88 69 33 46 ];
+        %tmp.88 = getv %tmp.87 :COLOR_DK_GRAY;
+        symbol [ Graphics %tmp.89 69 48 56 ];
+        %tmp.89 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.90 69 57 74 ];
+        %tmp.90 = getv %tmp.89 :COLOR_TRANSPARENT;
+        invoke %tmp.85 %tmp.86(%tmp.88, %tmp.90);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_67_38_70_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_67_8_72_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_67_8_72_8_if_else_false:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_70_15_72_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 71 12 ]
+        %tmp.91 = lgetv %dc;
+        symbol [ dc %tmp.91 71 12 14 ];
+        symbol [ setColor %tmp.92 71 15 23 ];
+        %tmp.92 = getv function %tmp.91 :setColor;
+        symbol [ Graphics %tmp.93 71 24 32 ];
+        %tmp.93 = getm $.Toybox.Graphics;
+        symbol [ COLOR_WHITE %tmp.94 71 33 44 ];
+        %tmp.94 = getv %tmp.93 :COLOR_WHITE;
+        symbol [ Graphics %tmp.95 71 46 54 ];
+        %tmp.95 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.96 71 55 72 ];
+        %tmp.96 = getv %tmp.95 :COLOR_TRANSPARENT;
+        invoke %tmp.91 %tmp.92(%tmp.94, %tmp.96);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_70_15_72_8_stop:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_67_8_72_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 73 8 ]
+        %tmp.97 = lgetv %dc;
+        symbol [ dc %tmp.97 73 8 10 ];
+        symbol [ drawText %tmp.98 73 11 19 ];
+        %tmp.98 = getv function %tmp.97 :drawText;
+        %tmp.99 = 25;
+        %tmp.100 = lgetv %y.3;
+        symbol [ y %tmp.100 73 24 25 ];
+        %tmp.101 = 20;
+        %tmp.102 = add %tmp.100 %tmp.101;
+        symbol [ Graphics %tmp.103 73 32 40 ];
+        %tmp.103 = getm $.Toybox.Graphics;
+        symbol [ FONT_SMALL %tmp.104 73 41 51 ];
+        %tmp.104 = getv %tmp.103 :FONT_SMALL;
+        %tmp.105 = lgetv %displayKey.4;
+        symbol [ displayKey %tmp.105 73 53 63 ];
+        symbol [ Graphics %tmp.106 73 65 73 ];
+        %tmp.106 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_LEFT %tmp.107 73 74 91 ];
+        %tmp.107 = getv %tmp.106 :TEXT_JUSTIFY_LEFT;
+        invoke %tmp.97 %tmp.98(%tmp.99, %tmp.102, %tmp.104, %tmp.105, %tmp.107);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 75 8 ]
+        %tmp.108 = lgetv %y.3;
+        symbol [ y %tmp.108 75 8 9 ];
+        %tmp.109 = 60;
+        %tmp.110 = add %tmp.108 %tmp.109;
+        lputv %y.3 %tmp.110;
+        symbol [ y %y.3 75 8 9 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 76 8 ]
+        %tmp.111 = lgetv %dc;
+        symbol [ dc %tmp.111 76 8 10 ];
+        symbol [ setColor %tmp.112 76 11 19 ];
+        %tmp.112 = getv function %tmp.111 :setColor;
+        symbol [ Graphics %tmp.113 76 20 28 ];
+        %tmp.113 = getm $.Toybox.Graphics;
+        symbol [ COLOR_WHITE %tmp.114 76 29 40 ];
+        %tmp.114 = getv %tmp.113 :COLOR_WHITE;
+        symbol [ Graphics %tmp.115 76 42 50 ];
+        %tmp.115 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.116 76 51 68 ];
+        %tmp.116 = getv %tmp.115 :COLOR_TRANSPARENT;
+        invoke %tmp.111 %tmp.112(%tmp.114, %tmp.116);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 77 8 ]
+        %tmp.117 = lgetv %dc;
+        symbol [ dc %tmp.117 77 8 10 ];
+        symbol [ drawText %tmp.118 77 11 19 ];
+        %tmp.118 = getv function %tmp.117 :drawText;
+        %tmp.119 = 20;
+        %tmp.120 = lgetv %y.3;
+        symbol [ y %tmp.120 77 24 25 ];
+        symbol [ Graphics %tmp.121 77 27 35 ];
+        %tmp.121 = getm $.Toybox.Graphics;
+        symbol [ FONT_SMALL %tmp.122 77 36 46 ];
+        %tmp.122 = getv %tmp.121 :FONT_SMALL;
+        %tmp.123 = "Model:";
+        symbol [ Graphics %tmp.124 77 58 66 ];
+        %tmp.124 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_LEFT %tmp.125 77 67 84 ];
+        %tmp.125 = getv %tmp.124 :TEXT_JUSTIFY_LEFT;
+        invoke %tmp.117 %tmp.118(%tmp.119, %tmp.120, %tmp.122, %tmp.123, %tmp.125);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 79 8 ]
+        %tmp.126 = lgetv %y.3;
+        symbol [ y %tmp.126 79 8 9 ];
+        %tmp.127 = 30;
+        %tmp.128 = add %tmp.126 %tmp.127;
+        lputv %y.3 %tmp.128;
+        symbol [ y %y.3 79 8 9 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 80 8 ]
+        %tmp.129 = lgetv %dc;
+        symbol [ dc %tmp.129 80 8 10 ];
+        symbol [ setColor %tmp.130 80 11 19 ];
+        %tmp.130 = getv function %tmp.129 :setColor;
+        symbol [ Graphics %tmp.131 80 20 28 ];
+        %tmp.131 = getm $.Toybox.Graphics;
+        symbol [ COLOR_BLUE %tmp.132 80 29 39 ];
+        %tmp.132 = getv %tmp.131 :COLOR_BLUE;
+        symbol [ Graphics %tmp.133 80 41 49 ];
+        %tmp.133 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.134 80 50 67 ];
+        %tmp.134 = getv %tmp.133 :COLOR_TRANSPARENT;
+        invoke %tmp.129 %tmp.130(%tmp.132, %tmp.134);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 81 8 ]
+        %tmp.135 = lgetv %dc;
+        symbol [ dc %tmp.135 81 8 10 ];
+        symbol [ drawText %tmp.136 81 11 19 ];
+        %tmp.136 = getv function %tmp.135 :drawText;
+        %tmp.137 = 20;
+        %tmp.138 = lgetv %y.3;
+        symbol [ y %tmp.138 81 24 25 ];
+        symbol [ Graphics %tmp.139 81 27 35 ];
+        %tmp.139 = getm $.Toybox.Graphics;
+        symbol [ FONT_SMALL %tmp.140 81 36 46 ];
+        %tmp.140 = getv %tmp.139 :FONT_SMALL;
+        symbol [ models %tmp.142 81 48 54 ];
+        %tmp.142 = getv ? :models;
+        symbol [ get %tmp.143 81 55 58 ];
+        %tmp.143 = getv function %tmp.142 :get;
+        symbol [ modelSelected %tmp.145 81 59 72 ];
+        %tmp.145 = getv ? :modelSelected;
+        %tmp.146 = invoke %tmp.142 %tmp.143(%tmp.145);
+        symbol [ Graphics %tmp.147 81 75 83 ];
+        %tmp.147 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_LEFT %tmp.148 81 84 101 ];
+        %tmp.148 = getv %tmp.147 :TEXT_JUSTIFY_LEFT;
+        invoke %tmp.135 %tmp.136(%tmp.137, %tmp.138, %tmp.140, %tmp.146, %tmp.148);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 83 8 ]
+        %tmp.149 = lgetv %y.3;
+        symbol [ y %tmp.149 83 8 9 ];
+        %tmp.150 = 50;
+        %tmp.151 = add %tmp.149 %tmp.150;
+        lputv %y.3 %tmp.151;
+        symbol [ y %y.3 83 8 9 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 84 8 ]
+        %tmp.152 = lgetv %dc;
+        symbol [ dc %tmp.152 84 8 10 ];
+        symbol [ setColor %tmp.153 84 11 19 ];
+        %tmp.153 = getv function %tmp.152 :setColor;
+        symbol [ Graphics %tmp.154 84 20 28 ];
+        %tmp.154 = getm $.Toybox.Graphics;
+        symbol [ COLOR_DK_GRAY %tmp.155 84 29 42 ];
+        %tmp.155 = getv %tmp.154 :COLOR_DK_GRAY;
+        symbol [ Graphics %tmp.156 84 44 52 ];
+        %tmp.156 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.157 84 53 70 ];
+        %tmp.157 = getv %tmp.156 :COLOR_TRANSPARENT;
+        invoke %tmp.152 %tmp.153(%tmp.155, %tmp.157);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 85 8 ]
+        %tmp.158 = lgetv %dc;
+        symbol [ dc %tmp.158 85 8 10 ];
+        symbol [ drawLine %tmp.159 85 11 19 ];
+        %tmp.159 = getv function %tmp.158 :drawLine;
+        %tmp.160 = 20;
+        %tmp.161 = lgetv %y.3;
+        symbol [ y %tmp.161 85 24 25 ];
+        %tmp.162 = lgetv %width.1;
+        symbol [ width %tmp.162 85 27 32 ];
+        %tmp.163 = 20;
+        %tmp.164 = sub %tmp.162 %tmp.163;
+        %tmp.165 = lgetv %y.3;
+        symbol [ y %tmp.165 85 39 40 ];
+        invoke %tmp.158 %tmp.159(%tmp.160, %tmp.161, %tmp.164, %tmp.165);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 87 8 ]
+        %tmp.166 = lgetv %y.3;
+        symbol [ y %tmp.166 87 8 9 ];
+        %tmp.167 = 20;
+        %tmp.168 = add %tmp.166 %tmp.167;
+        lputv %y.3 %tmp.168;
+        symbol [ y %y.3 87 8 9 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 88 8 ]
+        %tmp.169 = lgetv %dc;
+        symbol [ dc %tmp.169 88 8 10 ];
+        symbol [ setColor %tmp.170 88 11 19 ];
+        %tmp.170 = getv function %tmp.169 :setColor;
+        symbol [ Graphics %tmp.171 88 20 28 ];
+        %tmp.171 = getm $.Toybox.Graphics;
+        symbol [ COLOR_LT_GRAY %tmp.172 88 29 42 ];
+        %tmp.172 = getv %tmp.171 :COLOR_LT_GRAY;
+        symbol [ Graphics %tmp.173 88 44 52 ];
+        %tmp.173 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.174 88 53 70 ];
+        %tmp.174 = getv %tmp.173 :COLOR_TRANSPARENT;
+        invoke %tmp.169 %tmp.170(%tmp.172, %tmp.174);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 89 8 ]
+        %tmp.175 = lgetv %dc;
+        symbol [ dc %tmp.175 89 8 10 ];
+        symbol [ drawText %tmp.176 89 11 19 ];
+        %tmp.176 = getv function %tmp.175 :drawText;
+        %tmp.177 = lgetv %width.1;
+        symbol [ width %tmp.177 89 20 25 ];
+        %tmp.178 = 2;
+        %tmp.179 = div %tmp.177 %tmp.178;
+        %tmp.180 = lgetv %y.3;
+        symbol [ y %tmp.180 89 31 32 ];
+        symbol [ Graphics %tmp.181 89 34 42 ];
+        %tmp.181 = getm $.Toybox.Graphics;
+        symbol [ FONT_SMALL %tmp.182 89 43 53 ];
+        %tmp.182 = getv %tmp.181 :FONT_SMALL;
+        %tmp.183 = "Swipe left/right to change model";
+        symbol [ Graphics %tmp.184 89 91 99 ];
+        %tmp.184 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_CENTER %tmp.185 89 100 119 ];
+        %tmp.185 = getv %tmp.184 :TEXT_JUSTIFY_CENTER;
+        invoke %tmp.175 %tmp.176(%tmp.179, %tmp.180, %tmp.182, %tmp.183, %tmp.185);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 91 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_stop" ]
+        %keyLen.5 = local;
+        symbol [ keyLen %keyLen.5 91 12 18 ];
+        symbol [ apiKeyInput %tmp.187 91 21 32 ];
+        %tmp.187 = getv ? :apiKeyInput;
+        symbol [ length %tmp.188 91 33 39 ];
+        %tmp.188 = getv function %tmp.187 :length;
+        %tmp.189 = invoke %tmp.187 %tmp.188();
+        lputv %keyLen.5 %tmp.189;
+        symbol [ keyLen %keyLen.5 91 12 18 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 92 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_stop" ]
+        %statusColor.6 = local;
+        symbol [ statusColor %statusColor.6 92 12 23 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_26_92_120_begin:
+        %tmp.190 = lgetv %keyLen.5;
+        symbol [ keyLen %tmp.190 92 26 32 ];
+        %tmp.191 = 70;
+        %tmp.192 = eq %tmp.190 %tmp.191;
+        bf %tmp.192 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_26_92_120_else_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_26_92_120_true:
+        symbol [ Graphics %tmp.193 92 41 49 ];
+        %tmp.193 = getm $.Toybox.Graphics;
+        symbol [ COLOR_GREEN %tmp.194 92 50 61 ];
+        %tmp.194 = getv %tmp.193 :COLOR_GREEN;
+        push %tmp.194;
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_26_92_120_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_26_92_120_else_false:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_65_92_111_begin:
+        %tmp.195 = lgetv %keyLen.5;
+        symbol [ keyLen %tmp.195 92 65 71 ];
+        %tmp.196 = 0;
+        %tmp.197 = gt %tmp.195 %tmp.196;
+        bf %tmp.197 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_65_92_111_else_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_65_92_111_true:
+        symbol [ Graphics %tmp.198 92 78 86 ];
+        %tmp.198 = getm $.Toybox.Graphics;
+        symbol [ COLOR_YELLOW %tmp.199 92 87 99 ];
+        %tmp.199 = getv %tmp.198 :COLOR_YELLOW;
+        push %tmp.199;
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_65_92_111_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_65_92_111_else_false:
+        symbol [ Graphics %tmp.200 92 102 110 ];
+        %tmp.200 = getm $.Toybox.Graphics;
+        symbol [ COLOR_RED %tmp.201 92 111 120 ];
+        %tmp.201 = getv %tmp.200 :COLOR_RED;
+        push %tmp.201;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_65_92_111_end:
+        %tmp.202 = phi [%tmp.197 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_65_92_111_begin] [%tmp.199 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_65_92_111_true] [%tmp.201 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_65_92_111_else_false] [%tmp.202 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_65_92_111_end];
+        push %tmp.202;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_26_92_120_end:
+        %tmp.203 = phi [%tmp.192 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_26_92_120_begin] [%tmp.194 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_26_92_120_true] [%tmp.202 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_26_92_120_else_false] [%tmp.203 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_92_26_92_120_end];
+        lputv %statusColor.6 %tmp.203;
+        symbol [ statusColor %statusColor.6 92 12 23 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 93 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_stop" ]
+        %statusText.7 = local;
+        symbol [ statusText %statusText.7 93 12 22 ];
+        %tmp.204 = "Key: ";
+        %tmp.205 = lgetv %keyLen.5;
+        symbol [ keyLen %tmp.205 93 35 41 ];
+        symbol [ toString %tmp.206 93 42 50 ];
+        %tmp.206 = getv function %tmp.205 :toString;
+        %tmp.207 = invoke %tmp.205 %tmp.206();
+        %tmp.208 = add %tmp.204 %tmp.207;
+        %tmp.209 = "/70 characters";
+        %tmp.210 = add %tmp.208 %tmp.209;
+        lputv %statusText.7 %tmp.210;
+        symbol [ statusText %statusText.7 93 12 22 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 95 8 ]
+        %tmp.211 = lgetv %y.3;
+        symbol [ y %tmp.211 95 8 9 ];
+        %tmp.212 = 40;
+        %tmp.213 = add %tmp.211 %tmp.212;
+        lputv %y.3 %tmp.213;
+        symbol [ y %y.3 95 8 9 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 96 8 ]
+        %tmp.214 = lgetv %dc;
+        symbol [ dc %tmp.214 96 8 10 ];
+        symbol [ setColor %tmp.215 96 11 19 ];
+        %tmp.215 = getv function %tmp.214 :setColor;
+        %tmp.216 = lgetv %statusColor.6;
+        symbol [ statusColor %tmp.216 96 20 31 ];
+        symbol [ Graphics %tmp.217 96 33 41 ];
+        %tmp.217 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.218 96 42 59 ];
+        %tmp.218 = getv %tmp.217 :COLOR_TRANSPARENT;
+        invoke %tmp.214 %tmp.215(%tmp.216, %tmp.218);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 97 8 ]
+        %tmp.219 = lgetv %dc;
+        symbol [ dc %tmp.219 97 8 10 ];
+        symbol [ drawText %tmp.220 97 11 19 ];
+        %tmp.220 = getv function %tmp.219 :drawText;
+        %tmp.221 = lgetv %width.1;
+        symbol [ width %tmp.221 97 20 25 ];
+        %tmp.222 = 2;
+        %tmp.223 = div %tmp.221 %tmp.222;
+        %tmp.224 = lgetv %y.3;
+        symbol [ y %tmp.224 97 31 32 ];
+        symbol [ Graphics %tmp.225 97 34 42 ];
+        %tmp.225 = getm $.Toybox.Graphics;
+        symbol [ FONT_SMALL %tmp.226 97 43 53 ];
+        %tmp.226 = getv %tmp.225 :FONT_SMALL;
+        %tmp.227 = lgetv %statusText.7;
+        symbol [ statusText %tmp.227 97 55 65 ];
+        symbol [ Graphics %tmp.228 97 67 75 ];
+        %tmp.228 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_CENTER %tmp.229 97 76 95 ];
+        %tmp.229 = getv %tmp.228 :TEXT_JUSTIFY_CENTER;
+        invoke %tmp.219 %tmp.220(%tmp.223, %tmp.224, %tmp.226, %tmp.227, %tmp.229);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 99 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_99_8_103_8_if_stmt:
+        symbol [ statusMessage %tmp.231 99 12 25 ];
+        %tmp.231 = getv ? :statusMessage;
+        symbol [ length %tmp.232 99 26 32 ];
+        %tmp.232 = getv function %tmp.231 :length;
+        %tmp.233 = invoke %tmp.231 %tmp.232();
+        %tmp.234 = 0;
+        %tmp.235 = gt %tmp.233 %tmp.234;
+        bf %tmp.235 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_99_8_103_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_99_8_103_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_99_40_103_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 100 12 ]
+        %tmp.236 = lgetv %y.3;
+        symbol [ y %tmp.236 100 12 13 ];
+        %tmp.237 = 30;
+        %tmp.238 = add %tmp.236 %tmp.237;
+        lputv %y.3 %tmp.238;
+        symbol [ y %y.3 100 12 13 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 101 12 ]
+        %tmp.239 = lgetv %dc;
+        symbol [ dc %tmp.239 101 12 14 ];
+        symbol [ setColor %tmp.240 101 15 23 ];
+        %tmp.240 = getv function %tmp.239 :setColor;
+        symbol [ Graphics %tmp.241 101 24 32 ];
+        %tmp.241 = getm $.Toybox.Graphics;
+        symbol [ COLOR_GREEN %tmp.242 101 33 44 ];
+        %tmp.242 = getv %tmp.241 :COLOR_GREEN;
+        symbol [ Graphics %tmp.243 101 46 54 ];
+        %tmp.243 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.244 101 55 72 ];
+        %tmp.244 = getv %tmp.243 :COLOR_TRANSPARENT;
+        invoke %tmp.239 %tmp.240(%tmp.242, %tmp.244);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 102 12 ]
+        %tmp.245 = lgetv %dc;
+        symbol [ dc %tmp.245 102 12 14 ];
+        symbol [ drawText %tmp.246 102 15 23 ];
+        %tmp.246 = getv function %tmp.245 :drawText;
+        %tmp.247 = lgetv %width.1;
+        symbol [ width %tmp.247 102 24 29 ];
+        %tmp.248 = 2;
+        %tmp.249 = div %tmp.247 %tmp.248;
+        %tmp.250 = lgetv %y.3;
+        symbol [ y %tmp.250 102 35 36 ];
+        symbol [ Graphics %tmp.251 102 38 46 ];
+        %tmp.251 = getm $.Toybox.Graphics;
+        symbol [ FONT_SMALL %tmp.252 102 47 57 ];
+        %tmp.252 = getv %tmp.251 :FONT_SMALL;
+        symbol [ statusMessage %tmp.254 102 59 72 ];
+        %tmp.254 = getv ? :statusMessage;
+        symbol [ Graphics %tmp.255 102 74 82 ];
+        %tmp.255 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_CENTER %tmp.256 102 83 102 ];
+        %tmp.256 = getv %tmp.255 :TEXT_JUSTIFY_CENTER;
+        invoke %tmp.245 %tmp.246(%tmp.249, %tmp.250, %tmp.252, %tmp.254, %tmp.256);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_99_40_103_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_99_8_103_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_99_8_103_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_44_26_104_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 106; @symbol_functiondef = [onTap,106,13,18]; @symbol_param<0> = [evt,106,19,22]; ]
+    function onTap(evt) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_106_24_115_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 107 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_106_24_115_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_106_24_115_4_stop" ]
+        %y.1 = local;
+        symbol [ y %y.1 107 12 13 ];
+        %tmp.1 = lgetv %evt;
+        symbol [ evt %tmp.1 107 16 19 ];
+        symbol [ getY %tmp.2 107 20 24 ];
+        %tmp.2 = getv function %tmp.1 :getY;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        lputv %y.1 %tmp.3;
+        symbol [ y %y.1 107 12 13 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 109 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_8_114_8_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_12_109_29_begin:
+        %tmp.4 = lgetv %y.1;
+        symbol [ y %tmp.4 109 12 13 ];
+        %tmp.5 = 110;
+        %tmp.6 = gte %tmp.4 %tmp.5;
+        bf %tmp.6 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_8_114_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_24_109_29_true:
+        %tmp.7 = lgetv %y.1;
+        symbol [ y %tmp.7 109 24 25 ];
+        %tmp.8 = 150;
+        %tmp.9 = lte %tmp.7 %tmp.8;
+        push %tmp.9;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_24_109_29_end:
+        %tmp.10 = phi [%tmp.6 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_12_109_29_begin] [%tmp.9 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_24_109_29_true] [%tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_24_109_29_end];
+        bf %tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_8_114_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_8_114_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_34_114_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 110 12 ]
+        symbol [ WatchUi %tmp.11 110 12 19 ];
+        %tmp.11 = getm $.Toybox.WatchUi;
+        symbol [ invokeTextInput %tmp.12 110 20 35 ];
+        %tmp.12 = getv function %tmp.11 :invokeTextInput;
+        symbol [ PhoneTextInputDelegate %tmp.16 111 20 42 ];
+        %tmp.16 = getv ? :PhoneTextInputDelegate;
+        %tmp.17 = self;
+        symbol [ self %tmp.17 111 43 47 ];
+        %tmp.13 = newc %tmp.16 (%tmp.17);
+        %tmp.18 = newd 2;
+        %tmp.20 = const :title;
+        symbol [ title %tmp.20 112 19 24 const ];
+        %tmp.21 = "Enter NVIDIA API Key";
+        %tmp.22 = dup %tmp.18;
+        %tmp.23 = aputv %tmp.22 %tmp.20 %tmp.21;
+        %tmp.25 = const :maxSize;
+        symbol [ maxSize %tmp.25 112 53 60 const ];
+        %tmp.26 = 70;
+        %tmp.27 = dup %tmp.23;
+        %tmp.28 = aputv %tmp.27 %tmp.25 %tmp.26;
+        invoke %tmp.11 %tmp.12(%tmp.13, %tmp.28);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_34_114_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_8_114_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_109_8_114_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_106_24_115_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 117; @symbol_functiondef = [onApiKeyEntered,117,13,28]; @symbol_param<0> = [text,117,29,33]; ]
+    function onApiKeyEntered(text) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_117_35_123_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 118 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_8_122_8_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_12_118_44_begin:
+        %tmp.1 = lgetv %text;
+        symbol [ text %tmp.1 118 12 16 ];
+        %tmp.2 = null;
+        %tmp.3 = ne %tmp.1 %tmp.2;
+        bf %tmp.3 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_8_122_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_28_118_44_true:
+        %tmp.4 = lgetv %text;
+        symbol [ text %tmp.4 118 28 32 ];
+        %tmp.5 = as %tmp.4 { (!Null) };
+        symbol [ length %tmp.6 118 33 39 ];
+        %tmp.6 = getv function %tmp.5 :length;
+        %tmp.7 = invoke %tmp.5 %tmp.6();
+        %tmp.8 = 0;
+        %tmp.9 = gt %tmp.7 %tmp.8;
+        push %tmp.9;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_28_118_44_end:
+        %tmp.10 = phi [%tmp.3 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_12_118_44_begin] [%tmp.9 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_28_118_44_true] [%tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_28_118_44_end];
+        bf %tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_8_122_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_8_122_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_47_122_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 119 12 ]
+        %tmp.11 = lgetv %text;
+        symbol [ text %tmp.11 119 26 30 ];
+        %tmp.12 = as %tmp.11 { (!Null) };
+        symbol [ apiKeyInput ? 119 12 23 ];
+        putv self :apiKeyInput %tmp.12;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 120 12 ]
+        symbol [ storage %tmp.14 120 12 19 ];
+        %tmp.14 = getv ? :storage;
+        symbol [ setApiKey %tmp.15 120 20 29 ];
+        %tmp.15 = getv function %tmp.14 :setApiKey;
+        %tmp.16 = lgetv %text;
+        symbol [ text %tmp.16 120 30 34 ];
+        %tmp.17 = as %tmp.16 { (!Null) };
+        invoke %tmp.14 %tmp.15(%tmp.17);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 121 12 ]
+        symbol [ View %tmp.19 121 12 16 ];
+        %tmp.19 = getv ? :View;
+        symbol [ requestUpdate %tmp.20 121 17 30 ];
+        %tmp.20 = getv function %tmp.19 :requestUpdate;
+        invoke %tmp.19 %tmp.20();
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_47_122_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_8_122_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_118_8_122_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_117_35_123_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 125; @symbol_functiondef = [onSwipe,125,13,20]; @symbol_param<0> = [evt,125,21,24]; ]
+    function onSwipe(evt) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_125_26_137_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 126 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_125_26_137_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_125_26_137_4_stop" ]
+        %direction.1 = local;
+        symbol [ direction %direction.1 126 12 21 ];
+        %tmp.1 = lgetv %evt;
+        symbol [ evt %tmp.1 126 24 27 ];
+        symbol [ getDirection %tmp.2 126 28 40 ];
+        %tmp.2 = getv function %tmp.1 :getDirection;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        lputv %direction.1 %tmp.3;
+        symbol [ direction %direction.1 126 12 21 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 128 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_128_8_136_8_if_stmt:
+        %tmp.4 = lgetv %direction.1;
+        symbol [ direction %tmp.4 128 12 21 ];
+        symbol [ WatchUi %tmp.5 128 25 32 ];
+        %tmp.5 = getm $.Toybox.WatchUi;
+        symbol [ SWIPE_DIRECTION_LEFT %tmp.6 128 33 53 ];
+        %tmp.6 = getv %tmp.5 :SWIPE_DIRECTION_LEFT;
+        %tmp.7 = eq %tmp.4 %tmp.6;
+        bf %tmp.7 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_128_8_136_8_if_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_128_8_136_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_128_55_132_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 129 12 ]
+        symbol [ modelSelected %tmp.9 129 29 42 ];
+        %tmp.9 = getv ? :modelSelected;
+        %tmp.10 = 1;
+        %tmp.11 = add %tmp.9 %tmp.10;
+        symbol [ models %tmp.13 129 50 56 ];
+        %tmp.13 = getv ? :models;
+        symbol [ size %tmp.14 129 57 61 ];
+        %tmp.14 = getv function %tmp.13 :size;
+        %tmp.15 = invoke %tmp.13 %tmp.14();
+        %tmp.16 = mod %tmp.11 %tmp.15;
+        symbol [ modelSelected ? 129 12 25 ];
+        putv self :modelSelected %tmp.16;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 130 12 ]
+        symbol [ storage %tmp.18 130 12 19 ];
+        %tmp.18 = getv ? :storage;
+        symbol [ setModel %tmp.19 130 20 28 ];
+        %tmp.19 = getv function %tmp.18 :setModel;
+        symbol [ models %tmp.21 130 29 35 ];
+        %tmp.21 = getv ? :models;
+        symbol [ get %tmp.22 130 36 39 ];
+        %tmp.22 = getv function %tmp.21 :get;
+        symbol [ modelSelected %tmp.24 130 40 53 ];
+        %tmp.24 = getv ? :modelSelected;
+        %tmp.25 = invoke %tmp.21 %tmp.22(%tmp.24);
+        invoke %tmp.18 %tmp.19(%tmp.25);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 131 12 ]
+        symbol [ View %tmp.27 131 12 16 ];
+        %tmp.27 = getv ? :View;
+        symbol [ requestUpdate %tmp.28 131 17 30 ];
+        %tmp.28 = getv function %tmp.27 :requestUpdate;
+        invoke %tmp.27 %tmp.28();
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_128_55_132_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_128_8_136_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_128_8_136_8_if_false:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 132 15 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_132_15_136_8_if_stmt:
+        %tmp.29 = lgetv %direction.1;
+        symbol [ direction %tmp.29 132 19 28 ];
+        symbol [ WatchUi %tmp.30 132 32 39 ];
+        %tmp.30 = getm $.Toybox.WatchUi;
+        symbol [ SWIPE_DIRECTION_RIGHT %tmp.31 132 40 61 ];
+        %tmp.31 = getv %tmp.30 :SWIPE_DIRECTION_RIGHT;
+        %tmp.32 = eq %tmp.29 %tmp.31;
+        bf %tmp.32 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_132_15_136_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_132_15_136_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_132_63_136_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 133 12 ]
+        symbol [ modelSelected %tmp.34 133 29 42 ];
+        %tmp.34 = getv ? :modelSelected;
+        %tmp.35 = 1;
+        %tmp.36 = sub %tmp.34 %tmp.35;
+        symbol [ models %tmp.38 133 49 55 ];
+        %tmp.38 = getv ? :models;
+        symbol [ size %tmp.39 133 56 60 ];
+        %tmp.39 = getv function %tmp.38 :size;
+        %tmp.40 = invoke %tmp.38 %tmp.39();
+        %tmp.41 = add %tmp.36 %tmp.40;
+        symbol [ models %tmp.43 133 66 72 ];
+        %tmp.43 = getv ? :models;
+        symbol [ size %tmp.44 133 73 77 ];
+        %tmp.44 = getv function %tmp.43 :size;
+        %tmp.45 = invoke %tmp.43 %tmp.44();
+        %tmp.46 = mod %tmp.41 %tmp.45;
+        symbol [ modelSelected ? 133 12 25 ];
+        putv self :modelSelected %tmp.46;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 134 12 ]
+        symbol [ storage %tmp.48 134 12 19 ];
+        %tmp.48 = getv ? :storage;
+        symbol [ setModel %tmp.49 134 20 28 ];
+        %tmp.49 = getv function %tmp.48 :setModel;
+        symbol [ models %tmp.51 134 29 35 ];
+        %tmp.51 = getv ? :models;
+        symbol [ get %tmp.52 134 36 39 ];
+        %tmp.52 = getv function %tmp.51 :get;
+        symbol [ modelSelected %tmp.54 134 40 53 ];
+        %tmp.54 = getv ? :modelSelected;
+        %tmp.55 = invoke %tmp.51 %tmp.52(%tmp.54);
+        invoke %tmp.48 %tmp.49(%tmp.55);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 135 12 ]
+        symbol [ View %tmp.57 135 12 16 ];
+        %tmp.57 = getv ? :View;
+        symbol [ requestUpdate %tmp.58 135 17 30 ];
+        %tmp.58 = getv function %tmp.57 :requestUpdate;
+        invoke %tmp.57 %tmp.58();
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_132_63_136_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_132_15_136_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_132_15_136_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_128_8_136_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_125_26_137_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 139; @symbol_functiondef = [onMenu,139,13,19]; ]
+    function onMenu() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_139_22_144_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 140 8 ]
+        symbol [ Application %tmp.1 140 8 19 ];
+        %tmp.1 = getm $.Toybox.Application;
+        symbol [ getApp %tmp.2 140 20 26 ];
+        %tmp.2 = getv function %tmp.1 :getApp;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        symbol [ syncToWatch %tmp.4 140 29 40 ];
+        %tmp.4 = getv function %tmp.3 :syncToWatch;
+        invoke %tmp.3 %tmp.4();
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 141 8 ]
+        %tmp.5 = "Synced to watch!";
+        symbol [ statusMessage ? 141 8 21 ];
+        putv self :statusMessage %tmp.5;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 142 8 ]
+        symbol [ View %tmp.7 142 8 12 ];
+        %tmp.7 = getv ? :View;
+        symbol [ requestUpdate %tmp.8 142 13 26 ];
+        %tmp.8 = getv function %tmp.7 :requestUpdate;
+        invoke %tmp.7 %tmp.8();
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 143 8 ]
+        %tmp.9 = true;
+        ret %tmp.9;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_139_22_144_4_stop:
+    }
+}
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 147; @symbol_classdef = [PhoneTextInputDelegate,147,6,28]; @symbol_extends<0> = [WatchUi,147,37,44]; @symbol_extends<1> = [TextConfirmationDelegate,147,45,69]; ]
+class PhoneTextInputDelegate extends WatchUi.TextConfirmationDelegate {
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 147; ]
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 147; ]
+    static
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 149; @position = 8; @symbol_vardef = [view,149,8,12]; ]
+    var view;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 151; @symbol_functiondef = [initialize,151,13,23]; @symbol_param<0> = [settingsView,151,24,36]; ]
+    function initialize(settingsView) as Void {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_151_38_154_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 152 8 ]
+        symbol [ TextConfirmationDelegate %tmp.2 152 8 32 ];
+        %tmp.2 = getv ? :TextConfirmationDelegate;
+        symbol [ initialize %tmp.3 152 33 43 ];
+        %tmp.3 = getv function %tmp.2 :initialize;
+        invoke %tmp.2 %tmp.3();
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 153 8 ]
+        %tmp.4 = lgetv %settingsView;
+        symbol [ settingsView %tmp.4 153 15 27 ];
+        symbol [ view ? 153 8 12 ];
+        putv self :view %tmp.4;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_151_38_154_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 156; @symbol_functiondef = [onConfirmed,156,13,24]; @symbol_param<0> = [text,156,25,29]; ]
+    function onConfirmed(text) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_156_31_158_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 157 8 ]
+        symbol [ view %tmp.2 157 8 12 ];
+        %tmp.2 = getv ? :view;
+        symbol [ onApiKeyEntered %tmp.3 157 13 28 ];
+        %tmp.3 = getv function %tmp.2 :onApiKeyEntered;
+        %tmp.4 = lgetv %text;
+        symbol [ text %tmp.4 157 29 33 ];
+        invoke %tmp.2 %tmp.3(%tmp.4);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_156_31_158_4_stop:
+    }
+}
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 161; @symbol_classdef = [PhoneInputDelegate,161,6,24]; @symbol_extends<0> = [WatchUi,161,33,40]; @symbol_extends<1> = [BehaviorDelegate,161,41,57]; ]
+class PhoneInputDelegate extends WatchUi.BehaviorDelegate {
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 161; ]
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 161; ]
+    static
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 163; @position = 8; @symbol_vardef = [view,163,8,12]; ]
+    var view;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 165; @symbol_functiondef = [initialize,165,13,23]; @symbol_param<0> = [settingsView,165,24,36]; ]
+    function initialize(settingsView) as Void {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_165_38_168_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 166 8 ]
+        symbol [ BehaviorDelegate %tmp.2 166 8 24 ];
+        %tmp.2 = getv ? :BehaviorDelegate;
+        symbol [ initialize %tmp.3 166 25 35 ];
+        %tmp.3 = getv function %tmp.2 :initialize;
+        invoke %tmp.2 %tmp.3();
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 167 8 ]
+        %tmp.4 = lgetv %settingsView;
+        symbol [ settingsView %tmp.4 167 15 27 ];
+        symbol [ view ? 167 8 12 ];
+        putv self :view %tmp.4;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_165_38_168_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 170; @symbol_functiondef = [onTap,170,13,18]; @symbol_param<0> = [evt,170,19,22]; ]
+    function onTap(evt) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_170_24_175_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 171 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_8_173_8_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_12_171_38_begin:
+        symbol [ view %tmp.2 171 12 16 ];
+        %tmp.2 = getv ? :view;
+        %tmp.3 = null;
+        %tmp.4 = ne %tmp.2 %tmp.3;
+        bf %tmp.4 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_8_173_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_28_171_38_true:
+        symbol [ view %tmp.6 171 28 32 ];
+        %tmp.6 = getv ? :view;
+        %tmp.7 = as %tmp.6 { (!Null) };
+        %tmp.9 = const :onTap;
+        symbol [ onTap %tmp.9 171 38 43 const ];
+        %tmp.10 = canhazplz %tmp.7 %tmp.9;
+        push %tmp.10;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_28_171_38_end:
+        %tmp.11 = phi [%tmp.4 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_12_171_38_begin] [%tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_28_171_38_true] [%tmp.11 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_28_171_38_end];
+        bf %tmp.11 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_8_173_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_8_173_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_45_173_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 172 12 ]
+        symbol [ view %tmp.13 172 12 16 ];
+        %tmp.13 = getv ? :view;
+        %tmp.14 = as %tmp.13 { (interface { var onTap; }) && (!Null) };
+        symbol [ onTap %tmp.15 172 17 22 ];
+        %tmp.15 = getv function %tmp.14 :onTap;
+        %tmp.16 = lgetv %evt;
+        symbol [ evt %tmp.16 172 23 26 ];
+        invoke %tmp.14 %tmp.15(%tmp.16);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_45_173_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_8_173_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_171_8_173_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 174 8 ]
+        %tmp.17 = true;
+        ret %tmp.17;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_170_24_175_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 177; @symbol_functiondef = [onSwipe,177,13,20]; @symbol_param<0> = [evt,177,21,24]; ]
+    function onSwipe(evt) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_177_26_182_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 178 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_8_180_8_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_12_178_38_begin:
+        symbol [ view %tmp.2 178 12 16 ];
+        %tmp.2 = getv ? :view;
+        %tmp.3 = null;
+        %tmp.4 = ne %tmp.2 %tmp.3;
+        bf %tmp.4 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_8_180_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_28_178_38_true:
+        symbol [ view %tmp.6 178 28 32 ];
+        %tmp.6 = getv ? :view;
+        %tmp.7 = as %tmp.6 { (!Null) };
+        %tmp.9 = const :onSwipe;
+        symbol [ onSwipe %tmp.9 178 38 45 const ];
+        %tmp.10 = canhazplz %tmp.7 %tmp.9;
+        push %tmp.10;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_28_178_38_end:
+        %tmp.11 = phi [%tmp.4 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_12_178_38_begin] [%tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_28_178_38_true] [%tmp.11 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_28_178_38_end];
+        bf %tmp.11 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_8_180_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_8_180_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_47_180_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 179 12 ]
+        symbol [ view %tmp.13 179 12 16 ];
+        %tmp.13 = getv ? :view;
+        %tmp.14 = as %tmp.13 { (interface { var onSwipe; }) && (!Null) };
+        symbol [ onSwipe %tmp.15 179 17 24 ];
+        %tmp.15 = getv function %tmp.14 :onSwipe;
+        %tmp.16 = lgetv %evt;
+        symbol [ evt %tmp.16 179 25 28 ];
+        invoke %tmp.14 %tmp.15(%tmp.16);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_47_180_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_8_180_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_178_8_180_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 181 8 ]
+        %tmp.17 = true;
+        ret %tmp.17;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_177_26_182_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 184; @symbol_functiondef = [onMenu,184,13,19]; ]
+    function onMenu() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_184_22_189_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 185 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_8_187_8_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_12_185_38_begin:
+        symbol [ view %tmp.2 185 12 16 ];
+        %tmp.2 = getv ? :view;
+        %tmp.3 = null;
+        %tmp.4 = ne %tmp.2 %tmp.3;
+        bf %tmp.4 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_8_187_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_28_185_38_true:
+        symbol [ view %tmp.6 185 28 32 ];
+        %tmp.6 = getv ? :view;
+        %tmp.7 = as %tmp.6 { (!Null) };
+        %tmp.9 = const :onMenu;
+        symbol [ onMenu %tmp.9 185 38 44 const ];
+        %tmp.10 = canhazplz %tmp.7 %tmp.9;
+        push %tmp.10;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_28_185_38_end:
+        %tmp.11 = phi [%tmp.4 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_12_185_38_begin] [%tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_28_185_38_true] [%tmp.11 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_28_185_38_end];
+        bf %tmp.11 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_8_187_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_8_187_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_46_187_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 186 12 ]
+        symbol [ view %tmp.13 186 19 23 ];
+        %tmp.13 = getv ? :view;
+        %tmp.14 = as %tmp.13 { (interface { var onMenu; }) && (!Null) };
+        symbol [ onMenu %tmp.15 186 24 30 ];
+        %tmp.15 = getv function %tmp.14 :onMenu;
+        %tmp.16 = invoke %tmp.14 %tmp.15();
+        ret %tmp.16;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_46_187_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_8_187_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_185_8_187_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc" 188 8 ]
+        %tmp.17 = false;
+        ret %tmp.17;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_PhoneSettingsView_mc_184_22_189_4_stop:
+    }
+}
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/PhoneSettingsView.mc"; @line = 1; ]
+<init> {
+}

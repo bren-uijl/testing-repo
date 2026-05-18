@@ -3,7 +3,7 @@ using Toybox.Communications;
 using Toybox.System;
 using Toybox.Json;
 
-class AiChatPhoneApp extends Application.AppBase
+class AiChatPhoneApp extends Application.AppBase {
 
     var propertyStore;
 
@@ -51,9 +51,9 @@ class AiChatPhoneApp extends Application.AppBase
             System.println("Failed to sync to watch: " + e.toString());
         }
     }
-end
+}
 
-class PhonePropertyStore
+class PhonePropertyStore {
 
     var store;
 
@@ -87,4 +87,4 @@ class PhonePropertyStore
     function save() {
         Application.getApp().setAppProperty("AiChatPhoneStore", store);
     }
-end
+}

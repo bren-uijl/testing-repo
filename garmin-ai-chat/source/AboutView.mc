@@ -2,7 +2,7 @@ using Toybox.WatchUi;
 using Toybox.Graphics;
 using Toybox.Lang;
 
-class AboutView extends WatchUi.View
+class AboutView extends WatchUi.View {
 
     var items;
     var scrollOffset;
@@ -84,9 +84,9 @@ class AboutView extends WatchUi.View
             }
         }
     }
-end
+}
 
-class AboutInputDelegate extends WatchUi.BehaviorDelegate
+class AboutInputDelegate extends WatchUi.BehaviorDelegate {
 
     var view;
 
@@ -106,4 +106,4 @@ class AboutInputDelegate extends WatchUi.BehaviorDelegate
         WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
         return true;
     }
-end
+}
