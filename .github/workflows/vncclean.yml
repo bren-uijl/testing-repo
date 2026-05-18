@@ -1,0 +1,49 @@
+name: Stream VNC to Cloudflare
+on: workflow_dispatch
+
+jobs:
+  stream-desktop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install VNC and Desktop Environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xfce4 xfce4-goodies x11vnc xvfb novnc websockify wget curl
+
+      - name: Download Cloudflare Tunnel Client
+        run: |
+          wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O cloudflared
+          chmod +x cloudflared
+          sudo mv cloudflared /usr/local/bin/
+
+      - name: Start Virtual Desktop Environment
+        run: |
+          # 1. Start the virtual frame buffer (invisible display :1)
+          Xvfb :1 -screen 0 1280x720x24 &
+          export DISPLAY=:1
+          sleep 2
+          
+          # 2. Start the XFCE Desktop inside that display
+          startxfce4 &
+          sleep 3
+          
+          # 3. Start the VNC server tracking display :1 on port 5900
+          x11vnc -display :1 -nopw -listen localhost -forever -shared &
+          sleep 2
+          
+          # 4. Use websockify to convert VNC port 5900 into a web browser port 8080
+          websockify --web=/usr/share/novnc/ 8080 localhost:5900 &
+          sleep 2
+
+      - name: Start Cloudflare Tunnel and Keep Alive
+        run: |
+          echo "========================================================="
+          echo "LOOK BELOW FOR YOUR CLOUDFLARE QUICK TUNNEL LINK"
+          echo "========================================================="
+          
+          # Start a free ephemeral cloudflare tunnel pointing to the noVNC web server port
+          # The 'timeout 15m' command keeps the GitHub Action open for 15 minutes before closing.
+          timeout 15m cloudflared tunnel --url http://localhost:8080 || true
