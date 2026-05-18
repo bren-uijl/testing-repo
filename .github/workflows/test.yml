@@ -1,14 +1,14 @@
-name: Download + Share File (Stable)
+name: File Share (Stable)
 
 on:
   workflow_dispatch:
 
 jobs:
-  share:
+  run:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install dependencies
+      - name: Install tools
         run: |
           sudo apt update
           sudo apt install -y curl python3
@@ -16,49 +16,36 @@ jobs:
       - name: Download file
         run: |
           curl -L -o file.exe "https://www.techspot.com/downloads/downloadnowfile/6263/?evp=ade18730bca83a75dc399311646f81ff&file=7608"
-          echo "Downloaded file:"
           ls -lh
 
-      - name: Install Cloudflare tunnel
+      - name: Install cloudflared
         run: |
           curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
           chmod +x cloudflared
 
       - name: Start server and tunnel
         run: |
-          # Start HTTP server
           python3 -m http.server 8080 &
-          sleep 2
+          sleep 3
 
-          # Start Cloudflare tunnel
           ./cloudflared tunnel --url http://localhost:8080 > cf.log 2>&1 &
+          sleep 5
 
-          echo "Waiting for Cloudflare URL..."
+          echo "Looking for URL..."
 
-          # Retry loop to get URL (prevents crash)
-          for i in {1..30}; do
-            URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare.com' cf.log | head -n 1 || true)
+          URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare.com' cf.log | head -n 1 || true)
 
-            if [ ! -z "$URL" ]; then
-              echo "======================================"
-              echo "✅ YOUR DOWNLOAD LINK:"
-              echo "$URL/file.exe"
-              echo "======================================"
-              break
-            fi
-
-            sleep 3
-          done
-
-          # If URL not found, show logs
           if [ -z "$URL" ]; then
-            echo "❌ Tunnel failed. Dumping logs:"
+            echo "❌ Failed to get URL"
             cat cf.log
+          else
+            echo "✅ DOWNLOAD HERE:"
+            echo "$URL/file.exe"
           fi
 
-          # Keepalive loop (prevents workflow exit)
-          echo "Keepalive started..."
+          # Keepalive (with output so GitHub doesn't kill it)
           while true; do
+            echo "alive: $(date)"
             sleep 60
           done
 ``
