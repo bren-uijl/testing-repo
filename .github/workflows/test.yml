@@ -1,51 +1,12 @@
-name: File Share (Stable)
+name: Test Workflow
 
 on:
   workflow_dispatch:
 
 jobs:
-  run:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install tools
-        run: |
-          sudo apt update
-          sudo apt install -y curl python3
-
-      - name: Download file
-        run: |
-          curl -L -o file.exe "https://www.techspot.com/downloads/downloadnowfile/6263/?evp=ade18730bca83a75dc399311646f81ff&file=7608"
-          ls -lh
-
-      - name: Install cloudflared
-        run: |
-          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
-          chmod +x cloudflared
-
-      - name: Start server and tunnel
-        run: |
-          python3 -m http.server 8080 &
-          sleep 3
-
-          ./cloudflared tunnel --url http://localhost:8080 > cf.log 2>&1 &
-          sleep 5
-
-          echo "Looking for URL..."
-
-          URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare.com' cf.log | head -n 1 || true)
-
-          if [ -z "$URL" ]; then
-            echo "❌ Failed to get URL"
-            cat cf.log
-          else
-            echo "✅ DOWNLOAD HERE:"
-            echo "$URL/file.exe"
-          fi
-
-          # Keepalive (with output so GitHub doesn't kill it)
-          while true; do
-            echo "alive: $(date)"
-            sleep 60
-          done
-``
+      - name: Hello
+        run: echo "Hello world"
