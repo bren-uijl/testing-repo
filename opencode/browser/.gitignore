@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+out/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+
+# User data
+userData/
+
+# Browser-specific
+*.crx
+extensions/temp/
+*.enc
+password-vault.json
+privacy-settings.json
+reading-settings.json
+download-settings.json
+
+# Installer outputs
+*.exe
+*.dmg
+*.AppImage
+*.deb
+*.rpm
+*.snap
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Electron builder
+electron-builder.yml
