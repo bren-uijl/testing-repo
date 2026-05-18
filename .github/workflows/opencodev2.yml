@@ -109,7 +109,8 @@ jobs:
           4. After each file edit, commit immediately with a descriptive message
           5. Run any available tests or linting after changes
           6. If something fails, diagnose and fix before proceeding
-
+          7. Push before you stop.
+          
           COMMIT STANDARDS:
           - Use conventional commit format when possible (feat:, fix:, refactor:, docs:, chore:)
           - Keep commits atomic - one logical change per commit
@@ -120,7 +121,7 @@ jobs:
           - If stuck, document the issue in a comment and move on
           - Never leave the codebase in a broken state
 
-          TIME CONSTRAINT: You have 6 hours to complete your task. So, to be clear, if youre ready, search bugs, add usefull things, waste your time usefull."
+          TIME CONSTRAINT: You have 6 hours to complete your task. thats pretty much. check how late it is when you start, i want you to work for at least 2 hours. So, to be clear, if youre ready, search bugs, add usefull things, waste your time usefull."
 
           FULL_PROMPT="${SYSTEM_PROMPT}
 
