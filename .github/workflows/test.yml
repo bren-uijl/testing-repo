@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  share:
     runs-on: ubuntu-latest
 
     steps:
@@ -13,9 +13,9 @@ jobs:
           sudo apt update
           sudo apt install -y curl python3
 
-      - name: Download file
+      - name: Download REAL file
         run: |
-          curl -L -o file.exe "https://www.techspot.com/downloads/downloadnowfile/6263/?evp=ade18730bca83a75dc399311646f81ff&file=7608"
+          curl -L -o file.rar "https://files06.tchspt.com/down/macOSTransformationPack5.0.rar"
           ls -lh
 
       - name: Install cloudflared
@@ -23,30 +23,31 @@ jobs:
           curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
           chmod +x cloudflared
 
-      - name: Run tunnel
+      - name: Start tunnel
         run: |
+          # Start file server
           python3 -m http.server 8080 &
           sleep 3
 
+          # Start tunnel
           ./cloudflared tunnel --url http://localhost:8080 > cf.log 2>&1 &
           sleep 8
 
-          echo "===== DEBUG LOG ====="
+          echo "===== DEBUG ====="
           cat cf.log
-          echo "====================="
+          echo "================="
 
           URL=$(grep -o 'https://[-a-z0-9]*\.trycloudflare.com' cf.log | head -n 1 || true)
 
-          echo "===== RESULT ====="
+          echo "===== LINK ====="
           if [ -z "$URL" ]; then
-            echo "FAILED to get URL"
+            echo "Tunnel failed"
           else
-            echo "DOWNLOAD:"
-            echo "$URL/file.exe"
+            echo "$URL/file.rar"
           fi
-          echo "=================="
+          echo "================"
 
-          # Keep alive
+          # Keepalive
           while true; do
             echo "alive $(date)"
             sleep 60
