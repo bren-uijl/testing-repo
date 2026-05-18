@@ -1,0 +1,132 @@
+using Toybox.System;
+using Toybox.Application;
+
+class Conversation
+
+    var id;
+    var title;
+    var messages;
+    var createdAt;
+    var updatedAt;
+
+    function initialize(convId, convTitle) {
+        id = convId;
+        title = convTitle;
+        messages = [];
+        createdAt = System.getTimer();
+        updatedAt = System.getTimer();
+    }
+
+    function addMessage(msg) {
+        messages.add(msg);
+        updatedAt = System.getTimer();
+
+        if (messages.size() == 1 && msg.isUser()) {
+            var preview = msg.content;
+            if (preview.length() > 40) {
+                preview = preview.substring(0, 37) + "...";
+            }
+            title = preview;
+        }
+
+        save();
+    }
+
+    function getMessages() {
+        return messages;
+    }
+
+    function getMessageCount() {
+        return messages.size();
+    }
+
+    function getLastMessage() {
+        if (messages.size() > 0) {
+            return messages.get(messages.size() - 1);
+        }
+        return null;
+    }
+
+    function getPreview() {
+        var last = getLastMessage();
+        if (last == null) {
+            return "Empty";
+        }
+        var text = last.content;
+        if (text.length() > 50) {
+            text = text.substring(0, 47) + "...";
+        }
+        return text;
+    }
+
+    function getDisplayTime() {
+        var elapsed = System.getTimer() - updatedAt;
+        var minutes = elapsed / 60000;
+
+        if (minutes < 1) {
+            return "Now";
+        } else if (minutes < 60) {
+            return minutes.toString() + "m ago";
+        } else if (minutes < 1440) {
+            return (minutes / 60).toString() + "h ago";
+        } else {
+            return (minutes / 1440).toString() + "d ago";
+        }
+    }
+
+    function getApiMessages() {
+        var apiMsgs = [];
+        for (var i = 0; i < messages.size(); i++) {
+            var msg = messages.get(i);
+            if (!msg.isSystem()) {
+                apiMsgs.add({
+                    :role => msg.role,
+                    :content => msg.content
+                });
+            }
+        }
+        return apiMsgs;
+    }
+
+    function save() {
+        var storage = Application.getApp().getPropertyStore();
+        var convData = {
+            :id => id,
+            :title => title,
+            :createdAt => createdAt,
+            :updatedAt => updatedAt,
+            :messages => []
+        };
+
+        for (var i = 0; i < messages.size(); i++) {
+            convData.get(:messages).add(messages.get(i).toDictionary());
+        }
+
+        storage.setConversation(id, convData);
+    }
+
+    function delete() {
+        var storage = Application.getApp().getPropertyStore();
+        storage.deleteConversation(id);
+    }
+
+    static function load(convId, convData) {
+        var conv = new Conversation(convId, convData.get(:title));
+        conv.createdAt = convData.get(:createdAt);
+        conv.updatedAt = convData.get(:updatedAt);
+
+        var msgList = convData.get(:messages);
+        if (msgList != null) {
+            for (var i = 0; i < msgList.size(); i++) {
+                conv.messages.add(Message.fromDictionary(msgList.get(i)));
+            }
+        }
+
+        return conv;
+    }
+
+    static function create(title) {
+        var convId = System.getTimer().toString();
+        return new Conversation(convId, title);
+    }
+end
