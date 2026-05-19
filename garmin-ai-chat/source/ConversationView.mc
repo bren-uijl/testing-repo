@@ -353,10 +353,6 @@ class ConversationView extends WatchUi.View {
 
         if (error != null) {
             errorMessage = error;
-            try {
-                
-            } catch (e) {
-            }
         } else if (response != null) {
             conversation.removeLastMessage();
 
@@ -364,11 +360,6 @@ class ConversationView extends WatchUi.View {
             conversation.addMessage(assistantMsg);
 
             storage.setLastConversationId(conversation.id);
-
-            try {
-                
-            } catch (e) {
-            }
         }
 
         WatchUi.requestUpdate();
