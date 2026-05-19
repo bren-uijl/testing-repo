@@ -8,15 +8,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
 
+    env:
+      DISPLAY: ":0"
+      XAUTHORITY: "/tmp/xvfb.auth"
+
     steps:
       - name: Install desktop and tools
         run: |
+          sudo apt-get update
           sudo apt-get install -y \
             xfce4 \
             xfce4-goodies \
             dbus-x11 \
             xvfb \
-            x11vnc \
+            xauth \
+            x11-utils \
+            x11-xserver-utils \
             xdotool \
             scrot \
             imagemagick \
@@ -30,27 +37,68 @@ jobs:
           sudo dpkg -i cloudflared-linux-amd64.deb
           cloudflared --version
 
-      - name: Start virtual display
+      - name: Start virtual display with shared XAUTHORITY
         run: |
-          Xvfb :0 -screen 0 1280x800x24 -ac &
-          echo "DISPLAY=:0" >> $GITHUB_ENV
+          export DISPLAY=:0
+          export XAUTHORITY=/tmp/xvfb.auth
+
+          rm -f "$XAUTHORITY"
+          touch "$XAUTHORITY"
+
+          COOKIE=$(mcookie)
+          xauth -f "$XAUTHORITY" add :0 . "$COOKIE"
+          xauth -f "$XAUTHORITY" add localhost:0 . "$COOKIE"
+
+          Xvfb :0 \
+            -screen 0 1280x800x24 \
+            -auth "$XAUTHORITY" \
+            +extension XTEST \
+            +extension RANDR \
+            > xvfb.log 2>&1 &
+
           sleep 3
+
+          echo "DISPLAY=:0" >> "$GITHUB_ENV"
+          echo "XAUTHORITY=/tmp/xvfb.auth" >> "$GITHUB_ENV"
+
+          echo "Xvfb log:"
+          cat xvfb.log || true
+
+          echo "X authority:"
+          xauth -f "$XAUTHORITY" list || true
+
+          echo "XTEST check:"
+          xdpyinfo | grep -i xtest || true
+
+          echo "Mouse check:"
+          xdotool getmouselocation || true
 
       - name: Start XFCE desktop only
         run: |
           export DISPLAY=:0
+          export XAUTHORITY=/tmp/xvfb.auth
 
           dbus-launch --exit-with-session startxfce4 > xfce.log 2>&1 &
 
-          sleep 12
+          sleep 18
 
           echo "XFCE log:"
           cat xfce.log || true
 
-          echo "Visible windows:"
-          xdotool search --onlyvisible --name ".*" getwindowname %@ || true
+          echo "Processes:"
+          ps aux | grep -E "xfce|xfwm|xfdesktop|xfsettings|Xvfb" | grep -v grep || true
 
-          echo "Mouse position:"
+          echo "Visible windows:"
+          xdotool search --onlyvisible --name ".*" getwindowname %@ 2>/dev/null || true
+
+          echo "Desktop windows:"
+          xdotool search --class xfdesktop getwindowname %@ 2>/dev/null || true
+
+          echo "Mouse location:"
+          xdotool getmouselocation || true
+
+          echo "Move mouse self-test:"
+          xdotool mousemove --sync 640 400
           xdotool getmouselocation || true
 
       - name: Create stream folder
@@ -63,6 +111,7 @@ jobs:
           #!/usr/bin/env bash
 
           export DISPLAY=:0
+          export XAUTHORITY=/tmp/xvfb.auth
 
           while true
           do
@@ -70,7 +119,7 @@ jobs:
 
             if [ -f stream/raw.png ]; then
               convert stream/raw.png \
-                -quality 65 \
+                -quality 70 \
                 stream/latest.jpg 2>/dev/null || true
             fi
 
@@ -108,19 +157,20 @@ jobs:
                 transform: translate(-50%, -50%);
                 width: auto;
                 height: auto;
-                max-width: calc(100vw - 105px);
+                max-width: calc(100vw - 120px);
                 max-height: 100vh;
                 object-fit: contain;
                 cursor: crosshair;
                 user-select: none;
                 -webkit-user-select: none;
+                touch-action: none;
               }
 
               #sidebar {
                 position: fixed;
                 top: 0;
                 right: 0;
-                width: 105px;
+                width: 120px;
                 height: 100vh;
                 background: #111;
                 border-left: 1px solid #333;
@@ -133,7 +183,7 @@ jobs:
               }
 
               .btn {
-                width: 85px;
+                width: 95px;
                 height: 32px;
                 margin-bottom: 7px;
                 border: none;
@@ -152,7 +202,7 @@ jobs:
                 writing-mode: vertical-lr;
                 direction: rtl;
                 width: 30px;
-                height: 220px;
+                height: 170px;
                 margin-top: 12px;
               }
 
@@ -162,18 +212,24 @@ jobs:
                 font-size: 12px;
               }
 
-              #status {
+              #status,
+              #last {
                 color: #aaa;
                 margin-top: 8px;
                 font-size: 11px;
                 text-align: center;
-                width: 90px;
+                width: 105px;
+                overflow-wrap: break-word;
+              }
+
+              #last {
+                color: #7dff7d;
               }
             </style>
           </head>
 
           <body>
-            <img id="screen">
+            <img id="screen" draggable="false">
 
             <div id="sidebar">
               <button class="btn" id="ctrl">CTRL</button>
@@ -197,6 +253,7 @@ jobs:
 
               <div id="value">200ms</div>
               <div id="status">image HTTP</div>
+              <div id="last">no input yet</div>
             </div>
 
             <script>
@@ -204,6 +261,7 @@ jobs:
               const slider = document.getElementById("slider");
               const value = document.getElementById("value");
               const statusBox = document.getElementById("status");
+              const lastBox = document.getElementById("last");
 
               let loading = false;
               let refreshInterval = 200;
@@ -212,17 +270,26 @@ jobs:
               let remoteWidth = 1280;
               let remoteHeight = 800;
 
-              let mouseDown = false;
+              let pointerIsDown = false;
+              let pointerButton = 0;
+
               const held = new Set();
 
               async function send(path) {
+                lastBox.innerText = path;
+
                 try {
-                  await fetch(path, {
+                  const response = await fetch(path, {
                     method: "GET",
-                    cache: "no-store",
-                    keepalive: true
+                    cache: "no-store"
                   });
-                } catch (e) {}
+
+                  if (!response.ok) {
+                    lastBox.innerText = "HTTP " + response.status;
+                  }
+                } catch (e) {
+                  lastBox.innerText = "fetch failed";
+                }
               }
 
               async function refresh() {
@@ -279,8 +346,14 @@ jobs:
                 const relY = (e.clientY - rect.top) / rect.height;
 
                 return {
-                  x: Math.round(relX * remoteWidth),
-                  y: Math.round(relY * remoteHeight),
+                  x: Math.max(
+                    0,
+                    Math.min(remoteWidth - 1, Math.round(relX * remoteWidth))
+                  ),
+                  y: Math.max(
+                    0,
+                    Math.min(remoteHeight - 1, Math.round(relY * remoteHeight))
+                  ),
                   inside:
                     relX >= 0 &&
                     relX <= 1 &&
@@ -289,39 +362,58 @@ jobs:
                 };
               }
 
-              screen.addEventListener("mousedown", async (e) => {
+              screen.addEventListener("pointerdown", async (e) => {
                 e.preventDefault();
+
+                try {
+                  screen.setPointerCapture(e.pointerId);
+                } catch {}
 
                 const c = coords(e);
                 if (!c.inside) return;
 
-                mouseDown = true;
+                pointerIsDown = true;
+                pointerButton = e.button;
 
                 await send(`/mousedown?x=${c.x}&y=${c.y}&button=${e.button}`);
               });
 
-              screen.addEventListener("mouseup", async (e) => {
+              screen.addEventListener("pointerup", async (e) => {
                 e.preventDefault();
 
                 const c = coords(e);
                 if (!c.inside) return;
 
-                mouseDown = false;
+                pointerIsDown = false;
 
-                await send(`/mouseup?x=${c.x}&y=${c.y}&button=${e.button}`);
+                await send(`/mouseup?x=${c.x}&y=${c.y}&button=${pointerButton}`);
               });
 
-              screen.addEventListener("mousemove", async (e) => {
+              screen.addEventListener("pointermove", async (e) => {
                 const c = coords(e);
                 if (!c.inside) return;
 
-                if (mouseDown) {
+                if (pointerIsDown) {
                   await send(`/mousemove?x=${c.x}&y=${c.y}`);
                 }
               });
 
-              screen.addEventListener("contextmenu", (e) => {
+              screen.addEventListener("click", async (e) => {
                 e.preventDefault();
+
+                const c = coords(e);
+                if (!c.inside) return;
+
+                await send(`/click?x=${c.x}&y=${c.y}&button=${e.button}`);
+              });
+
+              screen.addEventListener("contextmenu", async (e) => {
+                e.preventDefault();
+
+                const c = coords(e);
+                if (!c.inside) return;
+
+                await send(`/click?x=${c.x}&y=${c.y}&button=2`);
               });
 
               screen.addEventListener(
@@ -410,25 +502,38 @@ jobs:
           import os
           import urllib.parse
           import subprocess
+          import mimetypes
 
           ROOT = "stream"
 
           DISPLAY_ENV = dict(os.environ)
           DISPLAY_ENV["DISPLAY"] = ":0"
+          DISPLAY_ENV["XAUTHORITY"] = "/tmp/xvfb.auth"
 
           def run_cmd(args):
               try:
                   print("RUN:", " ".join(args), flush=True)
 
-                  subprocess.run(
+                  result = subprocess.run(
                       args,
                       env=DISPLAY_ENV,
-                      stdout=subprocess.DEVNULL,
-                      stderr=subprocess.DEVNULL,
-                      timeout=5
+                      stdout=subprocess.PIPE,
+                      stderr=subprocess.PIPE,
+                      text=True,
+                      timeout=8
                   )
+
+                  if result.stdout:
+                      print("STDOUT:", result.stdout.strip(), flush=True)
+
+                  if result.stderr:
+                      print("STDERR:", result.stderr.strip(), flush=True)
+
+                  print("EXIT:", result.returncode, flush=True)
+                  return result.returncode
               except Exception as e:
-                  print("ERROR:", e, flush=True)
+                  print("ERROR:", repr(e), flush=True)
+                  return 1
 
           def key_to_xdotool(key):
               mapping = {
@@ -475,62 +580,81 @@ jobs:
 
               return "1"
 
+          def q(query, name, default="0"):
+              return query.get(name, [default])[0]
+
+          def move_mouse(x, y):
+              return run_cmd(["xdotool", "mousemove", "--sync", x, y])
+
           class Handler(BaseHTTPRequestHandler):
               def log_message(self, format, *args):
                   return
 
-              def ok(self):
+              def ok(self, body=b"ok"):
                   self.send_response(200)
                   self.send_header("Cache-Control", "no-store")
+                  self.send_header("Content-Type", "text/plain")
                   self.end_headers()
-                  self.wfile.write(b"ok")
+                  self.wfile.write(body)
 
               def do_GET(self):
                   parsed = urllib.parse.urlparse(self.path)
                   path = parsed.path
                   query = urllib.parse.parse_qs(parsed.query)
 
-                  if path == "/mousedown":
-                      x = query.get("x", ["0"])[0]
-                      y = query.get("y", ["0"])[0]
-                      button = query.get("button", ["0"])[0]
+                  print("REQ:", self.path, flush=True)
 
+                  if path == "/click":
+                      x = q(query, "x")
+                      y = q(query, "y")
+                      button = q(query, "button", "0")
                       btn = mouse_button(button)
 
-                      run_cmd(["xdotool", "mousemove", x, y])
+                      move_mouse(x, y)
+                      run_cmd(["xdotool", "click", btn])
+
+                      self.ok()
+                      return
+
+                  if path == "/mousedown":
+                      x = q(query, "x")
+                      y = q(query, "y")
+                      button = q(query, "button", "0")
+                      btn = mouse_button(button)
+
+                      move_mouse(x, y)
                       run_cmd(["xdotool", "mousedown", btn])
 
                       self.ok()
                       return
 
                   if path == "/mouseup":
-                      x = query.get("x", ["0"])[0]
-                      y = query.get("y", ["0"])[0]
-                      button = query.get("button", ["0"])[0]
-
+                      x = q(query, "x")
+                      y = q(query, "y")
+                      button = q(query, "button", "0")
                       btn = mouse_button(button)
 
-                      run_cmd(["xdotool", "mousemove", x, y])
+                      move_mouse(x, y)
                       run_cmd(["xdotool", "mouseup", btn])
 
                       self.ok()
                       return
 
                   if path == "/mousemove":
-                      x = query.get("x", ["0"])[0]
-                      y = query.get("y", ["0"])[0]
+                      x = q(query, "x")
+                      y = q(query, "y")
 
-                      run_cmd(["xdotool", "mousemove", x, y])
+                      move_mouse(x, y)
 
                       self.ok()
                       return
 
                   if path == "/scroll":
-                      x = query.get("x", ["0"])[0]
-                      y = query.get("y", ["0"])[0]
-                      direction = query.get("direction", ["down"])[0]
+                      x = q(query, "x")
+                      y = q(query, "y")
+                      direction = q(query, "direction", "down")
 
-                      run_cmd(["xdotool", "mousemove", x, y])
+                      move_mouse(x, y)
 
                       if direction == "up":
                           run_cmd(["xdotool", "click", "4"])
@@ -541,7 +665,7 @@ jobs:
                       return
 
                   if path == "/keydown":
-                      key = query.get("key", [""])[0]
+                      key = q(query, "key", "")
 
                       if key:
                           if len(key) == 1:
@@ -553,7 +677,7 @@ jobs:
                       return
 
                   if path == "/keyup":
-                      key = query.get("key", [""])[0]
+                      key = q(query, "key", "")
 
                       if key:
                           if len(key) != 1:
@@ -563,7 +687,7 @@ jobs:
                       return
 
                   if path == "/press":
-                      key = query.get("key", [""])[0]
+                      key = q(query, "key", "")
 
                       if key:
                           run_cmd(["xdotool", "key", key_to_xdotool(key)])
@@ -571,24 +695,62 @@ jobs:
                       self.ok()
                       return
 
+                  if path == "/debug":
+                      lines = []
+
+                      def grab(cmd):
+                          try:
+                              r = subprocess.run(
+                                  cmd,
+                                  env=DISPLAY_ENV,
+                                  stdout=subprocess.PIPE,
+                                  stderr=subprocess.STDOUT,
+                                  text=True,
+                                  timeout=5
+                              )
+                              return r.stdout
+                          except Exception as e:
+                              return repr(e)
+
+                      lines.append("DISPLAY=" + DISPLAY_ENV.get("DISPLAY", ""))
+                      lines.append("XAUTHORITY=" + DISPLAY_ENV.get("XAUTHORITY", ""))
+                      lines.append("")
+                      lines.append("xauth:")
+                      lines.append(grab(["xauth", "-f", "/tmp/xvfb.auth", "list"]))
+                      lines.append("")
+                      lines.append("mouse:")
+                      lines.append(grab(["xdotool", "getmouselocation"]))
+                      lines.append("")
+                      lines.append("windows:")
+                      lines.append(grab(["xdotool", "search", "--onlyvisible", "--name", ".*", "getwindowname", "%@"]))
+                      lines.append("")
+                      lines.append("processes:")
+                      lines.append(grab(["bash", "-lc", "ps aux | grep -E 'xfce|xfwm|xfdesktop|Xvfb' | grep -v grep"]))
+
+                      self.ok("\n".join(lines).encode())
+                      return
+
+                  if path == "/selftest":
+                      move_mouse("640", "400")
+                      run_cmd(["xdotool", "click", "3"])
+                      self.ok(b"selftest sent right-click at 640,400")
+                      return
+
                   if path == "/":
                       path = "/index.html"
 
-                  file_path = ROOT + path
+                  safe_path = os.path.normpath(path).lstrip("/")
+                  file_path = os.path.join(ROOT, safe_path)
 
-                  if os.path.exists(file_path):
+                  if os.path.exists(file_path) and os.path.isfile(file_path):
                       self.send_response(200)
                       self.send_header(
                           "Cache-Control",
                           "no-store, no-cache, must-revalidate"
                       )
 
-                      if file_path.endswith(".html"):
-                          self.send_header("Content-Type", "text/html")
-                      elif file_path.endswith(".jpg"):
-                          self.send_header("Content-Type", "image/jpeg")
-                      elif file_path.endswith(".png"):
-                          self.send_header("Content-Type", "image/png")
+                      content_type = mimetypes.guess_type(file_path)[0] or "application/octet-stream"
+                      self.send_header("Content-Type", content_type)
 
                       self.end_headers()
 
@@ -604,16 +766,27 @@ jobs:
               daemon_threads = True
 
           print("Control server running on 0.0.0.0:8080", flush=True)
+          print("DISPLAY:", DISPLAY_ENV["DISPLAY"], flush=True)
+          print("XAUTHORITY:", DISPLAY_ENV["XAUTHORITY"], flush=True)
+
           ThreadedHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
           EOF
 
       - name: Start control server
         run: |
+          export DISPLAY=:0
+          export XAUTHORITY=/tmp/xvfb.auth
+
           nohup python3 control.py > server.log 2>&1 &
+
           sleep 2
 
           curl -I http://localhost:8080 || true
 
+          echo "Debug:"
+          curl http://localhost:8080/debug || true
+
+          echo ""
           echo "Server log:"
           cat server.log || true
 
@@ -644,17 +817,31 @@ jobs:
           echo "No browser."
           echo "No terminal."
           echo "No app opened."
-          echo "Plain HTTP image polling."
+          echo ""
+          echo "Debug URLs:"
+          echo "$URL/debug"
+          echo "$URL/selftest"
           echo "================================="
 
           cat cloudflare.log || true
 
       - name: Keep alive
         run: |
+          export DISPLAY=:0
+          export XAUTHORITY=/tmp/xvfb.auth
+
           while true
           do
             echo "alive $(date)"
+
             echo "Mouse:"
-            DISPLAY=:0 xdotool getmouselocation || true
+            xdotool getmouselocation || true
+
+            echo "Recent server log:"
+            tail -n 40 server.log || true
+
+            echo "Screenshot log:"
+            tail -n 10 screenshot.log || true
+
             sleep 60
           done
