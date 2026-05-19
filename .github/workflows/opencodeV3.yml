@@ -39,7 +39,7 @@ jobs:
         with:
           ref: ${{ inputs.branch }}
 
-      - name: Install Linux GUI, automation, and stream dependencies
+      - name: Install Linux GUI, automation, and HTTP stream dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -52,9 +52,7 @@ jobs:
             wget \
             jq \
             python3 \
-            python3-pip
-
-          python3 -m pip install --user aiohttp
+            python3-aiohttp
 
       - name: Start virtual Linux desktop
         run: |
@@ -66,14 +64,14 @@ jobs:
 
           xdpyinfo -display :99 >/dev/null
 
-      - name: Create WebSocket image and terminal streaming server
+      - name: Create HTTP image and terminal streaming server
         run: |
-          cat > /tmp/ws_stream.py <<'PY'
+          cat > /tmp/http_stream.py <<'PY'
           import asyncio
-          import base64
           import json
           import os
           import subprocess
+          import time
           from aiohttp import web
 
           DISPLAY = os.environ.get("DISPLAY", ":99")
@@ -81,7 +79,7 @@ jobs:
           SCREEN_WIDTH = int(os.environ.get("SCREEN_WIDTH", "1280"))
           SCREEN_HEIGHT = int(os.environ.get("SCREEN_HEIGHT", "900"))
 
-          SCREENSHOT_PATH = "/tmp/ws-screen.png"
+          SCREENSHOT_PATH = "/tmp/http-screen.jpg"
           OPENCODE_LOG_PATH = "/tmp/opencode-output.log"
 
           INDEX_HTML = f"""
@@ -132,7 +130,6 @@ jobs:
                 max-width: none;
                 max-height: none;
                 object-fit: none;
-                image-rendering: auto;
                 cursor: crosshair;
               }}
 
@@ -170,30 +167,21 @@ jobs:
                 color: #aaa;
                 font-size: 12px;
               }}
-
-              .ok {{
-                color: #7CFC98;
-              }}
-
-              .bad {{
-                color: #ff7070;
-              }}
             </style>
           </head>
           <body>
             <div id="bar">
               <strong>OpenCode Live View</strong>
-              <span id="status" class="small">connecting...</span>
               <span class="small">
+                — NO WebSockets
                 — GUI is 1:1 at {SCREEN_WIDTH}x{SCREEN_HEIGHT}
-                — click GUI to send mouse clicks
-                — arrow keys, Enter, Escape, Backspace and Tab are forwarded
+                — HTTP MJPEG stream + HTTP terminal polling
               </span>
             </div>
 
             <div id="layout">
               <div id="screen-wrap">
-                <img id="screen" />
+                <img id="screen" src="/stream.mjpg" />
               </div>
 
               <div id="terminal-wrap">
@@ -205,10 +193,6 @@ jobs:
             <script>
               const img = document.getElementById("screen");
               const terminal = document.getElementById("terminal");
-              const statusEl = document.getElementById("status");
-
-              const proto = location.protocol === "https:" ? "wss:" : "ws:";
-              const ws = new WebSocket(`${{proto}}//${{location.host}}/ws`);
 
               let userScrolledTerminal = false;
 
@@ -218,56 +202,45 @@ jobs:
                 userScrolledTerminal = !nearBottom;
               }});
 
-              ws.onopen = () => {{
-                statusEl.textContent = "connected";
-                statusEl.className = "small ok";
-              }};
+              async function refreshTerminal() {{
+                try {{
+                  const response = await fetch("/terminal", {{
+                    cache: "no-store"
+                  }});
 
-              ws.onclose = () => {{
-                statusEl.textContent = "disconnected";
-                statusEl.className = "small bad";
-              }};
-
-              ws.onerror = () => {{
-                statusEl.textContent = "error";
-                statusEl.className = "small bad";
-              }};
-
-              ws.onmessage = (event) => {{
-                const msg = JSON.parse(event.data);
-
-                if (msg.type === "frame") {{
-                  img.dataset.width = msg.width;
-                  img.dataset.height = msg.height;
-                  img.src = "data:image/png;base64," + msg.data;
-                }}
-
-                if (msg.type === "terminal") {{
-                  terminal.textContent = msg.text || "Waiting for OpenCode output...";
+                  const text = await response.text();
+                  terminal.textContent = text || "Waiting for OpenCode output...";
 
                   if (!userScrolledTerminal) {{
                     terminal.scrollTop = terminal.scrollHeight;
                   }}
+                }} catch (error) {{
+                  terminal.textContent = "Could not load terminal output: " + error;
                 }}
-              }};
+              }}
 
-              img.addEventListener("click", (event) => {{
+              setInterval(refreshTerminal, 1000);
+              refreshTerminal();
+
+              img.addEventListener("click", async (event) => {{
                 const rect = img.getBoundingClientRect();
 
-                const naturalWidth = Number(img.dataset.width || {SCREEN_WIDTH});
-                const naturalHeight = Number(img.dataset.height || {SCREEN_HEIGHT});
+                const x = Math.round((event.clientX - rect.left) * {SCREEN_WIDTH} / rect.width);
+                const y = Math.round((event.clientY - rect.top) * {SCREEN_HEIGHT} / rect.height);
 
-                const x = Math.round((event.clientX - rect.left) * naturalWidth / rect.width);
-                const y = Math.round((event.clientY - rect.top) * naturalHeight / rect.height);
-
-                ws.send(JSON.stringify({{
-                  type: "click",
-                  x,
-                  y
-                }}));
+                await fetch("/click", {{
+                  method: "POST",
+                  headers: {{
+                    "Content-Type": "application/json"
+                  }},
+                  body: JSON.stringify({{
+                    x,
+                    y
+                  }})
+                }});
               }});
 
-              window.addEventListener("keydown", (event) => {{
+              window.addEventListener("keydown", async (event) => {{
                 const allowed = [
                   "ArrowUp",
                   "ArrowDown",
@@ -286,10 +259,15 @@ jobs:
 
                 event.preventDefault();
 
-                ws.send(JSON.stringify({{
-                  type: "key",
-                  key: event.key
-                }}));
+                await fetch("/key", {{
+                  method: "POST",
+                  headers: {{
+                    "Content-Type": "application/json"
+                  }},
+                  body: JSON.stringify({{
+                    key: event.key
+                  }})
+                }});
               }});
             </script>
           </body>
@@ -308,6 +286,28 @@ jobs:
                   text=True,
               )
 
+          def take_jpeg_screenshot():
+              png_path = "/tmp/http-screen.png"
+
+              result = run_cmd(["scrot", png_path])
+
+              if result.returncode != 0:
+                  raise RuntimeError(result.stderr or result.stdout or "scrot failed")
+
+              convert = run_cmd([
+                  "convert",
+                  png_path,
+                  "-quality",
+                  "80",
+                  SCREENSHOT_PATH
+              ])
+
+              if convert.returncode != 0:
+                  raise RuntimeError(convert.stderr or convert.stdout or "convert failed")
+
+              with open(SCREENSHOT_PATH, "rb") as f:
+                  return f.read()
+
           def read_terminal_log():
               if not os.path.exists(OPENCODE_LOG_PATH):
                   return "Waiting for OpenCode output..."
@@ -317,97 +317,98 @@ jobs:
                       f.seek(0, os.SEEK_END)
                       size = f.tell()
                       f.seek(max(size - 60000, 0), os.SEEK_SET)
-                      data = f.read().decode("utf-8", errors="replace")
-                      return data
+                      return f.read().decode("utf-8", errors="replace")
               except Exception as e:
                   return f"Could not read OpenCode log: {e}"
-
-          def take_screenshot_frame():
-              result = run_cmd(["scrot", SCREENSHOT_PATH])
-
-              if result.returncode != 0:
-                  error_text = result.stderr or result.stdout or "Unknown screenshot error"
-                  return {
-                      "type": "terminal",
-                      "text": f"Screenshot failed: {error_text}",
-                  }
-
-              with open(SCREENSHOT_PATH, "rb") as f:
-                  data = base64.b64encode(f.read()).decode("ascii")
-
-              return {
-                  "type": "frame",
-                  "width": SCREEN_WIDTH,
-                  "height": SCREEN_HEIGHT,
-                  "data": data,
-              }
 
           async def index(request):
               return web.Response(
                   text=INDEX_HTML,
-                  content_type="text/html",
+                  content_type="text/html"
               )
 
-          async def websocket_handler(request):
-              ws = web.WebSocketResponse()
-              await ws.prepare(request)
+          async def stream_mjpeg(request):
+              response = web.StreamResponse(
+                  status=200,
+                  reason="OK",
+                  headers={
+                      "Content-Type": "multipart/x-mixed-replace; boundary=frame",
+                      "Cache-Control": "no-cache, no-store, must-revalidate",
+                      "Pragma": "no-cache",
+                      "Expires": "0",
+                  },
+              )
 
-              async def sender():
-                  counter = 0
+              await response.prepare(request)
 
-                  while not ws.closed:
-                      frame = take_screenshot_frame()
-                      await ws.send_str(json.dumps(frame))
+              while True:
+                  try:
+                      jpg = take_jpeg_screenshot()
 
-                      if counter % 2 == 0:
-                          await ws.send_str(json.dumps({
-                              "type": "terminal",
-                              "text": read_terminal_log(),
-                          }))
+                      await response.write(b"--frame\r\n")
+                      await response.write(b"Content-Type: image/jpeg\r\n")
+                      await response.write(f"Content-Length: {len(jpg)}\r\n\r\n".encode("ascii"))
+                      await response.write(jpg)
+                      await response.write(b"\r\n")
 
-                      counter += 1
                       await asyncio.sleep(0.5)
+                  except asyncio.CancelledError:
+                      break
+                  except Exception as e:
+                      error = str(e).encode("utf-8", errors="replace")
+                      await response.write(b"--frame\r\n")
+                      await response.write(b"Content-Type: text/plain\r\n\r\n")
+                      await response.write(error)
+                      await response.write(b"\r\n")
+                      await asyncio.sleep(1)
 
-              sender_task = asyncio.create_task(sender())
+              return response
 
-              try:
-                  async for msg in ws:
-                      if msg.type != web.WSMsgType.TEXT:
-                          continue
+          async def terminal(request):
+              return web.Response(
+                  text=read_terminal_log(),
+                  content_type="text/plain"
+              )
 
-                      try:
-                          data = json.loads(msg.data)
-                      except Exception:
-                          continue
+          async def click(request):
+              data = await request.json()
+              x = str(int(data.get("x", 0)))
+              y = str(int(data.get("y", 0)))
 
-                      if data.get("type") == "click":
-                          x = str(int(data.get("x", 0)))
-                          y = str(int(data.get("y", 0)))
-                          run_cmd(["xdotool", "mousemove", x, y, "click", "1"])
+              run_cmd(["xdotool", "mousemove", x, y, "click", "1"])
 
-                      if data.get("type") == "key":
-                          key = str(data.get("key", ""))
+              return web.json_response({
+                  "ok": True,
+                  "x": x,
+                  "y": y
+              })
 
-                          key_map = {
-                              "ArrowUp": "Up",
-                              "ArrowDown": "Down",
-                              "ArrowLeft": "Left",
-                              "ArrowRight": "Right",
-                              "Enter": "Return",
-                              "Escape": "Escape",
-                              "Backspace": "BackSpace",
-                              "Tab": "Tab",
-                              " ": "space",
-                          }
+          async def key(request):
+              data = await request.json()
+              key_name = str(data.get("key", ""))
 
-                          mapped = key_map.get(key)
+              key_map = {
+                  "ArrowUp": "Up",
+                  "ArrowDown": "Down",
+                  "ArrowLeft": "Left",
+                  "ArrowRight": "Right",
+                  "Enter": "Return",
+                  "Escape": "Escape",
+                  "Backspace": "BackSpace",
+                  "Tab": "Tab",
+                  " ": "space",
+              }
 
-                          if mapped:
-                              run_cmd(["xdotool", "key", mapped])
-              finally:
-                  sender_task.cancel()
+              mapped = key_map.get(key_name)
 
-              return ws
+              if mapped:
+                  run_cmd(["xdotool", "key", mapped])
+
+              return web.json_response({
+                  "ok": True,
+                  "key": key_name,
+                  "mapped": mapped
+              })
 
           async def health(request):
               return web.Response(text="ok\n")
@@ -415,18 +416,21 @@ jobs:
           app = web.Application()
           app.router.add_get("/", index)
           app.router.add_get("/index.html", index)
-          app.router.add_get("/ws", websocket_handler)
+          app.router.add_get("/stream.mjpg", stream_mjpeg)
+          app.router.add_get("/terminal", terminal)
+          app.router.add_post("/click", click)
+          app.router.add_post("/key", key)
           app.router.add_get("/health", health)
 
           if __name__ == "__main__":
               web.run_app(app, host="0.0.0.0", port=STREAM_PORT)
           PY
 
-      - name: Start WebSocket image and terminal stream
+      - name: Start HTTP image and terminal stream
         run: |
           touch /tmp/opencode-output.log
 
-          python3 /tmp/ws_stream.py > /tmp/ws-stream.log 2>&1 &
+          python3 /tmp/http_stream.py > /tmp/http-stream.log 2>&1 &
           sleep 3
 
           curl -f http://localhost:${STREAM_PORT}/health
@@ -438,7 +442,7 @@ jobs:
           sudo mv cloudflared /usr/local/bin/cloudflared
           cloudflared --version
 
-      - name: Start Cloudflare tunnel to image stream
+      - name: Start Cloudflare tunnel to HTTP stream
         run: |
           cloudflared tunnel --url http://localhost:${STREAM_PORT} --no-autoupdate > /tmp/cloudflared.log 2>&1 &
 
@@ -526,6 +530,10 @@ jobs:
           sudo ln -sf /tmp/ui /usr/local/bin/ui
 
       - name: Run OpenCode with GUI access
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}
         working-directory: ${{ github.workspace }}/${{ inputs.working_directory }}
         run: |
           echo "Live side-by-side UI and terminal stream:"
@@ -540,6 +548,7 @@ jobs:
             echo "Model: ${{ inputs.model }}"
             echo "Display: $DISPLAY"
             echo "Screen: ${SCREEN_WIDTH}x${SCREEN_HEIGHT}"
+            echo "Transport: HTTP only, no WebSockets"
             echo ""
           } | tee -a /tmp/opencode-output.log
 
@@ -549,6 +558,11 @@ jobs:
           You are running in GitHub Actions on Linux with a virtual desktop.
 
           The desktop is available on DISPLAY=:99.
+
+          The user can watch the live side-by-side GUI and terminal stream here:
+          ${{ env.STREAM_URL }}
+
+          The stream uses HTTP only. It does not use WebSockets.
 
           The GUI stream is 1:1 pixel size.
 
@@ -564,6 +578,9 @@ jobs:
 
           Use screenshots before clicking.
           If you need to launch a GUI app, launch it with DISPLAY=:99.
+
+          If a captcha appears, do not solve or bypass it. Report that a captcha blocked automation and suggest using test or development captcha settings.
+          PROMPT
           )" 2>&1 | tee -a /tmp/opencode-output.log
 
       - name: Upload UI logs and screenshots
@@ -574,5 +591,6 @@ jobs:
           path: |
             /tmp/*.log
             /tmp/ui-screenshot.png
-            /tmp/ws-screen.png
+            /tmp/http-screen.jpg
+            /tmp/http-screen.png
             /tmp/opencode-output.log
