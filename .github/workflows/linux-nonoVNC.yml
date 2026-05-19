@@ -1,305 +1,719 @@
-name: Openbox Input Diagnostics Fixed v2
+name: OpenCode Auto Run v3
 
 on:
-  workflow_dispatch:
-
-jobs:
-  diagnose-openbox-input:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-
-    env:
-      DISPLAY: ":0"
-      XAUTHORITY: "/tmp/xvfb.auth"
-
-    steps:
-      - name: Install packages
-        run: |
-          set -euxo pipefail
-
-          sudo apt-get update
-          sudo apt-get install -y \
-            xvfb \
-            xauth \
+  workflow fluxbox \  workflow_dispatch:
+            dbus-x11 \
+            wmctrl \
             x11-utils \
-            x11-xserver-utils \
-            openbox \
             xdotool \
             scrot \
             imagemagick \
-            libxml2-utils \
-            python3
+            curl \
+            wget \
+            jq \
+            python3 \
+            python3-aiohttp \
+            xterm
 
-      - name: Start Xvfb with shared auth
+      - name: Start virtual Linux desktop
         run: |
-          set -euxo pipefail
+          Xvfb :99 -screen 0 ${SCREEN_WIDTH}x${SCREEN_HEIGHT}x24 -ac +extension GLX +render > /tmp/xvfb.log 2>&1 &
+          sleep 2
 
-          export DISPLAY=:0
-          export XAUTHORITY=/tmp/xvfb.auth
+          eval "$(dbus-launch --sh-syntax)"
+          echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS" >> "$GITHUB_ENV"
+          echo "DBUS_SESSION_BUS_PID=$DBUS_SESSION_BUS_PID" >> "$GITHUB_ENV"
 
-          rm -f "$XAUTHORITY"
-          touch "$XAUTHORITY"
+          fluxbox > /tmp/fluxbox.log 2>&1 &
+          sleep 2
 
-          COOKIE="$(mcookie)"
-          xauth -f "$XAUTHORITY" add :0 . "$COOKIE"
-          xauth -f "$XAUTHORITY" add localhost:0 . "$COOKIE"
+          xdpyinfo -display :99 >/dev/null
+          echo "Virtual desktop ready on DISPLAY=$DISPLAY"
+          echo "Resolution: ${SCREEN_WIDTH}x${SCREEN_HEIGHT}"
 
-          Xvfb :0 \
-            -screen 0 1280x800x24 \
-            -auth "$XAUTHORITY" \
-            +extension XTEST \
-            +extension RANDR \
-            -ac \
-            > xvfb.log 2>&1 &
+      - name: Create HTTP GUI and terminal stream
+        run: |
+          cat > /tmp/http_stream.py <<'PY'
+          import asyncio
+          import html
+          import os
+          import subprocess
+          from aiohttp import web
 
+          DISPLAY = os.environ.get("DISPLAY", ":99")
+          STREAM_PORT = int(os.environ.get("STREAM_PORT", "8765"))
+          SCREEN_WIDTH = int(os.environ.get("SCREEN_WIDTH", "1440"))
+          SCREEN_HEIGHT = int(os.environ.get("SCREEN_HEIGHT", "900"))
+
+          OPENCODE_LOG_PATH = "/tmp/opencode-output.log"
+          PNG_PATH = "/tmp/http-screen.png"
+          JPG_PATH = "/tmp/http-screen.jpg"
+
+          INDEX_HTML = f"""<!doctype html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <title>OpenCode Live View</title>
+            <style>
+              html, body {{
+                margin: 0;
+                padding: 0;
+                background: #111;
+                color: #eee;
+                font-family: Arial, sans-serif;
+                overflow: auto;
+              }}
+
+              #bar {{
+                padding: 8px 12px;
+                background: #222;
+                border-bottom: 1px solid #333;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+              }}
+
+              #layout {{
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 12px;
+              }}
+
+              #screen-wrap {{
+                flex: 0 0 auto;
+                width: {SCREEN_WIDTH}px;
+                height: {SCREEN_HEIGHT}px;
+                background: #000;
+                border: 1px solid #444;
+                overflow: hidden;
+              }}
+
+              #screen {{
+                display: block;
+                width: {SCREEN_WIDTH}px;
+                height: {SCREEN_HEIGHT}px;
+                max-width: none;
+                max-height: none;
+                object-fit: fill;
+                cursor: crosshair;
+              }}
+
+              #terminal-wrap {{
+                flex: 0 0 760px;
+                height: {SCREEN_HEIGHT}px;
+                background: #050505;
+                border: 1px solid #444;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+              }}
+
+              #terminal-title {{
+                padding: 8px;
+                background: #181818;
+                border-bottom: 1px solid #333;
+                font-weight: bold;
+              }}
+
+              #terminal {{
+                margin: 0;
+                padding: 10px;
+                flex: 1;
+                overflow: auto;
+                white-space: pre-wrap;
+                word-break: break-word;
+                font-family: Consolas, Monaco, monospace;
+                font-size: 13px;
+                line-height: 1.35;
+                color: #d8d8d8;
+              }}
+
+              .small {{
+                color: #aaa;
+                font-size: 12px;
+              }}
+            </style>
+          </head>
+          <body>
+            <div id="bar">
+              <strong>OpenCode Live View</strong>
+              <span class="small">
+                — HTTP only
+                — GUI {SCREEN_WIDTH}x{SCREEN_HEIGHT}
+                — click image to send mouse click
+                — arrow keys, Enter, Escape, Backspace, Tab, Space are forwarded
+              </span>
+            </div>
+
+            <div id="layout">
+              <div id="screen-wrap">
+                <img id="screen" src="/stream.mjpg">
+              </div>
+
+              <div id="terminal-wrap">
+                <div id="terminal-title">OpenCode terminal output</div>
+                <pre id="terminal">Waiting for OpenCode output...</pre>
+              </div>
+            </div>
+
+            <script>
+              const img = document.getElementById("screen");
+              const terminal = document.getElementById("terminal");
+              let userScrolledTerminal = false;
+
+              terminal.addEventListener("scroll", () => {{
+                const nearBottom = terminal.scrollHeight - terminal.scrollTop - terminal.clientHeight < 40;
+                userScrolledTerminal = !nearBottom;
+              }});
+
+              async function refreshTerminal() {{
+                try {{
+                  const response = await fetch("/terminal", {{ cache: "no-store" }});
+                  const text = await response.text();
+                  terminal.textContent = text || "Waiting for OpenCode output...";
+
+                  if (!userScrolledTerminal) {{
+                    terminal.scrollTop = terminal.scrollHeight;
+                  }}
+                }} catch (error) {{
+                  terminal.textContent = "Could not load terminal output: " + error;
+                }}
+              }}
+
+              setInterval(refreshTerminal, 1000);
+              refreshTerminal();
+
+              img.addEventListener("click", async (event) => {{
+                const rect = img.getBoundingClientRect();
+                const x = Math.round((event.clientX - rect.left) * {SCREEN_WIDTH} / rect.width);
+                const y = Math.round((event.clientY - rect.top) * {SCREEN_HEIGHT} / rect.height);
+
+                await fetch("/click", {{
+                  method: "POST",
+                  headers: {{ "Content-Type": "application/json" }},
+                  body: JSON.stringify({{ x, y }})
+                }});
+              }});
+
+              window.addEventListener("keydown", async (event) => {{
+                const allowed = [
+                  "ArrowUp",
+                  "ArrowDown",
+                  "ArrowLeft",
+                  "ArrowRight",
+                  "Enter",
+                  "Escape",
+                  "Backspace",
+                  "Tab",
+                  " "
+                ];
+
+                if (!allowed.includes(event.key)) {{
+                  return;
+                }}
+
+                event.preventDefault();
+
+                await fetch("/key", {{
+                  method: "POST",
+                  headers: {{ "Content-Type": "application/json" }},
+                  body: JSON.stringify({{ key: event.key }})
+                }});
+              }});
+            </script>
+          </body>
+          </html>
+          """
+
+          def run_cmd(args):
+              env = os.environ.copy()
+              env["DISPLAY"] = DISPLAY
+              env["GDK_BACKEND"] = "x11"
+              env["NO_AT_BRIDGE"] = "1"
+
+              return subprocess.run(
+                  args,
+                  env=env,
+                  stdout=subprocess.PIPE,
+                  stderr=subprocess.PIPE,
+                  text=True,
+              )
+
+          def read_terminal_log():
+              if not os.path.exists(OPENCODE_LOG_PATH):
+                  return "Waiting for OpenCode output..."
+
+              try:
+                  with open(OPENCODE_LOG_PATH, "rb") as f:
+                      f.seek(0, os.SEEK_END)
+                      size = f.tell()
+                      f.seek(max(size - 120000, 0), os.SEEK_SET)
+                      return f.read().decode("utf-8", errors="replace")
+              except Exception as e:
+                  return f"Could not read OpenCode log: {e}"
+
+          def take_jpeg_screenshot():
+              result = run_cmd(["scrot", PNG_PATH])
+
+              if result.returncode != 0:
+                  raise RuntimeError(result.stderr or result.stdout or "scrot failed")
+
+              convert = run_cmd([
+                  "convert",
+                  PNG_PATH,
+                  "-quality",
+                  "80",
+                  JPG_PATH
+              ])
+
+              if convert.returncode != 0:
+                  raise RuntimeError(convert.stderr or convert.stdout or "convert failed")
+
+              with open(JPG_PATH, "rb") as f:
+                  return f.read()
+
+          async def index(request):
+              return web.Response(
+                  text=INDEX_HTML,
+                  content_type="text/html"
+              )
+
+          async def stream_mjpeg(request):
+              response = web.StreamResponse(
+                  status=200,
+                  reason="OK",
+                  headers={
+                      "Content-Type": "multipart/x-mixed-replace; boundary=frame",
+                      "Cache-Control": "no-cache, no-store, must-revalidate",
+                      "Pragma": "no-cache",
+                      "Expires": "0",
+                  },
+              )
+
+              await response.prepare(request)
+
+              while True:
+                  try:
+                      jpg = take_jpeg_screenshot()
+
+                      await response.write(b"--frame\r\n")
+                      await response.write(b"Content-Type: image/jpeg\r\n")
+                      await response.write(f"Content-Length: {len(jpg)}\r\n\r\n".encode("ascii"))
+                      await response.write(jpg)
+                      await response.write(b"\r\n")
+
+                      await asyncio.sleep(0.5)
+                  except asyncio.CancelledError:
+                      break
+                  except ConnectionResetError:
+                      break
+                  except Exception as e:
+                      text = html.escape(str(e)).encode("utf-8", errors="replace")
+                      await response.write(b"--frame\r\n")
+                      await response.write(b"Content-Type: text/plain\r\n\r\n")
+                      await response.write(text)
+                      await response.write(b"\r\n")
+                      await asyncio.sleep(1)
+
+              return response
+
+          async def terminal(request):
+              return web.Response(
+                  text=read_terminal_log(),
+                  content_type="text/plain"
+              )
+
+          async def click(request):
+              data = await request.json()
+              x = str(int(data.get("x", 0)))
+              y = str(int(data.get("y", 0)))
+
+              run_cmd(["xdotool", "mousemove", x, y, "click", "1"])
+
+              return web.json_response({
+                  "ok": True,
+                  "x": x,
+                  "y": y
+              })
+
+          async def key(request):
+              data = await request.json()
+              key_name = str(data.get("key", ""))
+
+              key_map = {
+                  "ArrowUp": "Up",
+                  "ArrowDown": "Down",
+                  "ArrowLeft": "Left",
+                  "ArrowRight": "Right",
+                  "Enter": "Return",
+                  "Escape": "Escape",
+                  "Backspace": "BackSpace",
+                  "Tab": "Tab",
+                  " ": "space",
+              }
+
+              mapped = key_map.get(key_name)
+
+              if mapped:
+                  run_cmd(["xdotool", "key", mapped])
+
+              return web.json_response({
+                  "ok": True,
+                  "key": key_name,
+                  "mapped": mapped
+              })
+
+          async def health(request):
+              return web.Response(text="ok\n")
+
+          app = web.Application()
+          app.router.add_get("/", index)
+          app.router.add_get("/index.html", index)
+          app.router.add_get("/stream.mjpg", stream_mjpeg)
+          app.router.add_get("/terminal", terminal)
+          app.router.add_post("/click", click)
+          app.router.add_post("/key", key)
+          app.router.add_get("/health", health)
+
+          if __name__ == "__main__":
+              web.run_app(app, host="0.0.0.0", port=STREAM_PORT)
+          PY
+
+      - name: Start HTTP GUI and terminal stream
+        run: |
+          touch /tmp/opencode-output.log
+
+          python3 /tmp/http_stream.py > /tmp/http-stream.log 2>&1 &
           sleep 3
 
-          echo "=== xvfb.log ==="
-          cat xvfb.log || true
+          curl -f http://localhost:${STREAM_PORT}/health
 
-          echo "=== xauth list ==="
-          xauth -f "$XAUTHORITY" list || true
-
-          echo "=== XTEST check ==="
-          xdpyinfo | grep -i xtest || true
-
-          echo "=== initial mouse location ==="
-          xdotool getmouselocation || true
-
-      - name: Use stock Openbox rc.xml and custom menu.xml
+      - name: Install cloudflared
         run: |
-          set -euxo pipefail
+          wget -q -O cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x cloudflared
+          sudo mv cloudflared /usr/local/bin/cloudflared
+          cloudflared --version
 
-          mkdir -p ~/.config/openbox artifacts
-
-          cp /etc/xdg/openbox/rc.xml ~/.config/openbox/rc.xml
-
-          cat > ~/.config/openbox/menu.xml << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <openbox_menu xmlns="http://openbox.org/3.4/menu">
-            <menu id="root-menu" label="Root Menu">
-              <item label="Write marker file">
-                <action name="Execute">
-                  <command>sh -lc 'echo INPUT_WORKS > "$HOME/input_works.txt"'</command>
-                </action>
-              </item>
-              <separator />
-              <item label="Blue background">
-                <action name="Execute">
-                  <command>sh -lc "xsetroot -solid '#003366'"</command>
-                </action>
-              </item>
-              <item label="Green background">
-                <action name="Execute">
-                  <command>sh -lc "xsetroot -solid '#006633'"</command>
-                </action>
-              </item>
-              <item label="Red background">
-                <action name="Execute">
-                  <command>sh -lc "xsetroot -solid '#663300'"</command>
-                </action>
-              </item>
-            </menu>
-          </openbox_menu>
-          EOF
-
-          echo "=== validate rc.xml ==="
-          xmllint --noout ~/.config/openbox/rc.xml
-
-          echo "=== validate menu.xml ==="
-          xmllint --noout ~/.config/openbox/menu.xml
-
-          echo "=== rc.xml head ==="
-          sed -n '1,120p' ~/.config/openbox/rc.xml
-
-          echo "=== menu.xml ==="
-          cat ~/.config/openbox/menu.xml
-
-      - name: Start Openbox
+      - name: Start Cloudflare tunnel to live view
         run: |
-          set -euxo pipefail
+          cloudflared tunnel --url http://localhost:${STREAM_PORT} --no-autoupdate > /tmp/cloudflared.log 2>&1 &
 
-          export DISPLAY=:0
-          export XAUTHORITY=/tmp/xvfb.auth
+          for i in {1..60}; do
+            URL="$(grep -o 'https://[-a-z0-9.]*trycloudflare.com' /tmp/cloudflared.log | head -n 1 || true)"
 
-          rm -f "$HOME/input_works.txt"
+            if [ -n "$URL" ]; then
+              echo "STREAM_URL=$URL" >> "$GITHUB_ENV"
+              echo "::notice title=Live OpenCode GUI and Terminal::$URL"
+              echo "Live view: $URL"
+              exit 0
+            fi
 
-          xsetroot -solid '#000000'
+            sleep 2
+          done
 
-          nohup openbox --config-file "$HOME/.config/openbox/rc.xml" > openbox.log 2>&1 &
-          sleep 3
+          echo "Cloudflare tunnel did not start correctly."
+          cat /tmp/cloudflared.log
+          exit 1
 
-          echo "=== openbox process ==="
-          ps aux | grep -E '[o]penbox|[X]vfb' || true
-
-          echo "=== openbox.log ==="
-          cat openbox.log || true
-
-      - name: Create screenshot helper
+      - name: Install OpenCode
         run: |
-          set -euxo pipefail
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-          cat > screenshot.sh << 'EOF'
+      - name: Create UI helper
+        run: |
+          cat > /tmp/ui <<'EOF'
           #!/usr/bin/env bash
           set -euo pipefail
 
-          export DISPLAY=:0
-          export XAUTHORITY=/tmp/xvfb.auth
+          export DISPLAY="${DISPLAY:-:99}"
+          export GDK_BACKEND="${GDK_BACKEND:-x11}"
+          export NO_AT_BRIDGE="${NO_AT_BRIDGE:-1}"
 
-          name="$1"
+          case "${1:-}" in
+            screenshot)
+              out="${2:-/tmp/ui-screenshot.png}"
+              scrot "$out"
+              echo "$out"
+              ;;
 
-          scrot "artifacts/${name}.png"
-          identify "artifacts/${name}.png" || true
+            click)
+              xdotool mousemove "$2" "$3" click 1
+              ;;
 
-          convert "artifacts/${name}.png" \
-            -format "%[pixel:p{640,400}]\n" info: \
-            > "artifacts/${name}.center-pixel.txt" || true
+            rightclick)
+              xdotool mousemove "$2" "$3" click 3
+              ;;
+
+            doubleclick)
+              xdotool mousemove "$2" "$3" click --repeat 2 --delay 100 1
+              ;;
+
+            drag)
+              xdotool mousemove "$2" "$3" mousedown 1 mousemove "$4" "$5" mouseup 1
+              ;;
+
+            key)
+              xdotool key "$2"
+              ;;
+
+            type)
+              shift
+              xdotool type --delay 20 "$*"
+              ;;
+
+            mousemove)
+              xdotool mousemove "$2" "$3"
+              ;;
+
+            window-list)
+              echo "wmctrl:"
+              wmctrl -lx || true
+              echo ""
+              echo "xdotool:"
+              xdotool search --onlyvisible --name ".*" getwindowname %@ || true
+              ;;
+
+            xwininfo)
+              xwininfo -root -tree | head -120
+              ;;
+
+            fix-window)
+              name="${2:-}"
+              width="${3:-900}"
+              height="${4:-700}"
+              x="${5:-200}"
+              y="${6:-100}"
+
+              if [ -z "$name" ]; then
+                echo "Usage: ui fix-window NAME WIDTH HEIGHT X Y"
+                exit 1
+              fi
+
+              win="$(xdotool search --name "$name" | head -n 1 || true)"
+
+              if [ -z "$win" ]; then
+                echo "No window found matching: $name"
+                exit 1
+              fi
+
+              xdotool windowmap "$win" || true
+              xdotool windowsize "$win" "$width" "$height" || true
+              xdotool windowmove "$win" "$x" "$y" || true
+              xdotool windowraise "$win" || true
+              wmctrl -ia "$win" || true
+
+              echo "$win"
+              ;;
+
+            launch)
+              shift
+              nohup "$@" > /tmp/ui-launch.log 2>&1 &
+              echo "$!"
+              ;;
+
+            *)
+              echo "Usage:"
+              echo "  ui screenshot [PATH]"
+              echo "  ui click X Y"
+              echo "  ui rightclick X Y"
+              echo "  ui doubleclick X Y"
+              echo "  ui drag X1 Y1 X2 Y2"
+              echo "  ui key KEY"
+              echo "  ui type TEXT"
+              echo "  ui mousemove X Y"
+              echo "  ui window-list"
+              echo "  ui xwininfo"
+              echo "  ui fix-window NAME WIDTH HEIGHT X Y"
+              echo "  ui launch COMMAND ARGS..."
+              exit 1
+              ;;
+          esac
           EOF
 
-          chmod +x screenshot.sh
+          chmod +x /tmp/ui
+          sudo ln -sf /tmp/ui /usr/local/bin/ui
 
-      - name: Baseline screenshot
+      - name: Run OpenCode
+        id: opencode_run
+        env:
+          INPUT_PROMPT: ${{ github.event.inputs.prompt }}
+          INPUT_MODEL: ${{ github.event.inputs.model }}
+          INPUT_DIR: ${{ github.event.inputs.working_directory }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}
         run: |
-          set -euxo pipefail
-          ./screenshot.sh 01_baseline
-
-      - name: Test 1 - move pointer
-        run: |
-          set -euxo pipefail
-
-          export DISPLAY=:0
-          export XAUTHORITY=/tmp/xvfb.auth
-
-          xdotool mousemove --sync 640 400
-          xdotool getmouselocation | tee artifacts/02_mouse_after_move.txt
-
-          ./screenshot.sh 02_after_move
-
-      - name: Test 2 - open menu with right click
-        run: |
-          set -euxo pipefail
-
-          export DISPLAY=:0
-          export XAUTHORITY=/tmp/xvfb.auth
-
-          xdotool mousemove --sync 640 400
-          xdotool click 3
-          sleep 1
-
-          ./screenshot.sh 03_menu_opened
-
-      - name: Test 3 - click first menu item with mouse
-        run: |
-          set -euxo pipefail
-
-          export DISPLAY=:0
-          export XAUTHORITY=/tmp/xvfb.auth
-
-          rm -f "$HOME/input_works.txt"
-
-          # Open menu at center
-          xdotool mousemove --sync 640 400
-          xdotool click 3
-          sleep 0.7
-
-          # Click inside first item (slightly right/down from menu origin)
-          xdotool mousemove --sync 690 412
-          xdotool click 1
-          sleep 1
-
-          if [ -f "$HOME/input_works.txt" ]; then
-            echo "INPUT_WORKS marker created." | tee artifacts/04_marker_result.txt
-            cat "$HOME/input_works.txt" | tee -a artifacts/04_marker_result.txt
-          else
-            echo "Marker file was NOT created." | tee artifacts/04_marker_result.txt
-            exit 1
+          TARGET_DIR="."
+          if [ -n "$INPUT_DIR" ]; then
+            TARGET_DIR="$INPUT_DIR"
           fi
 
-          ./screenshot.sh 04_after_marker_click
-
-      - name: Test 4 - click Blue background item with mouse
-        run: |
-          set -euxo pipefail
-
-          export DISPLAY=:0
-          export XAUTHORITY=/tmp/xvfb.auth
-
-          # Reset to black
-          xsetroot -solid '#000000'
-          sleep 1
-          ./screenshot.sh 05_reset_black
-
-          # Open menu again
-          xdotool mousemove --sync 640 400
-          xdotool click 3
-          sleep 0.7
-
-          # Click inside "Blue background" item
-          # First item is at top; blue is below separator, so slightly lower.
-          xdotool mousemove --sync 700 452
-          xdotool click 1
-          sleep 1
-
-          ./screenshot.sh 06_after_blue_click
-
-      - name: Compare pixels
-        run: |
-          set -euxo pipefail
+          cd "$TARGET_DIR"
 
           {
-            echo "=== baseline center pixel ==="
-            cat artifacts/01_baseline.center-pixel.txt || true
-            echo
-            echo "=== menu-opened center pixel ==="
-            cat artifacts/03_menu_opened.center-pixel.txt || true
-            echo
-            echo "=== reset-black center pixel ==="
-            cat artifacts/05_reset_black.center-pixel.txt || true
-            echo
-            echo "=== after-blue center pixel ==="
-            cat artifacts/06_after_blue_click.center-pixel.txt || true
-          } | tee artifacts/07_pixel_compare.txt
+            echo "=== Starting OpenCode Run ==="
+            echo "Model: $INPUT_MODEL"
+            echo "Working directory: $TARGET_DIR"
+            echo "Display: $DISPLAY"
+            echo "Screen: ${SCREEN_WIDTH}x${SCREEN_HEIGHT}"
+            echo "Transport: HTTP only, no WebSockets"
+            echo "Live view: $STREAM_URL"
+            printf 'User prompt: %s\n' "$INPUT_PROMPT"
+            echo ""
+          } | tee -a /tmp/opencode-output.log
 
-      - name: Collect debug info
-        if: always()
-        run: |
-          set +e
+          SYSTEM_PROMPT="You are an autonomous AI agent running in GitHub Actions.
 
-          export DISPLAY=:0
-          export XAUTHORITY=/tmp/xvfb.auth
+          ROLE:
+          You are a skilled software engineer with expertise in code review, refactoring, bug fixing, feature implementation, testing, debugging, and GUI interaction.
 
-          {
-            echo "=== xdotool mouse location ==="
-            xdotool getmouselocation
+          ENVIRONMENT:
+          You are running on Linux in GitHub Actions.
+          The virtual desktop is available on DISPLAY=:99.
+          GUI apps should be launched with DISPLAY=:99.
+          GTK apps should use GDK_BACKEND=x11.
+          The screen dimensions are ${SCREEN_WIDTH}x${SCREEN_HEIGHT}.
+          The coordinate system starts at the top-left corner.
+          Top-left is 0,0.
+          Bottom-right is approximately ${SCREEN_WIDTH},${SCREEN_HEIGHT}.
 
-            echo
-            echo "=== visible windows ==="
-            xdotool search --onlyvisible --name ".*" getwindowname %@
+          GUI CONTROL:
+          You can interact with GUI applications using these shell commands:
+          - ui screenshot
+          - ui screenshot PATH
+          - ui click X Y
+          - ui rightclick X Y
+          - ui doubleclick X Y
+          - ui drag X1 Y1 X2 Y2
+          - ui key KEY
+          - ui type TEXT
+          - ui mousemove X Y
+          - ui window-list
+          - ui xwininfo
+          - ui fix-window NAME WIDTH HEIGHT X Y
+          - ui launch COMMAND ARGS
 
-            echo
-            echo "=== processes ==="
-            ps aux | grep -E 'openbox|Xvfb|xdotool' | grep -v grep
+          GUI WORKFLOW:
+          1. Start GUI apps in the background.
+          2. Wait a few seconds after launching GUI apps.
+          3. Always take a screenshot before clicking.
+          4. If the screenshot only shows the desktop background, inspect windows with ui window-list and ui xwininfo.
+          5. If the target app exists but is tiny, hidden, or misplaced, use ui fix-window.
+          6. Use coordinates carefully based on the ${SCREEN_WIDTH}x${SCREEN_HEIGHT} screen.
+          7. Prefer direct shell checks and logs when useful, but use the GUI tools when the task requires visual interaction.
 
-            echo
-            echo "=== rc.xml ==="
-            cat ~/.config/openbox/rc.xml
+          BEHAVIOR RULES:
+          1. Always read and understand existing code before making changes.
+          2. Follow the existing code style and conventions of the project.
+          3. Make incremental, well-tested changes.
+          4. Never break existing functionality.
+          5. Write clear, concise code without unnecessary comments.
+          6. Prefer editing existing files over creating new ones.
+          7. Always verify your changes work before committing.
 
-            echo
-            echo "=== menu.xml ==="
-            cat ~/.config/openbox/menu.xml
+          WORKFLOW:
+          1. Explore the codebase to understand structure and conventions.
+          2. Plan your changes mentally before executing.
+          3. Make one logical change at a time.
+          4. After each file edit, commit immediately with a descriptive message.
+          5. Run any available tests or linting after changes.
+          6. If something fails, diagnose and fix before proceeding.
+          7. Push before you stop.
 
-            echo
-            echo "=== xvfb.log ==="
-            cat xvfb.log
+          COMMIT STANDARDS:
+          - Use conventional commit format when possible.
+          - Keep commits atomic.
+          - Write meaningful commit messages that explain what changed and why.
+          - Git config is already done.
 
-            echo
-            echo "=== openbox.log ==="
-            cat openbox.log
-          } > artifacts/debug.txt 2>&1
+          ERROR HANDLING:
+          - If a tool fails, retry once with adjusted parameters.
+          - If stuck, document the issue and move on.
+          - Never leave the codebase in a broken state.
 
-      - name: Upload artifacts
+          TIME CONSTRAINT:
+          You have 6 hours to complete your task. Check the time when you start. Work thoroughly and do not stop early if the task still needs useful work."
+
+          FULL_PROMPT="${SYSTEM_PROMPT}
+
+          USER REQUEST:
+          ${INPUT_PROMPT}
+
+          Remember:
+          - After each edit, commit what you have done.
+          - Write instructions for your future self down in a .opencode folder.
+          - Use screenshots before clicking when doing GUI work.
+          - If a GUI window is not visible, inspect and fix the window instead of just waiting."
+
+          echo "Prompt length: ${#FULL_PROMPT} characters"
+          echo "" | tee -a /tmp/opencode-output.log
+
+          opencode run "$FULL_PROMPT" --model "$INPUT_MODEL" --thinking --dangerously-skip-permissions 2>&1 | tee -a /tmp/opencode-output.log
+
+      - name: Upload debug artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: openbox-input-diagnostics-fixed-v2
-          path: artifacts/
+          name: opencode-v3-debug
+          path: |
+            /tmp/*.log
+            /tmp/*.png
+            /tmp/*.jpg
+            /tmp/opencode-output.log
+    inputs:
+      prompt:
+        description: "What should OpenCode do? Be specific for best results."
+        required: true
+        default: "Inspect this project and improve it where useful."
+      branch:
+        description: "Branch to run on"
+        required: true
+        default: "main"
+      model:
+        description: "AI model to use"
+        required: false
+        default: "opencode/qwen3.6-plus-free"
+      working_directory:
+        description: "Subdirectory to work in (leave empty for repo root)"
+        required: false
+        default: ""
+
+permissions: write-all
+
+jobs:
+  opencode:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    env:
+      DISPLAY: ":99"
+      STREAM_PORT: "8765"
+      SCREEN_WIDTH: "1440"
+      SCREEN_HEIGHT: "900"
+      GDK_BACKEND: "x11"
+      NO_AT_BRIDGE: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config --global user.name "opencode-agent"
+          git config --global user.email "opencode-agent@users.noreply.github.com"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Install Linux GUI, automation, and stream dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            xvfb \
