@@ -13,17 +13,15 @@ jobs:
       XAUTHORITY: "/tmp/xvfb.auth"
 
     steps:
-      - name: Install desktop and tools
+      - name: Install tools
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            xfce4 \
-            xfce4-goodies \
-            dbus-x11 \
             xvfb \
             xauth \
             x11-utils \
             x11-xserver-utils \
+            openbox \
             xdotool \
             scrot \
             imagemagick \
@@ -37,7 +35,7 @@ jobs:
           sudo dpkg -i cloudflared-linux-amd64.deb
           cloudflared --version
 
-      - name: Start virtual display with shared XAUTHORITY
+      - name: Start Xvfb
         run: |
           export DISPLAY=:0
           export XAUTHORITY=/tmp/xvfb.auth
@@ -54,6 +52,7 @@ jobs:
             -auth "$XAUTHORITY" \
             +extension XTEST \
             +extension RANDR \
+            -ac \
             > xvfb.log 2>&1 &
 
           sleep 3
@@ -61,45 +60,74 @@ jobs:
           echo "DISPLAY=:0" >> "$GITHUB_ENV"
           echo "XAUTHORITY=/tmp/xvfb.auth" >> "$GITHUB_ENV"
 
-          echo "Xvfb log:"
-          cat xvfb.log || true
-
-          echo "X authority:"
-          xauth -f "$XAUTHORITY" list || true
-
-          echo "XTEST check:"
           xdpyinfo | grep -i xtest || true
-
-          echo "Mouse check:"
           xdotool getmouselocation || true
 
-      - name: Start XFCE desktop only
+      - name: Start Openbox desktop only
         run: |
           export DISPLAY=:0
           export XAUTHORITY=/tmp/xvfb.auth
 
-          dbus-launch --exit-with-session startxfce4 > xfce.log 2>&1 &
+          mkdir -p ~/.config/openbox
 
-          sleep 18
+          cat > ~/.config/openbox/menu.xml << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <openbox_menu xmlns="http://openbox.org/3.4/menu">
+            <menu id="root-menu" label="Openbox">
+              <item label="Input works">
+                <action name="Execute">
+                  <command>sh -c "xsetroot -solid '#003366'"</command>
+                </action>
+              </item>
+              <separator />
+              <item label="Blue background">
+                <action name="Execute">
+                  <command>sh -c "xsetroot -solid '#003366'"</command>
+                </action>
+              </item>
+              <item label="Green background">
+                <action name="Execute">
+                  <command>sh -c "xsetroot -solid '#006633'"</command>
+                </action>
+              </item>
+              <item label="Red background">
+                <action name="Execute">
+                  <command>sh -c "xsetroot -solid '#663300'"</command>
+                </action>
+              </item>
+            </menu>
+          </openbox_menu>
+          EOF
 
-          echo "XFCE log:"
-          cat xfce.log || true
+          cat > ~/.config/openbox/rc.xml << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <openbox_config xmlns="http://openbox.org/3.4/rc">
+            <mouse>
+              <context name="Root">
+                Press
+                  <action name="ShowMenu">
+                    <menu>root-menu</menu>
+                  </action>
+                </mousebind>
+              </context>
+            </mouse>
+          </openbox_config>
+          EOF
 
-          echo "Processes:"
-          ps aux | grep -E "xfce|xfwm|xfdesktop|xfsettings|Xvfb" | grep -v grep || true
+          xsetroot -solid '#202020'
 
-          echo "Visible windows:"
-          xdotool search --onlyvisible --name ".*" getwindowname %@ 2>/dev/null || true
+          nohup openbox --config-file ~/.config/openbox/rc.xml > openbox.log 2>&1 &
 
-          echo "Desktop windows:"
-          xdotool search --class xfdesktop getwindowname %@ 2>/dev/null || true
+          sleep 3
 
-          echo "Mouse location:"
-          xdotool getmouselocation || true
+          echo "Openbox log:"
+          cat openbox.log || true
 
-          echo "Move mouse self-test:"
+          echo "Self-test right-click:"
           xdotool mousemove --sync 640 400
-          xdotool getmouselocation || true
+          xdotool click 3
+
+          sleep 1
 
       - name: Create stream folder
         run: |
@@ -118,9 +146,7 @@ jobs:
             scrot stream/raw.png 2>/dev/null || true
 
             if [ -f stream/raw.png ]; then
-              convert stream/raw.png \
-                -quality 70 \
-                stream/latest.jpg 2>/dev/null || true
+              convert stream/raw.png -quality 75 stream/latest.jpg 2>/dev/null || true
             fi
 
             sleep 0.20
@@ -138,7 +164,6 @@ jobs:
           <head>
             <meta charset="UTF-8">
             <title>Remote Linux Image Stream</title>
-
             <style>
               html, body {
                 margin: 0;
@@ -155,14 +180,11 @@ jobs:
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                width: auto;
-                height: auto;
                 max-width: calc(100vw - 120px);
                 max-height: 100vh;
                 object-fit: contain;
                 cursor: crosshair;
                 user-select: none;
-                -webkit-user-select: none;
                 touch-action: none;
               }
 
@@ -202,18 +224,11 @@ jobs:
                 writing-mode: vertical-lr;
                 direction: rtl;
                 width: 30px;
-                height: 170px;
+                height: 160px;
                 margin-top: 12px;
               }
 
-              #value {
-                color: white;
-                margin-top: 8px;
-                font-size: 12px;
-              }
-
-              #status,
-              #last {
+              #value, #status, #last {
                 color: #aaa;
                 margin-top: 8px;
                 font-size: 11px;
@@ -227,7 +242,6 @@ jobs:
               }
             </style>
           </head>
-
           <body>
             <img id="screen" draggable="false">
 
@@ -241,19 +255,13 @@ jobs:
               <button class="btn" id="tab">TAB</button>
               <button class="btn" id="esc">ESC</button>
               <button class="btn" id="bksp">BKSP</button>
+              <button class="btn" id="test">TEST</button>
 
-              <input
-                id="slider"
-                type="range"
-                min="50"
-                max="1000"
-                value="200"
-                step="10"
-              >
+              <input id="slider" type="range" min="50" max="1000" value="200" step="10">
 
               <div id="value">200ms</div>
               <div id="status">image HTTP</div>
-              <div id="last">no input yet</div>
+              <div id="last">right-click desktop</div>
             </div>
 
             <script>
@@ -266,28 +274,25 @@ jobs:
               let loading = false;
               let refreshInterval = 200;
               let refreshTimer;
-
               let remoteWidth = 1280;
               let remoteHeight = 800;
-
-              let pointerIsDown = false;
+              let pointerDown = false;
               let pointerButton = 0;
-
               const held = new Set();
 
               async function send(path) {
                 lastBox.innerText = path;
 
                 try {
-                  const response = await fetch(path, {
+                  const r = await fetch(path, {
                     method: "GET",
                     cache: "no-store"
                   });
 
-                  if (!response.ok) {
-                    lastBox.innerText = "HTTP " + response.status;
+                  if (!r.ok) {
+                    lastBox.innerText = "HTTP " + r.status;
                   }
-                } catch (e) {
+                } catch {
                   lastBox.innerText = "fetch failed";
                 }
               }
@@ -297,10 +302,9 @@ jobs:
                 loading = true;
 
                 try {
-                  const response = await fetch(
-                    "latest.jpg?t=" + Date.now(),
-                    { cache: "no-store" }
-                  );
+                  const response = await fetch("latest.jpg?t=" + Date.now(), {
+                    cache: "no-store"
+                  });
 
                   const blob = await response.blob();
                   const bitmap = await createImageBitmap(blob);
@@ -310,7 +314,6 @@ jobs:
 
                   const url = URL.createObjectURL(blob);
                   const old = screen.src;
-
                   screen.src = url;
 
                   if (old && old.startsWith("blob:")) {
@@ -318,7 +321,7 @@ jobs:
                   }
 
                   statusBox.innerText = remoteWidth + "x" + remoteHeight;
-                } catch (e) {
+                } catch {
                   statusBox.innerText = "waiting...";
                 }
 
@@ -326,10 +329,7 @@ jobs:
               }
 
               function startLoop() {
-                if (refreshTimer) {
-                  clearInterval(refreshTimer);
-                }
-
+                if (refreshTimer) clearInterval(refreshTimer);
                 refreshTimer = setInterval(refresh, refreshInterval);
               }
 
@@ -341,28 +341,17 @@ jobs:
 
               function coords(e) {
                 const rect = screen.getBoundingClientRect();
-
                 const relX = (e.clientX - rect.left) / rect.width;
                 const relY = (e.clientY - rect.top) / rect.height;
 
                 return {
-                  x: Math.max(
-                    0,
-                    Math.min(remoteWidth - 1, Math.round(relX * remoteWidth))
-                  ),
-                  y: Math.max(
-                    0,
-                    Math.min(remoteHeight - 1, Math.round(relY * remoteHeight))
-                  ),
-                  inside:
-                    relX >= 0 &&
-                    relX <= 1 &&
-                    relY >= 0 &&
-                    relY <= 1
+                  x: Math.max(0, Math.min(remoteWidth - 1, Math.round(relX * remoteWidth))),
+                  y: Math.max(0, Math.min(remoteHeight - 1, Math.round(relY * remoteHeight))),
+                  inside: relX >= 0 && relX <= 1 && relY >= 0 && relY <= 1
                 };
               }
 
-              screen.addEventListener("pointerdown", async (e) => {
+              screen.addEventListener("pointerdown", async e => {
                 e.preventDefault();
 
                 try {
@@ -372,42 +361,33 @@ jobs:
                 const c = coords(e);
                 if (!c.inside) return;
 
-                pointerIsDown = true;
+                pointerDown = true;
                 pointerButton = e.button;
 
                 await send(`/mousedown?x=${c.x}&y=${c.y}&button=${e.button}`);
               });
 
-              screen.addEventListener("pointerup", async (e) => {
+              screen.addEventListener("pointerup", async e => {
                 e.preventDefault();
 
                 const c = coords(e);
                 if (!c.inside) return;
 
-                pointerIsDown = false;
+                pointerDown = false;
 
                 await send(`/mouseup?x=${c.x}&y=${c.y}&button=${pointerButton}`);
               });
 
-              screen.addEventListener("pointermove", async (e) => {
+              screen.addEventListener("pointermove", async e => {
                 const c = coords(e);
                 if (!c.inside) return;
 
-                if (pointerIsDown) {
+                if (pointerDown) {
                   await send(`/mousemove?x=${c.x}&y=${c.y}`);
                 }
               });
 
-              screen.addEventListener("click", async (e) => {
-                e.preventDefault();
-
-                const c = coords(e);
-                if (!c.inside) return;
-
-                await send(`/click?x=${c.x}&y=${c.y}&button=${e.button}`);
-              });
-
-              screen.addEventListener("contextmenu", async (e) => {
+              screen.addEventListener("contextmenu", async e => {
                 e.preventDefault();
 
                 const c = coords(e);
@@ -416,21 +396,26 @@ jobs:
                 await send(`/click?x=${c.x}&y=${c.y}&button=2`);
               });
 
-              screen.addEventListener(
-                "wheel",
-                async (e) => {
-                  e.preventDefault();
+              screen.addEventListener("dblclick", async e => {
+                e.preventDefault();
 
-                  const c = coords(e);
-                  if (!c.inside) return;
+                const c = coords(e);
+                if (!c.inside) return;
 
-                  const direction = e.deltaY > 0 ? "down" : "up";
-                  await send(`/scroll?x=${c.x}&y=${c.y}&direction=${direction}`);
-                },
-                { passive: false }
-              );
+                await send(`/doubleclick?x=${c.x}&y=${c.y}&button=0`);
+              });
 
-              document.addEventListener("keydown", async (e) => {
+              screen.addEventListener("wheel", async e => {
+                e.preventDefault();
+
+                const c = coords(e);
+                if (!c.inside) return;
+
+                const direction = e.deltaY > 0 ? "down" : "up";
+                await send(`/scroll?x=${c.x}&y=${c.y}&direction=${direction}`);
+              }, { passive: false });
+
+              document.addEventListener("keydown", async e => {
                 if (e.target.tagName === "INPUT") return;
 
                 e.preventDefault();
@@ -440,7 +425,7 @@ jobs:
                 await send(`/keydown?key=${encodeURIComponent(e.key)}`);
               });
 
-              document.addEventListener("keyup", async (e) => {
+              document.addEventListener("keyup", async e => {
                 if (e.target.tagName === "INPUT") return;
 
                 e.preventDefault();
@@ -455,12 +440,10 @@ jobs:
                   if (held.has(key)) {
                     held.delete(key);
                     btn.classList.remove("active");
-
                     await send(`/keyup?key=${encodeURIComponent(key)}`);
                   } else {
                     held.add(key);
                     btn.classList.add("active");
-
                     await send(`/keydown?key=${encodeURIComponent(key)}`);
                   }
                 });
@@ -471,21 +454,11 @@ jobs:
               toggleButton("shift", "Shift");
               toggleButton("super", "Meta");
 
-              document.getElementById("enter").onclick = () => {
-                send("/press?key=Enter");
-              };
-
-              document.getElementById("tab").onclick = () => {
-                send("/press?key=Tab");
-              };
-
-              document.getElementById("esc").onclick = () => {
-                send("/press?key=Escape");
-              };
-
-              document.getElementById("bksp").onclick = () => {
-                send("/press?key=Backspace");
-              };
+              document.getElementById("enter").onclick = () => send("/press?key=Enter");
+              document.getElementById("tab").onclick = () => send("/press?key=Tab");
+              document.getElementById("esc").onclick = () => send("/press?key=Escape");
+              document.getElementById("bksp").onclick = () => send("/press?key=Backspace");
+              document.getElementById("test").onclick = () => send("/selftest");
 
               startLoop();
               refresh();
@@ -511,10 +484,10 @@ jobs:
           DISPLAY_ENV["XAUTHORITY"] = "/tmp/xvfb.auth"
 
           def run_cmd(args):
-              try:
-                  print("RUN:", " ".join(args), flush=True)
+              print("RUN:", " ".join(args), flush=True)
 
-                  result = subprocess.run(
+              try:
+                  r = subprocess.run(
                       args,
                       env=DISPLAY_ENV,
                       stdout=subprocess.PIPE,
@@ -523,17 +496,29 @@ jobs:
                       timeout=8
                   )
 
-                  if result.stdout:
-                      print("STDOUT:", result.stdout.strip(), flush=True)
+                  if r.stdout:
+                      print("STDOUT:", r.stdout.strip(), flush=True)
 
-                  if result.stderr:
-                      print("STDERR:", result.stderr.strip(), flush=True)
+                  if r.stderr:
+                      print("STDERR:", r.stderr.strip(), flush=True)
 
-                  print("EXIT:", result.returncode, flush=True)
-                  return result.returncode
+                  print("EXIT:", r.returncode, flush=True)
+                  return r.returncode
               except Exception as e:
                   print("ERROR:", repr(e), flush=True)
                   return 1
+
+          def q(query, name, default="0"):
+              return query.get(name, [default])[0]
+
+          def mouse_button(browser_button):
+              if browser_button == "0":
+                  return "1"
+              if browser_button == "1":
+                  return "2"
+              if browser_button == "2":
+                  return "3"
+              return "1"
 
           def key_to_xdotool(key):
               mapping = {
@@ -542,49 +527,29 @@ jobs:
                   "Tab": "Tab",
                   "Escape": "Escape",
                   "Esc": "Escape",
-
                   "ArrowUp": "Up",
                   "ArrowDown": "Down",
                   "ArrowLeft": "Left",
                   "ArrowRight": "Right",
-
                   "Delete": "Delete",
                   "Insert": "Insert",
                   "Home": "Home",
                   "End": "End",
                   "PageUp": "Page_Up",
                   "PageDown": "Page_Down",
-
                   "Control": "Control_L",
                   "Alt": "Alt_L",
                   "Shift": "Shift_L",
                   "Meta": "Super_L",
-
                   " ": "space",
                   "Spacebar": "space"
               }
 
               return mapping.get(key, key)
 
-          def mouse_button(browser_button):
-              # Browser MouseEvent.button:
-              # 0 = left
-              # 1 = middle
-              # 2 = right
-              if browser_button == "0":
-                  return "1"
-              if browser_button == "1":
-                  return "2"
-              if browser_button == "2":
-                  return "3"
-
-              return "1"
-
-          def q(query, name, default="0"):
-              return query.get(name, [default])[0]
-
           def move_mouse(x, y):
-              return run_cmd(["xdotool", "mousemove", "--sync", x, y])
+              run_cmd(["xdotool", "mousemove", "--sync", x, y])
+              run_cmd(["xdotool", "getmouselocation"])
 
           class Handler(BaseHTTPRequestHandler):
               def log_message(self, format, *args):
@@ -607,8 +572,7 @@ jobs:
                   if path == "/click":
                       x = q(query, "x")
                       y = q(query, "y")
-                      button = q(query, "button", "0")
-                      btn = mouse_button(button)
+                      btn = mouse_button(q(query, "button", "0"))
 
                       move_mouse(x, y)
                       run_cmd(["xdotool", "click", btn])
@@ -616,11 +580,21 @@ jobs:
                       self.ok()
                       return
 
+                  if path == "/doubleclick":
+                      x = q(query, "x")
+                      y = q(query, "y")
+                      btn = mouse_button(q(query, "button", "0"))
+
+                      move_mouse(x, y)
+                      run_cmd(["xdotool", "click", "--repeat", "2", "--delay", "120", btn])
+
+                      self.ok()
+                      return
+
                   if path == "/mousedown":
                       x = q(query, "x")
                       y = q(query, "y")
-                      button = q(query, "button", "0")
-                      btn = mouse_button(button)
+                      btn = mouse_button(q(query, "button", "0"))
 
                       move_mouse(x, y)
                       run_cmd(["xdotool", "mousedown", btn])
@@ -631,8 +605,7 @@ jobs:
                   if path == "/mouseup":
                       x = q(query, "x")
                       y = q(query, "y")
-                      button = q(query, "button", "0")
-                      btn = mouse_button(button)
+                      btn = mouse_button(q(query, "button", "0"))
 
                       move_mouse(x, y)
                       run_cmd(["xdotool", "mouseup", btn])
@@ -679,9 +652,8 @@ jobs:
                   if path == "/keyup":
                       key = q(query, "key", "")
 
-                      if key:
-                          if len(key) != 1:
-                              run_cmd(["xdotool", "keyup", key_to_xdotool(key)])
+                      if key and len(key) != 1:
+                          run_cmd(["xdotool", "keyup", key_to_xdotool(key)])
 
                       self.ok()
                       return
@@ -695,8 +667,14 @@ jobs:
                       self.ok()
                       return
 
+                  if path == "/selftest":
+                      move_mouse("640", "400")
+                      run_cmd(["xdotool", "click", "3"])
+                      self.ok(b"selftest sent right-click at 640,400. Go back to / to see the stream.")
+                      return
+
                   if path == "/debug":
-                      lines = []
+                      output = []
 
                       def grab(cmd):
                           try:
@@ -712,28 +690,19 @@ jobs:
                           except Exception as e:
                               return repr(e)
 
-                      lines.append("DISPLAY=" + DISPLAY_ENV.get("DISPLAY", ""))
-                      lines.append("XAUTHORITY=" + DISPLAY_ENV.get("XAUTHORITY", ""))
-                      lines.append("")
-                      lines.append("xauth:")
-                      lines.append(grab(["xauth", "-f", "/tmp/xvfb.auth", "list"]))
-                      lines.append("")
-                      lines.append("mouse:")
-                      lines.append(grab(["xdotool", "getmouselocation"]))
-                      lines.append("")
-                      lines.append("windows:")
-                      lines.append(grab(["xdotool", "search", "--onlyvisible", "--name", ".*", "getwindowname", "%@"]))
-                      lines.append("")
-                      lines.append("processes:")
-                      lines.append(grab(["bash", "-lc", "ps aux | grep -E 'xfce|xfwm|xfdesktop|Xvfb' | grep -v grep"]))
+                      output.append("DISPLAY=" + DISPLAY_ENV["DISPLAY"])
+                      output.append("XAUTHORITY=" + DISPLAY_ENV["XAUTHORITY"])
+                      output.append("")
+                      output.append("mouse:")
+                      output.append(grab(["xdotool", "getmouselocation"]))
+                      output.append("")
+                      output.append("windows:")
+                      output.append(grab(["xdotool", "search", "--onlyvisible", "--name", ".*", "getwindowname", "%@"]))
+                      output.append("")
+                      output.append("openbox:")
+                      output.append(grab(["bash", "-lc", "ps aux | grep openbox | grep -v grep"]))
 
-                      self.ok("\n".join(lines).encode())
-                      return
-
-                  if path == "/selftest":
-                      move_mouse("640", "400")
-                      run_cmd(["xdotool", "click", "3"])
-                      self.ok(b"selftest sent right-click at 640,400")
+                      self.ok("\n".join(output).encode())
                       return
 
                   if path == "/":
@@ -742,16 +711,10 @@ jobs:
                   safe_path = os.path.normpath(path).lstrip("/")
                   file_path = os.path.join(ROOT, safe_path)
 
-                  if os.path.exists(file_path) and os.path.isfile(file_path):
+                  if os.path.isfile(file_path):
                       self.send_response(200)
-                      self.send_header(
-                          "Cache-Control",
-                          "no-store, no-cache, must-revalidate"
-                      )
-
-                      content_type = mimetypes.guess_type(file_path)[0] or "application/octet-stream"
-                      self.send_header("Content-Type", content_type)
-
+                      self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
+                      self.send_header("Content-Type", mimetypes.guess_type(file_path)[0] or "application/octet-stream")
                       self.end_headers()
 
                       with open(file_path, "rb") as f:
@@ -766,9 +729,6 @@ jobs:
               daemon_threads = True
 
           print("Control server running on 0.0.0.0:8080", flush=True)
-          print("DISPLAY:", DISPLAY_ENV["DISPLAY"], flush=True)
-          print("XAUTHORITY:", DISPLAY_ENV["XAUTHORITY"], flush=True)
-
           ThreadedHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
           EOF
 
@@ -782,11 +742,8 @@ jobs:
           sleep 2
 
           curl -I http://localhost:8080 || true
-
-          echo "Debug:"
           curl http://localhost:8080/debug || true
 
-          echo ""
           echo "Server log:"
           cat server.log || true
 
@@ -813,14 +770,9 @@ jobs:
           echo "$URL"
 
           echo ""
-          echo "Desktop only."
-          echo "No browser."
-          echo "No terminal."
-          echo "No app opened."
-          echo ""
-          echo "Debug URLs:"
-          echo "$URL/debug"
-          echo "$URL/selftest"
+          echo "Open the main URL, not /selftest."
+          echo "Right-click the streamed desktop."
+          echo "The Openbox menu should appear."
           echo "================================="
 
           cat cloudflare.log || true
@@ -838,10 +790,7 @@ jobs:
             xdotool getmouselocation || true
 
             echo "Recent server log:"
-            tail -n 40 server.log || true
-
-            echo "Screenshot log:"
-            tail -n 10 screenshot.log || true
+            tail -n 50 server.log || true
 
             sleep 60
           done
