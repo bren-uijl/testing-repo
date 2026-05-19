@@ -1,4 +1,4 @@
-name: Openbox Input Diagnostics Fixed
+name: Openbox Input Diagnostics Fixed v2
 
 on:
   workflow_dispatch:
@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Install packages
         run: |
+          set -euxo pipefail
+
           sudo apt-get update
           sudo apt-get install -y \
             xvfb \
@@ -61,19 +63,21 @@ jobs:
           echo "=== XTEST check ==="
           xdpyinfo | grep -i xtest || true
 
-          echo "=== Initial mouse location ==="
+          echo "=== initial mouse location ==="
           xdotool getmouselocation || true
 
-      - name: Create valid Openbox config
+      - name: Use stock Openbox rc.xml and custom menu.xml
         run: |
           set -euxo pipefail
 
           mkdir -p ~/.config/openbox artifacts
 
+          cp /etc/xdg/openbox/rc.xml ~/.config/openbox/rc.xml
+
           cat > ~/.config/openbox/menu.xml << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <openbox_menu xmlns="http://openbox.org/3.4/menu">
-            <menu id="root-menu" label="Openbox">
+            <menu id="root-menu" label="Root Menu">
               <item label="Write marker file">
                 <action name="Execute">
                   <command>sh -lc 'echo INPUT_WORKS > "$HOME/input_works.txt"'</command>
@@ -99,58 +103,37 @@ jobs:
           </openbox_menu>
           EOF
 
-          cat > ~/.config/openbox/rc.xml << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <openbox_config xmlns="http://openbox.org/3.4/rc">
-            <keyboard>
-              <keybind key="A-space">
-                <action name="ShowMenu">
-                  <menu>root-menu</menu>
-                </action>
-              </keybind>
-            </keyboard>
+          echo "=== validate rc.xml ==="
+          xmllint --noout ~/.config/openbox/rc.xml
 
-            <mouse>
-              <context name="Root">
-                <mousebind button="Right" action="Press">
-                  <action name="ShowMenu">
-                    <menu>root-menu</menu>
-                  </action>
-                </mousebind>
-              </context>
-            </mouse>
-          </openbox_config>
-          EOF
+          echo "=== validate menu.xml ==="
+          xmllint --noout ~/.config/openbox/menu.xml
 
-          echo "=== rc.xml ==="
-          cat ~/.config/openbox/rc.xml
+          echo "=== rc.xml head ==="
+          sed -n '1,120p' ~/.config/openbox/rc.xml
 
           echo "=== menu.xml ==="
           cat ~/.config/openbox/menu.xml
 
-          xmllint --noout ~/.config/openbox/rc.xml
-          xmllint --noout ~/.config/openbox/menu.xml
-
-      - name: Start Openbox with explicit config
+      - name: Start Openbox
         run: |
           set -euxo pipefail
 
           export DISPLAY=:0
           export XAUTHORITY=/tmp/xvfb.auth
 
-          xsetroot -solid '#202020'
+          rm -f "$HOME/input_works.txt"
+
+          xsetroot -solid '#000000'
 
           nohup openbox --config-file "$HOME/.config/openbox/rc.xml" > openbox.log 2>&1 &
           sleep 3
 
-          openbox --reconfigure || true
-          sleep 1
+          echo "=== openbox process ==="
+          ps aux | grep -E '[o]penbox|[X]vfb' || true
 
           echo "=== openbox.log ==="
           cat openbox.log || true
-
-          echo "=== openbox process ==="
-          ps aux | grep -E '[o]penbox|[X]vfb' || true
 
       - name: Create screenshot helper
         run: |
@@ -159,6 +142,7 @@ jobs:
           cat > screenshot.sh << 'EOF'
           #!/usr/bin/env bash
           set -euo pipefail
+
           export DISPLAY=:0
           export XAUTHORITY=/tmp/xvfb.auth
 
@@ -174,12 +158,12 @@ jobs:
 
           chmod +x screenshot.sh
 
-      - name: Screenshot baseline
+      - name: Baseline screenshot
         run: |
           set -euxo pipefail
           ./screenshot.sh 01_baseline
 
-      - name: Self-test 1 - move pointer
+      - name: Test 1 - move pointer
         run: |
           set -euxo pipefail
 
@@ -191,7 +175,7 @@ jobs:
 
           ./screenshot.sh 02_after_move
 
-      - name: Self-test 2 - open root menu with right click
+      - name: Test 2 - open menu with right click
         run: |
           set -euxo pipefail
 
@@ -204,7 +188,7 @@ jobs:
 
           ./screenshot.sh 03_menu_opened
 
-      - name: Self-test 3 - activate first menu item by keyboard
+      - name: Test 3 - click first menu item with mouse
         run: |
           set -euxo pipefail
 
@@ -213,68 +197,68 @@ jobs:
 
           rm -f "$HOME/input_works.txt"
 
-          # Open the menu
+          # Open menu at center
           xdotool mousemove --sync 640 400
           xdotool click 3
-          sleep 1
+          sleep 0.7
 
-          # First item should be selected by default
-          xdotool key Return
+          # Click inside first item (slightly right/down from menu origin)
+          xdotool mousemove --sync 690 412
+          xdotool click 1
           sleep 1
 
           if [ -f "$HOME/input_works.txt" ]; then
-            echo "INPUT_WORKS marker created."
-            cat "$HOME/input_works.txt" | tee artifacts/04_marker_contents.txt
+            echo "INPUT_WORKS marker created." | tee artifacts/04_marker_result.txt
+            cat "$HOME/input_works.txt" | tee -a artifacts/04_marker_result.txt
           else
-            echo "Marker file was NOT created." | tee artifacts/04_marker_contents.txt
+            echo "Marker file was NOT created." | tee artifacts/04_marker_result.txt
             exit 1
           fi
 
-          ./screenshot.sh 04_after_marker
+          ./screenshot.sh 04_after_marker_click
 
-      - name: Self-test 4 - activate blue background by keyboard
+      - name: Test 4 - click Blue background item with mouse
         run: |
           set -euxo pipefail
 
           export DISPLAY=:0
           export XAUTHORITY=/tmp/xvfb.auth
 
-          # Reset to black first
+          # Reset to black
           xsetroot -solid '#000000'
           sleep 1
           ./screenshot.sh 05_reset_black
 
-          # Open menu
+          # Open menu again
           xdotool mousemove --sync 640 400
           xdotool click 3
+          sleep 0.7
+
+          # Click inside "Blue background" item
+          # First item is at top; blue is below separator, so slightly lower.
+          xdotool mousemove --sync 700 452
+          xdotool click 1
           sleep 1
 
-          # Go to "Blue background"
-          xdotool key Down
-          xdotool key Down
-          xdotool key Return
-          sleep 1
-
-          ./screenshot.sh 06_after_select_blue
+          ./screenshot.sh 06_after_blue_click
 
       - name: Compare pixels
         run: |
           set -euxo pipefail
 
-          echo "=== baseline center pixel ===" | tee artifacts/07_pixel_compare.txt
-          cat artifacts/01_baseline.center-pixel.txt | tee -a artifacts/07_pixel_compare.txt || true
-
-          echo "" | tee -a artifacts/07_pixel_compare.txt
-          echo "=== menu-opened center pixel ===" | tee -a artifacts/07_pixel_compare.txt
-          cat artifacts/03_menu_opened.center-pixel.txt | tee -a artifacts/07_pixel_compare.txt || true
-
-          echo "" | tee -a artifacts/07_pixel_compare.txt
-          echo "=== reset-black center pixel ===" | tee -a artifacts/07_pixel_compare.txt
-          cat artifacts/05_reset_black.center-pixel.txt | tee -a artifacts/07_pixel_compare.txt || true
-
-          echo "" | tee -a artifacts/07_pixel_compare.txt
-          echo "=== after-blue center pixel ===" | tee -a artifacts/07_pixel_compare.txt
-          cat artifacts/06_after_select_blue.center-pixel.txt | tee -a artifacts/07_pixel_compare.txt || true
+          {
+            echo "=== baseline center pixel ==="
+            cat artifacts/01_baseline.center-pixel.txt || true
+            echo
+            echo "=== menu-opened center pixel ==="
+            cat artifacts/03_menu_opened.center-pixel.txt || true
+            echo
+            echo "=== reset-black center pixel ==="
+            cat artifacts/05_reset_black.center-pixel.txt || true
+            echo
+            echo "=== after-blue center pixel ==="
+            cat artifacts/06_after_blue_click.center-pixel.txt || true
+          } | tee artifacts/07_pixel_compare.txt
 
       - name: Collect debug info
         if: always()
@@ -317,5 +301,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: openbox-input-diagnostics-fixed
+          name: openbox-input-diagnostics-fixed-v2
           path: artifacts/
