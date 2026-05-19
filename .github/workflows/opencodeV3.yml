@@ -604,7 +604,7 @@ jobs:
           - If stuck, document the issue and move on.
           - Never leave the codebase in a broken state.
           
-          FULL_PROMPT="${SYSTEM_PROMPT}
+          FULL_PROMPT=${SYSTEM_PROMPT}
 
           USER REQUEST:
           ${INPUT_PROMPT}
