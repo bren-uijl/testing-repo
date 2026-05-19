@@ -16,6 +16,8 @@ class ConversationListView extends WatchUi.View {
     var deleteTargetIdx;
     var showQuickPrompts;
     var quickPrompts;
+    var viewWidth;
+    var viewHeight;
 
     function initialize() {
         View.initialize();
@@ -41,6 +43,8 @@ class ConversationListView extends WatchUi.View {
     function onLayout(dc) {
         storage = Application.getApp().getPropertyStore();
         loadConversations();
+        viewWidth = dc.getWidth();
+        viewHeight = dc.getHeight();
     }
 
     function loadConversations() {
@@ -74,8 +78,8 @@ class ConversationListView extends WatchUi.View {
                 var a = conversations.get(i);
                 var b = conversations.get(j);
                 if (b.updatedAt > a.updatedAt) {
-                    conversations.set(i, b);
-                    conversations.set(j, a);
+                    conversations[i] = b;
+                    conversations[j] = a;
                 }
             }
         }
@@ -203,7 +207,7 @@ class ConversationListView extends WatchUi.View {
     function onTap(evt) {
         var x = evt.getX();
         var y = evt.getY();
-        var width = getWidth();
+        var width = viewWidth;
 
         var newBtnY = 42;
         var btnWidth = 70;
@@ -215,7 +219,7 @@ class ConversationListView extends WatchUi.View {
                 deleteSelectedConversation();
             } else {
                 showQuickPrompts = !showQuickPrompts;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
             return;
         }
@@ -243,7 +247,7 @@ class ConversationListView extends WatchUi.View {
             if (deleteMode) {
                 deleteMode = false;
                 deleteTargetIdx = -1;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             } else {
                 Application.getApp().showSettings();
             }
@@ -256,7 +260,7 @@ class ConversationListView extends WatchUi.View {
             if (idx >= 0 && idx < conversations.size()) {
                 if (deleteMode) {
                     deleteTargetIdx = idx;
-                    View.requestUpdate();
+                    WatchUi.requestUpdate();
                 } else {
                     var conv = conversations.get(idx);
                     Application.getApp().showConversation(conv.id);
@@ -268,27 +272,27 @@ class ConversationListView extends WatchUi.View {
     function onSwipe(evt) {
         var direction = evt.getDirection();
 
-        if (direction == WatchUi.SWIPE_DIRECTION_LEFT) {
+        if (direction == WatchUi.SWIPE_LEFT) {
             if (!deleteMode && conversations.size() > 0) {
                 deleteMode = true;
                 deleteTargetIdx = -1;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
-        } else if (direction == WatchUi.SWIPE_DIRECTION_RIGHT) {
+        } else if (direction == WatchUi.SWIPE_RIGHT) {
             if (deleteMode) {
                 deleteMode = false;
                 deleteTargetIdx = -1;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
-        } else if (direction == WatchUi.SWIPE_DIRECTION_UP) {
-            if (scrollOffset + (getHeight() - headerHeight - 50) / itemHeight < conversations.size()) {
+        } else if (direction == WatchUi.SWIPE_UP) {
+            if (scrollOffset + (viewHeight - headerHeight - 50) / itemHeight < conversations.size()) {
                 scrollOffset += 1;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
-        } else if (direction == WatchUi.SWIPE_DIRECTION_DOWN) {
+        } else if (direction == WatchUi.SWIPE_DOWN) {
             if (scrollOffset > 0) {
                 scrollOffset -= 1;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
         }
     }
@@ -299,7 +303,7 @@ class ConversationListView extends WatchUi.View {
             conv.delete();
             conversations.remove(deleteTargetIdx);
             deleteTargetIdx = -1;
-            View.requestUpdate();
+            WatchUi.requestUpdate();
         }
     }
 

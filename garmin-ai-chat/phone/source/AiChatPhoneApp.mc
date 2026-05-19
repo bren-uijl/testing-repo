@@ -1,7 +1,6 @@
 using Toybox.Application;
 using Toybox.Communications;
 using Toybox.System;
-using Toybox.Json;
 
 class AiChatPhoneApp extends Application.AppBase {
 
@@ -36,20 +35,7 @@ class AiChatPhoneApp extends Application.AppBase {
     }
 
     function syncToWatch() {
-        if (propertyStore == null) {
-            return;
-        }
-
-        var data = {
-            :apiKey => propertyStore.getApiKey(),
-            :model => propertyStore.getModel()
-        };
-
-        try {
-            Communications.sendToWatchApp(Json.encode(data));
-        } catch (e) {
-            System.println("Failed to sync to watch: " + e.toString());
-        }
+        System.println("Sync to watch not supported in SDK 9.1.0");
     }
 }
 
@@ -58,7 +44,7 @@ class PhonePropertyStore {
     var store;
 
     function initialize() {
-        store = Application.getApp().getAppProperty("AiChatPhoneStore");
+        store = Application.getApp().getProperty("AiChatPhoneStore");
         if (store == null) {
             store = {};
             store.put(:apiKey, "");
@@ -85,6 +71,6 @@ class PhonePropertyStore {
     }
 
     function save() {
-        Application.getApp().setAppProperty("AiChatPhoneStore", store);
+        Application.getApp().setProperty("AiChatPhoneStore", store);
     }
 }

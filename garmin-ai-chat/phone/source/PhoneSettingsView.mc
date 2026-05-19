@@ -107,10 +107,9 @@ class PhoneSettingsView extends WatchUi.View {
         var y = evt.getY();
 
         if (y >= 110 && y <= 150) {
-            WatchUi.invokeTextInput(
-                new PhoneTextInputDelegate(self),
-                { :title => "Enter NVIDIA API Key", :maxSize => 70 }
-            );
+            if (WatchUi has :TextPicker) {
+                WatchUi.pushView(new WatchUi.TextPicker(apiKeyInput), new PhoneTextInputDelegate(self), WatchUi.SLIDE_DOWN);
+            }
         }
     }
 
@@ -118,43 +117,47 @@ class PhoneSettingsView extends WatchUi.View {
         if (text != null && text.length() > 0) {
             apiKeyInput = text;
             storage.setApiKey(text);
-            View.requestUpdate();
+            WatchUi.requestUpdate();
         }
     }
 
     function onSwipe(evt) {
         var direction = evt.getDirection();
 
-        if (direction == WatchUi.SWIPE_DIRECTION_LEFT) {
+        if (direction == WatchUi.SWIPE_LEFT) {
             modelSelected = (modelSelected + 1) % models.size();
             storage.setModel(models.get(modelSelected));
-            View.requestUpdate();
-        } else if (direction == WatchUi.SWIPE_DIRECTION_RIGHT) {
+            WatchUi.requestUpdate();
+        } else if (direction == WatchUi.SWIPE_RIGHT) {
             modelSelected = (modelSelected - 1 + models.size()) % models.size();
             storage.setModel(models.get(modelSelected));
-            View.requestUpdate();
+            WatchUi.requestUpdate();
         }
     }
 
     function onMenu() {
-        Application.getApp().syncToWatch();
-        statusMessage = "Synced to watch!";
-        View.requestUpdate();
+        statusMessage = "Sync not available";
+        WatchUi.requestUpdate();
         return true;
     }
 }
 
-class PhoneTextInputDelegate extends WatchUi.TextConfirmationDelegate {
+class PhoneTextInputDelegate extends WatchUi.TextPickerDelegate {
 
     var view;
 
     function initialize(settingsView) {
-        TextConfirmationDelegate.initialize();
+        TextPickerDelegate.initialize();
         view = settingsView;
     }
 
-    function onConfirmed(text) {
+    function onTextEntered(text, changed) {
         view.onApiKeyEntered(text);
+        return true;
+    }
+
+    function onCancel() {
+        return true;
     }
 }
 

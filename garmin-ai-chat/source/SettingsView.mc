@@ -12,6 +12,8 @@ class SettingsView extends WatchUi.View {
     var scrollOffset;
     var itemHeight;
     var headerHeight;
+    var viewWidth;
+    var viewHeight;
 
     function initialize() {
         View.initialize();
@@ -26,6 +28,8 @@ class SettingsView extends WatchUi.View {
     function onLayout(dc) {
         storage = Application.getApp().getPropertyStore();
         buildItems();
+        viewWidth = dc.getWidth();
+        viewHeight = dc.getHeight();
     }
 
     function buildItems() {
@@ -160,7 +164,7 @@ class SettingsView extends WatchUi.View {
     function resetSystemPrompt() {
         storage.setSystemPrompt("You are a helpful assistant on a Garmin watch. Keep responses concise and under 200 characters.");
         buildItems();
-        View.requestUpdate();
+        WatchUi.requestUpdate();
     }
 
     function cycleModel() {
@@ -178,21 +182,21 @@ class SettingsView extends WatchUi.View {
         var current = storage.getModel();
         var nextIdx = 0;
         for (var i = 0; i < models.size(); i++) {
-            if (models.get(i) == current) {
+            if (models[i] == current) {
                 nextIdx = (i + 1) % models.size();
                 break;
             }
         }
 
-        storage.setModel(models.get(nextIdx));
+        storage.setModel(models[nextIdx]);
         buildItems();
-        View.requestUpdate();
+        WatchUi.requestUpdate();
     }
 
     function clearAllConversations() {
         storage.clearAllConversations();
         buildItems();
-        View.requestUpdate();
+        WatchUi.requestUpdate();
     }
 
     function getModelDisplayName(modelId) {
@@ -218,9 +222,9 @@ class SettingsView extends WatchUi.View {
             return "Mistral Med 3.5";
         }
 
-        var parts = modelId.split("/");
-        if (parts.size() > 1) {
-            return parts.get(1);
+        var slashIdx = modelId.indexOf("/");
+        if (slashIdx >= 0) {
+            return modelId.substring(slashIdx + 1);
         }
         return modelId;
     }
@@ -228,15 +232,15 @@ class SettingsView extends WatchUi.View {
     function onSwipe(evt) {
         var direction = evt.getDirection();
 
-        if (direction == WatchUi.SWIPE_DIRECTION_UP) {
-            if (scrollOffset + (getHeight() - headerHeight - 20) / itemHeight < items.size()) {
+        if (direction == WatchUi.SWIPE_UP) {
+            if (scrollOffset + (viewHeight - headerHeight - 20) / itemHeight < items.size()) {
                 scrollOffset += 1;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
-        } else if (direction == WatchUi.SWIPE_DIRECTION_DOWN) {
+        } else if (direction == WatchUi.SWIPE_DOWN) {
             if (scrollOffset > 0) {
                 scrollOffset -= 1;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
         }
     }

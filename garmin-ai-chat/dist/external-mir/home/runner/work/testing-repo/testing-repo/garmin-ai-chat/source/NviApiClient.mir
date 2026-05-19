@@ -1,0 +1,951 @@
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 1; @symbol_importdef<0> = [Toybox,1,7,13]; @symbol_importdef<1> = [Communications,1,14,28]; ]
+import Toybox.Communications;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 2; @symbol_importdef<0> = [Toybox,2,7,13]; @symbol_importdef<1> = [System,2,14,20]; ]
+import Toybox.System;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 3; @symbol_importdef<0> = [Toybox,3,7,13]; @symbol_importdef<1> = [Lang,3,14,18]; ]
+import Toybox.Lang;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 5; @symbol_classdef = [NviApiClient,5,6,18]; ]
+class NviApiClient {
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 5; ]
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 5; ]
+    static
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 7; @position = 8; @symbol_vardef = [baseUrl,7,8,15]; ]
+    var baseUrl;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 8; @position = 8; @symbol_vardef = [apiKey,8,8,14]; ]
+    var apiKey;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 9; @position = 8; @symbol_vardef = [model,9,8,13]; ]
+    var model;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 10; @position = 8; @symbol_vardef = [callback,10,8,16]; ]
+    var callback;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 12; @symbol_functiondef = [initialize,12,13,23]; ]
+    function initialize() as Void {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_12_26_17_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 13 8 ]
+        %tmp.1 = "https://integrate.api.nvidia.com/v1/chat/completions";
+        symbol [ baseUrl ? 13 8 15 ];
+        putv self :baseUrl %tmp.1;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 14 8 ]
+        %tmp.2 = null;
+        symbol [ apiKey ? 14 8 14 ];
+        putv self :apiKey %tmp.2;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 15 8 ]
+        %tmp.3 = "nvidia/nemotron-nano-9b-v2";
+        symbol [ model ? 15 8 13 ];
+        putv self :model %tmp.3;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 16 8 ]
+        %tmp.4 = null;
+        symbol [ callback ? 16 8 16 ];
+        putv self :callback %tmp.4;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_12_26_17_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 19; @symbol_functiondef = [setApiKey,19,13,22]; @symbol_param<0> = [key,19,23,26]; ]
+    function setApiKey(key) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_19_28_21_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 20 8 ]
+        %tmp.1 = lgetv %key;
+        symbol [ key %tmp.1 20 17 20 ];
+        symbol [ apiKey ? 20 8 14 ];
+        putv self :apiKey %tmp.1;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_19_28_21_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 23; @symbol_functiondef = [setModel,23,13,21]; @symbol_param<0> = [m,23,22,23]; ]
+    function setModel(m) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_23_25_27_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 24 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_8_26_8_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_12_24_38_begin:
+        %tmp.1 = lgetv %m;
+        symbol [ m %tmp.1 24 12 13 ];
+        %tmp.2 = null;
+        %tmp.3 = ne %tmp.1 %tmp.2;
+        bf %tmp.3 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_8_26_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_25_24_38_true:
+        %tmp.4 = lgetv %m;
+        symbol [ m %tmp.4 24 25 26 ];
+        %tmp.5 = as %tmp.4 { (!Null) };
+        symbol [ length %tmp.6 24 27 33 ];
+        %tmp.6 = getv function %tmp.5 :length;
+        %tmp.7 = invoke %tmp.5 %tmp.6();
+        %tmp.8 = 0;
+        %tmp.9 = gt %tmp.7 %tmp.8;
+        push %tmp.9;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_25_24_38_end:
+        %tmp.10 = phi [%tmp.3 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_12_24_38_begin] [%tmp.9 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_25_24_38_true] [%tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_25_24_38_end];
+        bf %tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_8_26_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_8_26_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_41_26_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 25 12 ]
+        %tmp.11 = lgetv %m;
+        symbol [ m %tmp.11 25 20 21 ];
+        %tmp.12 = as %tmp.11 { (!Null) };
+        symbol [ model ? 25 12 17 ];
+        putv self :model %tmp.12;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_41_26_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_8_26_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_24_8_26_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_23_25_27_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 29; @symbol_functiondef = [setCallback,29,13,24]; @symbol_param<0> = [cb,29,25,27]; ]
+    function setCallback(cb) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_29_29_31_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 30 8 ]
+        %tmp.1 = lgetv %cb;
+        symbol [ cb %tmp.1 30 19 21 ];
+        symbol [ callback ? 30 8 16 ];
+        putv self :callback %tmp.1;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_29_29_31_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 33; @symbol_functiondef = [sendMessage,33,13,24]; @symbol_param<0> = [messages,33,25,33]; @symbol_param<1> = [cb,33,35,37]; ]
+    function sendMessage(messages, cb) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_33_39_73_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 34 8 ]
+        %tmp.1 = lgetv %cb;
+        symbol [ cb %tmp.1 34 19 21 ];
+        symbol [ callback ? 34 8 16 ];
+        putv self :callback %tmp.1;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 36 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_8_41_8_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_12_36_49_begin:
+        symbol [ apiKey %tmp.3 36 12 18 ];
+        %tmp.3 = getv ? :apiKey;
+        %tmp.4 = null;
+        %tmp.5 = eq %tmp.3 %tmp.4;
+        bt %tmp.5 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_8_41_8_if_true;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_30_36_49_false:
+        symbol [ apiKey %tmp.7 36 30 36 ];
+        %tmp.7 = getv ? :apiKey;
+        %tmp.8 = as %tmp.7 { (!Null) };
+        symbol [ length %tmp.9 36 37 43 ];
+        %tmp.9 = getv function %tmp.8 :length;
+        %tmp.10 = invoke %tmp.8 %tmp.9();
+        %tmp.11 = 0;
+        %tmp.12 = eq %tmp.10 %tmp.11;
+        push %tmp.12;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_30_36_49_end:
+        %tmp.13 = phi [%tmp.5 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_12_36_49_begin] [%tmp.12 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_30_36_49_false] [%tmp.13 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_30_36_49_end];
+        bf %tmp.13 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_8_41_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_8_41_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_52_41_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 37 12 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_37_12_39_12_if_stmt:
+        symbol [ callback %tmp.15 37 16 24 ];
+        %tmp.15 = getv ? :callback;
+        %tmp.16 = null;
+        %tmp.17 = ne %tmp.15 %tmp.16;
+        bf %tmp.17 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_37_12_39_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_37_12_39_12_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_37_34_39_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 38 16 ]
+        symbol [ callback %tmp.19 38 16 24 ];
+        %tmp.19 = getv ? :callback;
+        %tmp.20 = as %tmp.19 { (!Null) };
+        symbol [ onComplete %tmp.21 38 25 35 ];
+        %tmp.21 = getv function %tmp.20 :onComplete;
+        %tmp.22 = null;
+        %tmp.23 = "No API key set";
+        invoke %tmp.20 %tmp.21(%tmp.22, %tmp.23);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_37_34_39_12_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_37_12_39_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_37_12_39_12_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 40 12 ]
+        ret ?;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_52_41_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_8_41_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_36_8_41_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 43 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_8_48_8_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_12_43_51_begin:
+        %tmp.24 = lgetv %messages;
+        symbol [ messages %tmp.24 43 12 20 ];
+        %tmp.25 = null;
+        %tmp.26 = eq %tmp.24 %tmp.25;
+        bt %tmp.26 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_8_48_8_if_true;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_32_43_51_false:
+        %tmp.27 = lgetv %messages;
+        symbol [ messages %tmp.27 43 32 40 ];
+        %tmp.28 = as %tmp.27 { (!Null) };
+        symbol [ size %tmp.29 43 41 45 ];
+        %tmp.29 = getv function %tmp.28 :size;
+        %tmp.30 = invoke %tmp.28 %tmp.29();
+        %tmp.31 = 0;
+        %tmp.32 = eq %tmp.30 %tmp.31;
+        push %tmp.32;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_32_43_51_end:
+        %tmp.33 = phi [%tmp.26 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_12_43_51_begin] [%tmp.32 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_32_43_51_false] [%tmp.33 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_32_43_51_end];
+        bf %tmp.33 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_8_48_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_8_48_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_54_48_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 44 12 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_44_12_46_12_if_stmt:
+        symbol [ callback %tmp.35 44 16 24 ];
+        %tmp.35 = getv ? :callback;
+        %tmp.36 = null;
+        %tmp.37 = ne %tmp.35 %tmp.36;
+        bf %tmp.37 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_44_12_46_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_44_12_46_12_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_44_34_46_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 45 16 ]
+        symbol [ callback %tmp.39 45 16 24 ];
+        %tmp.39 = getv ? :callback;
+        %tmp.40 = as %tmp.39 { (!Null) };
+        symbol [ onComplete %tmp.41 45 25 35 ];
+        %tmp.41 = getv function %tmp.40 :onComplete;
+        %tmp.42 = null;
+        %tmp.43 = "No messages to send";
+        invoke %tmp.40 %tmp.41(%tmp.42, %tmp.43);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_44_34_46_12_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_44_12_46_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_44_12_46_12_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 47 12 ]
+        ret ?;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_54_48_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_8_48_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_43_8_48_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 50 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_33_39_73_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_33_39_73_4_stop" ]
+        %requestBody.1 = local;
+        symbol [ requestBody %requestBody.1 50 12 23 ];
+        %tmp.44 = newd 5;
+        %tmp.46 = const :model;
+        symbol [ model %tmp.46 51 13 18 const ];
+        symbol [ model %tmp.48 51 22 27 ];
+        %tmp.48 = getv ? :model;
+        %tmp.49 = dup %tmp.44;
+        %tmp.50 = aputv %tmp.49 %tmp.46 %tmp.48;
+        %tmp.52 = const :messages;
+        symbol [ messages %tmp.52 52 13 21 const ];
+        %tmp.53 = lgetv %messages;
+        symbol [ messages %tmp.53 52 25 33 ];
+        %tmp.54 = dup %tmp.50;
+        %tmp.55 = aputv %tmp.54 %tmp.52 %tmp.53;
+        %tmp.57 = const :max_tokens;
+        symbol [ max_tokens %tmp.57 53 13 23 const ];
+        %tmp.58 = 1024;
+        %tmp.59 = dup %tmp.55;
+        %tmp.60 = aputv %tmp.59 %tmp.57 %tmp.58;
+        %tmp.62 = const :temperature;
+        symbol [ temperature %tmp.62 54 13 24 const ];
+        %tmp.63 = 0.7;
+        %tmp.64 = dup %tmp.60;
+        %tmp.65 = aputv %tmp.64 %tmp.62 %tmp.63;
+        %tmp.67 = const :stream;
+        symbol [ stream %tmp.67 55 13 19 const ];
+        %tmp.68 = false;
+        %tmp.69 = dup %tmp.65;
+        %tmp.70 = aputv %tmp.69 %tmp.67 %tmp.68;
+        lputv %requestBody.1 %tmp.70;
+        symbol [ requestBody %requestBody.1 50 12 23 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 58 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_33_39_73_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_33_39_73_4_stop" ]
+        %options.2 = local;
+        symbol [ options %options.2 58 12 19 ];
+        %tmp.71 = newd 3;
+        %tmp.73 = const :method;
+        symbol [ method %tmp.73 59 13 19 const ];
+        symbol [ Communications %tmp.74 59 23 37 ];
+        %tmp.74 = getm $.Toybox.Communications;
+        symbol [ HTTP_REQUEST_METHOD_POST %tmp.75 59 38 62 ];
+        %tmp.75 = getv %tmp.74 :HTTP_REQUEST_METHOD_POST;
+        %tmp.76 = dup %tmp.71;
+        %tmp.77 = aputv %tmp.76 %tmp.73 %tmp.75;
+        %tmp.79 = const :headers;
+        symbol [ headers %tmp.79 60 13 20 const ];
+        %tmp.80 = newd 1;
+        %tmp.81 = "Content-Type";
+        symbol [ Communications %tmp.82 61 34 48 ];
+        %tmp.82 = getm $.Toybox.Communications;
+        symbol [ REQUEST_CONTENT_TYPE_JSON %tmp.83 61 49 74 ];
+        %tmp.83 = getv %tmp.82 :REQUEST_CONTENT_TYPE_JSON;
+        %tmp.84 = dup %tmp.80;
+        %tmp.85 = aputv %tmp.84 %tmp.81 %tmp.83;
+        %tmp.86 = dup %tmp.77;
+        %tmp.87 = aputv %tmp.86 %tmp.79 %tmp.85;
+        %tmp.89 = const :responseType;
+        symbol [ responseType %tmp.89 63 13 25 const ];
+        symbol [ Communications %tmp.90 63 29 43 ];
+        %tmp.90 = getm $.Toybox.Communications;
+        symbol [ HTTP_RESPONSE_CONTENT_TYPE_JSON %tmp.91 63 44 75 ];
+        %tmp.91 = getv %tmp.90 :HTTP_RESPONSE_CONTENT_TYPE_JSON;
+        %tmp.92 = dup %tmp.87;
+        %tmp.93 = aputv %tmp.92 %tmp.89 %tmp.91;
+        lputv %options.2 %tmp.93;
+        symbol [ options %options.2 58 12 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 66 8 ]
+        try @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_beginTry @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_endTry @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_catch @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_finally;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_beginTry:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_12_68_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 67 12 ]
+        symbol [ Communications %tmp.94 67 12 26 ];
+        %tmp.94 = getm $.Toybox.Communications;
+        symbol [ makeWebRequest %tmp.95 67 27 41 ];
+        %tmp.95 = getv function %tmp.94 :makeWebRequest;
+        symbol [ baseUrl %tmp.97 67 42 49 ];
+        %tmp.97 = getv ? :baseUrl;
+        %tmp.98 = lgetv %requestBody.1;
+        symbol [ requestBody %tmp.98 67 51 62 ];
+        %tmp.99 = lgetv %options.2;
+        symbol [ options %tmp.99 67 64 71 ];
+        %tmp.100 = self;
+        symbol [ method %tmp.101 67 73 79 ];
+        %tmp.101 = getv function %tmp.100 :method;
+        %tmp.103 = const :onResponse;
+        symbol [ onResponse %tmp.103 67 81 91 const ];
+        %tmp.104 = invoke %tmp.100 %tmp.101(%tmp.103);
+        invoke %tmp.94 %tmp.95(%tmp.97, %tmp.98, %tmp.99, %tmp.104);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_12_68_8_stop:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_endTry:
+        jsr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_finally;
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_catch:
+        %tmp.105 = exception;
+        push %tmp.105;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 68 10 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_catch" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_68_10_72_8_end" ]
+        %e.3 = local;
+        symbol [ e %e.3 68 17 18 ];
+        %tmp.106 = dup %tmp.105;
+        lputv %e.3 %tmp.106;
+        symbol [ e %e.3 68 17 18 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_68_20_72_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 69 12 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_69_12_71_12_if_stmt:
+        symbol [ callback %tmp.108 69 16 24 ];
+        %tmp.108 = getv ? :callback;
+        %tmp.109 = null;
+        %tmp.110 = ne %tmp.108 %tmp.109;
+        bf %tmp.110 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_69_12_71_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_69_12_71_12_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_69_34_71_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 70 16 ]
+        symbol [ callback %tmp.112 70 16 24 ];
+        %tmp.112 = getv ? :callback;
+        %tmp.113 = as %tmp.112 { (!Null) };
+        symbol [ onComplete %tmp.114 70 25 35 ];
+        %tmp.114 = getv function %tmp.113 :onComplete;
+        %tmp.115 = null;
+        %tmp.116 = "Network error: ";
+        %tmp.117 = lgetv %e.3;
+        symbol [ e %tmp.117 70 62 63 ];
+        symbol [ toString %tmp.118 70 64 72 ];
+        %tmp.118 = getv function %tmp.117 :toString;
+        %tmp.119 = invoke %tmp.117 %tmp.118();
+        %tmp.120 = add %tmp.116 %tmp.119;
+        invoke %tmp.113 %tmp.114(%tmp.115, %tmp.120);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_69_34_71_12_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_69_12_71_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_69_12_71_12_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_68_20_72_8_stop:
+        jsr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_finally;
+        pop;
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_68_10_72_8_end:
+        try @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_catch @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_68_10_72_8_end @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_68_10_72_8_end @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_finally;
+        jsr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_finally;
+        throw %tmp.105;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_finally:
+        jsrret;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_66_8_72_8_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_33_39_73_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 75; @symbol_functiondef = [onResponse,75,13,23]; @symbol_param<0> = [responseCode,75,24,36]; @symbol_param<0>_type<0> = [Number,75,40,46]; @symbol_param<1> = [data,75,48,52]; @symbol_param<1>_type<0> = [Dictionary,75,56,66]; @symbol_param<1>_type<1> = [String,75,70,76]; ]
+    function onResponse(responseCode as Number, data as Dictionary or String or Null) as Void {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_75_94_108_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 76 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_76_8_78_8_if_stmt:
+        symbol [ callback %tmp.2 76 12 20 ];
+        %tmp.2 = getv ? :callback;
+        %tmp.3 = null;
+        %tmp.4 = eq %tmp.2 %tmp.3;
+        bf %tmp.4 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_76_8_78_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_76_8_78_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_76_30_78_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 77 12 ]
+        ret ?;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_76_30_78_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_76_8_78_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_76_8_78_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 80 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_8_107_8_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_12_80_43_begin:
+        %tmp.5 = lgetv %responseCode;
+        symbol [ responseCode %tmp.5 80 12 24 ];
+        %tmp.6 = 200;
+        %tmp.7 = eq %tmp.5 %tmp.6;
+        bf %tmp.7 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_8_107_8_if_else_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_35_80_43_true:
+        %tmp.8 = lgetv %data;
+        symbol [ data %tmp.8 80 35 39 ];
+        %tmp.9 = null;
+        %tmp.10 = ne %tmp.8 %tmp.9;
+        push %tmp.10;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_35_80_43_end:
+        %tmp.11 = phi [%tmp.7 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_12_80_43_begin] [%tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_35_80_43_true] [%tmp.11 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_35_80_43_end];
+        bf %tmp.11 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_8_107_8_if_else_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_8_107_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_49_104_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 81 12 ]
+        try @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_beginTry @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_endTry @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_catch @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_finally;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_beginTry:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_16_101_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 82 16 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_82_16_100_16_if_stmt:
+        %tmp.12 = lgetv %data;
+        symbol [ data %tmp.12 82 20 24 ];
+        %tmp.13 = as %tmp.12 { (!Null) };
+        symbol [ Dictionary %tmp.15 82 36 46 ];
+        %tmp.15 = getv ? :Dictionary;
+        %tmp.16 = isa %tmp.13 %tmp.15;
+        bf %tmp.16 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_82_16_100_16_if_else_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_82_16_100_16_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_82_48_98_16_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 83 20 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_82_48_98_16_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_82_48_98_16_stop" ]
+        %choices.1 = local;
+        symbol [ choices %choices.1 83 24 31 ];
+        %tmp.17 = lgetv %data;
+        symbol [ data %tmp.17 83 34 38 ];
+        %tmp.18 = as %tmp.17 { (Dictionary) && (!Null) };
+        %tmp.20 = const :choices;
+        symbol [ choices %tmp.20 83 40 47 const ];
+        %tmp.21 = agetv %tmp.18 %tmp.20;
+        lputv %choices.1 %tmp.21;
+        symbol [ choices %choices.1 83 24 31 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 84 20 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_20_96_20_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_24_84_60_begin:
+        %tmp.22 = lgetv %choices.1;
+        symbol [ choices %tmp.22 84 24 31 ];
+        %tmp.23 = null;
+        %tmp.24 = ne %tmp.22 %tmp.23;
+        bf %tmp.24 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_20_96_20_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_43_84_60_true:
+        %tmp.25 = lgetv %choices.1;
+        symbol [ choices %tmp.25 84 43 50 ];
+        %tmp.26 = as %tmp.25 { (!Null) };
+        symbol [ size %tmp.27 84 51 55 ];
+        %tmp.27 = getv function %tmp.26 :size;
+        %tmp.28 = invoke %tmp.26 %tmp.27();
+        %tmp.29 = 0;
+        %tmp.30 = gt %tmp.28 %tmp.29;
+        push %tmp.30;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_43_84_60_end:
+        %tmp.31 = phi [%tmp.24 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_24_84_60_begin] [%tmp.30 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_43_84_60_true] [%tmp.31 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_43_84_60_end];
+        bf %tmp.31 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_20_96_20_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_20_96_20_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_63_96_20_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 85 24 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_63_96_20_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_63_96_20_stop" ]
+        %choice.2 = local;
+        symbol [ choice %choice.2 85 28 34 ];
+        %tmp.32 = lgetv %choices.1;
+        symbol [ choices %tmp.32 85 37 44 ];
+        %tmp.33 = as %tmp.32 { (!Null) };
+        %tmp.34 = 0;
+        %tmp.35 = agetv %tmp.33 %tmp.34;
+        lputv %choice.2 %tmp.35;
+        symbol [ choice %choice.2 85 28 34 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 86 24 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_86_24_95_24_if_stmt:
+        %tmp.36 = lgetv %choice.2;
+        symbol [ choice %tmp.36 86 28 34 ];
+        %tmp.37 = null;
+        %tmp.38 = ne %tmp.36 %tmp.37;
+        bf %tmp.38 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_86_24_95_24_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_86_24_95_24_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_86_44_95_24_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 87 28 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_86_44_95_24_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_86_44_95_24_stop" ]
+        %message.3 = local;
+        symbol [ message %message.3 87 32 39 ];
+        %tmp.39 = lgetv %choice.2;
+        symbol [ choice %tmp.39 87 42 48 ];
+        %tmp.40 = as %tmp.39 { (!Null) };
+        %tmp.42 = const :message;
+        symbol [ message %tmp.42 87 50 57 const ];
+        %tmp.43 = agetv %tmp.40 %tmp.42;
+        lputv %message.3 %tmp.43;
+        symbol [ message %message.3 87 32 39 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 88 28 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_88_28_94_28_if_stmt:
+        %tmp.44 = lgetv %message.3;
+        symbol [ message %tmp.44 88 32 39 ];
+        %tmp.45 = null;
+        %tmp.46 = ne %tmp.44 %tmp.45;
+        bf %tmp.46 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_88_28_94_28_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_88_28_94_28_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_88_49_94_28_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 89 32 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_88_49_94_28_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_88_49_94_28_stop" ]
+        %content.4 = local;
+        symbol [ content %content.4 89 36 43 ];
+        %tmp.47 = lgetv %message.3;
+        symbol [ message %tmp.47 89 46 53 ];
+        %tmp.48 = as %tmp.47 { (!Null) };
+        %tmp.50 = const :content;
+        symbol [ content %tmp.50 89 55 62 const ];
+        %tmp.51 = agetv %tmp.48 %tmp.50;
+        lputv %content.4 %tmp.51;
+        symbol [ content %content.4 89 36 43 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 90 32 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_32_93_32_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_36_90_74_begin:
+        %tmp.52 = lgetv %content.4;
+        symbol [ content %tmp.52 90 36 43 ];
+        %tmp.53 = null;
+        %tmp.54 = ne %tmp.52 %tmp.53;
+        bf %tmp.54 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_32_93_32_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_55_90_74_true:
+        %tmp.55 = lgetv %content.4;
+        symbol [ content %tmp.55 90 55 62 ];
+        %tmp.56 = as %tmp.55 { (!Null) };
+        symbol [ length %tmp.57 90 63 69 ];
+        %tmp.57 = getv function %tmp.56 :length;
+        %tmp.58 = invoke %tmp.56 %tmp.57();
+        %tmp.59 = 0;
+        %tmp.60 = gt %tmp.58 %tmp.59;
+        push %tmp.60;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_55_90_74_end:
+        %tmp.61 = phi [%tmp.54 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_36_90_74_begin] [%tmp.60 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_55_90_74_true] [%tmp.61 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_55_90_74_end];
+        bf %tmp.61 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_32_93_32_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_32_93_32_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_77_93_32_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 91 36 ]
+        symbol [ callback %tmp.63 91 36 44 ];
+        %tmp.63 = getv ? :callback;
+        symbol [ onComplete %tmp.64 91 45 55 ];
+        %tmp.64 = getv function %tmp.63 :onComplete;
+        %tmp.65 = lgetv %content.4;
+        symbol [ content %tmp.65 91 56 63 ];
+        %tmp.66 = as %tmp.65 { (!Null) };
+        %tmp.67 = null;
+        invoke %tmp.63 %tmp.64(%tmp.66, %tmp.67);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 92 36 ]
+        jsr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_finally;
+        ret ?;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_77_93_32_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_32_93_32_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_90_32_93_32_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_88_49_94_28_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_88_28_94_28_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_88_28_94_28_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_86_44_95_24_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_86_24_95_24_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_86_24_95_24_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_63_96_20_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_20_96_20_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_84_20_96_20_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 97 20 ]
+        symbol [ callback %tmp.69 97 20 28 ];
+        %tmp.69 = getv ? :callback;
+        symbol [ onComplete %tmp.70 97 29 39 ];
+        %tmp.70 = getv function %tmp.69 :onComplete;
+        %tmp.71 = null;
+        %tmp.72 = "Invalid response format";
+        invoke %tmp.69 %tmp.70(%tmp.71, %tmp.72);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_82_48_98_16_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_82_16_100_16_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_82_16_100_16_if_else_false:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_98_23_100_16_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 99 20 ]
+        symbol [ callback %tmp.74 99 20 28 ];
+        %tmp.74 = getv ? :callback;
+        symbol [ onComplete %tmp.75 99 29 39 ];
+        %tmp.75 = getv function %tmp.74 :onComplete;
+        %tmp.76 = null;
+        %tmp.77 = "Unexpected response type";
+        invoke %tmp.74 %tmp.75(%tmp.76, %tmp.77);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_98_23_100_16_stop:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_82_16_100_16_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_16_101_12_stop:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_endTry:
+        jsr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_finally;
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_catch:
+        %tmp.78 = exception;
+        push %tmp.78;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 101 14 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_catch" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_101_14_103_12_end" ]
+        %e.5 = local;
+        symbol [ e %e.5 101 21 22 ];
+        %tmp.79 = dup %tmp.78;
+        lputv %e.5 %tmp.79;
+        symbol [ e %e.5 101 21 22 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_101_24_103_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 102 16 ]
+        symbol [ callback %tmp.81 102 16 24 ];
+        %tmp.81 = getv ? :callback;
+        symbol [ onComplete %tmp.82 102 25 35 ];
+        %tmp.82 = getv function %tmp.81 :onComplete;
+        %tmp.83 = null;
+        %tmp.84 = "Parse error: ";
+        %tmp.85 = lgetv %e.5;
+        symbol [ e %tmp.85 102 60 61 ];
+        symbol [ toString %tmp.86 102 62 70 ];
+        %tmp.86 = getv function %tmp.85 :toString;
+        %tmp.87 = invoke %tmp.85 %tmp.86();
+        %tmp.88 = add %tmp.84 %tmp.87;
+        invoke %tmp.81 %tmp.82(%tmp.83, %tmp.88);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_101_24_103_12_stop:
+        jsr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_finally;
+        pop;
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_101_14_103_12_end:
+        try @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_catch @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_101_14_103_12_end @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_101_14_103_12_end @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_finally;
+        jsr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_finally;
+        throw %tmp.78;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_finally:
+        jsrret;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_81_12_103_12_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_49_104_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_8_107_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_8_107_8_if_else_false:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_104_15_107_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 105 12 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_104_15_107_8_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_104_15_107_8_stop" ]
+        %errorMsg.6 = local;
+        symbol [ errorMsg %errorMsg.6 105 16 24 ];
+        %tmp.89 = self;
+        symbol [ getErrorMessage %tmp.90 105 27 42 ];
+        %tmp.90 = getv function %tmp.89 :getErrorMessage;
+        %tmp.91 = lgetv %responseCode;
+        symbol [ responseCode %tmp.91 105 43 55 ];
+        %tmp.92 = lgetv %data;
+        symbol [ data %tmp.92 105 57 61 ];
+        %tmp.93 = invoke %tmp.89 %tmp.90(%tmp.91, %tmp.92);
+        lputv %errorMsg.6 %tmp.93;
+        symbol [ errorMsg %errorMsg.6 105 16 24 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 106 12 ]
+        symbol [ callback %tmp.95 106 12 20 ];
+        %tmp.95 = getv ? :callback;
+        symbol [ onComplete %tmp.96 106 21 31 ];
+        %tmp.96 = getv function %tmp.95 :onComplete;
+        %tmp.97 = null;
+        %tmp.98 = lgetv %errorMsg.6;
+        symbol [ errorMsg %tmp.98 106 38 46 ];
+        invoke %tmp.95 %tmp.96(%tmp.97, %tmp.98);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_104_15_107_8_stop:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_80_8_107_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_75_94_108_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 110; @symbol_functiondef = [getErrorMessage,110,13,28]; @symbol_param<0> = [responseCode,110,29,41]; @symbol_param<1> = [data,110,43,47]; ]
+    function getErrorMessage(responseCode, data) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_110_49_150_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 111 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_110_49_150_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_110_49_150_4_stop" ]
+        %baseMsg.1 = local;
+        symbol [ baseMsg %baseMsg.1 111 12 19 ];
+        %tmp.1 = "HTTP ";
+        %tmp.2 = lgetv %responseCode;
+        symbol [ responseCode %tmp.2 111 32 44 ];
+        symbol [ toString %tmp.3 111 45 53 ];
+        %tmp.3 = getv function %tmp.2 :toString;
+        %tmp.4 = invoke %tmp.2 %tmp.3();
+        %tmp.5 = add %tmp.1 %tmp.4;
+        lputv %baseMsg.1 %tmp.5;
+        symbol [ baseMsg %baseMsg.1 111 12 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 113 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_113_8_123_8_if_stmt:
+        %tmp.6 = lgetv %responseCode;
+        symbol [ responseCode %tmp.6 113 12 24 ];
+        %tmp.7 = 401;
+        %tmp.8 = eq %tmp.6 %tmp.7;
+        bf %tmp.8 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_113_8_123_8_if_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_113_8_123_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_113_33_115_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 114 12 ]
+        %tmp.9 = "Invalid API key";
+        lputv %baseMsg.1 %tmp.9;
+        symbol [ baseMsg %baseMsg.1 114 12 19 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_113_33_115_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_113_8_123_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_113_8_123_8_if_false:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 115 15 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_115_15_123_8_if_stmt:
+        %tmp.10 = lgetv %responseCode;
+        symbol [ responseCode %tmp.10 115 19 31 ];
+        %tmp.11 = 403;
+        %tmp.12 = eq %tmp.10 %tmp.11;
+        bf %tmp.12 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_115_15_123_8_if_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_115_15_123_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_115_40_117_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 116 12 ]
+        %tmp.13 = "Access denied";
+        lputv %baseMsg.1 %tmp.13;
+        symbol [ baseMsg %baseMsg.1 116 12 19 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_115_40_117_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_115_15_123_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_115_15_123_8_if_false:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 117 15 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_117_15_123_8_if_stmt:
+        %tmp.14 = lgetv %responseCode;
+        symbol [ responseCode %tmp.14 117 19 31 ];
+        %tmp.15 = 429;
+        %tmp.16 = eq %tmp.14 %tmp.15;
+        bf %tmp.16 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_117_15_123_8_if_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_117_15_123_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_117_40_119_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 118 12 ]
+        %tmp.17 = "Rate limited, try later";
+        lputv %baseMsg.1 %tmp.17;
+        symbol [ baseMsg %baseMsg.1 118 12 19 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_117_40_119_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_117_15_123_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_117_15_123_8_if_false:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 119 15 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_119_15_123_8_if_stmt:
+        %tmp.18 = lgetv %responseCode;
+        symbol [ responseCode %tmp.18 119 19 31 ];
+        %tmp.19 = 500;
+        %tmp.20 = eq %tmp.18 %tmp.19;
+        bf %tmp.20 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_119_15_123_8_if_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_119_15_123_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_119_40_121_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 120 12 ]
+        %tmp.21 = "Server error";
+        lputv %baseMsg.1 %tmp.21;
+        symbol [ baseMsg %baseMsg.1 120 12 19 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_119_40_121_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_119_15_123_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_119_15_123_8_if_false:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 121 15 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_121_15_123_8_if_stmt:
+        %tmp.22 = lgetv %responseCode;
+        symbol [ responseCode %tmp.22 121 19 31 ];
+        %tmp.23 = 503;
+        %tmp.24 = eq %tmp.22 %tmp.23;
+        bf %tmp.24 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_121_15_123_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_121_15_123_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_121_40_123_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 122 12 ]
+        %tmp.25 = "Service unavailable";
+        lputv %baseMsg.1 %tmp.25;
+        symbol [ baseMsg %baseMsg.1 122 12 19 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_121_40_123_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_121_15_123_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_121_15_123_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_119_15_123_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_117_15_123_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_115_15_123_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_113_8_123_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 125 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_125_8_147_8_if_stmt:
+        %tmp.26 = lgetv %data;
+        symbol [ data %tmp.26 125 12 16 ];
+        %tmp.27 = null;
+        %tmp.28 = ne %tmp.26 %tmp.27;
+        bf %tmp.28 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_125_8_147_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_125_8_147_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_125_26_147_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 126 12 ]
+        try @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_beginTry @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_endTry @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_catch @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_finally;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_beginTry:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_16_145_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 127 16 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_127_16_144_16_if_stmt:
+        %tmp.29 = lgetv %data;
+        symbol [ data %tmp.29 127 20 24 ];
+        %tmp.30 = as %tmp.29 { (!Null) };
+        symbol [ Dictionary %tmp.32 127 36 46 ];
+        %tmp.32 = getv ? :Dictionary;
+        %tmp.33 = isa %tmp.30 %tmp.32;
+        bf %tmp.33 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_127_16_144_16_if_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_127_16_144_16_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_127_48_138_16_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 128 20 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_127_48_138_16_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_127_48_138_16_stop" ]
+        %error.2 = local;
+        symbol [ error %error.2 128 24 29 ];
+        %tmp.34 = lgetv %data;
+        symbol [ data %tmp.34 128 32 36 ];
+        %tmp.35 = as %tmp.34 { (Dictionary) && (!Null) };
+        %tmp.37 = const :error;
+        symbol [ error %tmp.37 128 38 43 const ];
+        %tmp.38 = agetv %tmp.35 %tmp.37;
+        lputv %error.2 %tmp.38;
+        symbol [ error %error.2 128 24 29 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 129 20 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_129_20_137_20_if_stmt:
+        %tmp.39 = lgetv %error.2;
+        symbol [ error %tmp.39 129 24 29 ];
+        %tmp.40 = null;
+        %tmp.41 = ne %tmp.39 %tmp.40;
+        bf %tmp.41 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_129_20_137_20_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_129_20_137_20_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_129_39_137_20_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 130 24 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_129_39_137_20_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_129_39_137_20_stop" ]
+        %message.3 = local;
+        symbol [ message %message.3 130 28 35 ];
+        %tmp.42 = lgetv %error.2;
+        symbol [ error %tmp.42 130 38 43 ];
+        %tmp.43 = as %tmp.42 { (!Null) };
+        %tmp.45 = const :message;
+        symbol [ message %tmp.45 130 45 52 const ];
+        %tmp.46 = agetv %tmp.43 %tmp.45;
+        lputv %message.3 %tmp.46;
+        symbol [ message %message.3 130 28 35 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 131 24 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_24_136_24_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_28_131_66_begin:
+        %tmp.47 = lgetv %message.3;
+        symbol [ message %tmp.47 131 28 35 ];
+        %tmp.48 = null;
+        %tmp.49 = ne %tmp.47 %tmp.48;
+        bf %tmp.49 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_24_136_24_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_47_131_66_true:
+        %tmp.50 = lgetv %message.3;
+        symbol [ message %tmp.50 131 47 54 ];
+        %tmp.51 = as %tmp.50 { (!Null) };
+        symbol [ length %tmp.52 131 55 61 ];
+        %tmp.52 = getv function %tmp.51 :length;
+        %tmp.53 = invoke %tmp.51 %tmp.52();
+        %tmp.54 = 0;
+        %tmp.55 = gt %tmp.53 %tmp.54;
+        push %tmp.55;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_47_131_66_end:
+        %tmp.56 = phi [%tmp.49 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_28_131_66_begin] [%tmp.55 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_47_131_66_true] [%tmp.56 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_47_131_66_end];
+        bf %tmp.56 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_24_136_24_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_24_136_24_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_69_136_24_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 132 28 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_132_28_134_28_if_stmt:
+        %tmp.57 = lgetv %message.3;
+        symbol [ message %tmp.57 132 32 39 ];
+        %tmp.58 = as %tmp.57 { (!Null) };
+        symbol [ length %tmp.59 132 40 46 ];
+        %tmp.59 = getv function %tmp.58 :length;
+        %tmp.60 = invoke %tmp.58 %tmp.59();
+        %tmp.61 = 50;
+        %tmp.62 = gt %tmp.60 %tmp.61;
+        bf %tmp.62 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_132_28_134_28_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_132_28_134_28_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_132_55_134_28_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 133 32 ]
+        %tmp.63 = lgetv %message.3;
+        symbol [ message %tmp.63 133 42 49 ];
+        %tmp.64 = as %tmp.63 { (!Null) };
+        symbol [ substring %tmp.65 133 50 59 ];
+        %tmp.65 = getv function %tmp.64 :substring;
+        %tmp.66 = 0;
+        %tmp.67 = 47;
+        %tmp.68 = invoke %tmp.64 %tmp.65(%tmp.66, %tmp.67);
+        %tmp.69 = "...";
+        %tmp.70 = add %tmp.68 %tmp.69;
+        lputv %message.3 %tmp.70;
+        symbol [ message %message.3 133 32 39 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_132_55_134_28_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_132_28_134_28_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_132_28_134_28_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 135 28 ]
+        %tmp.71 = lgetv %message.3;
+        symbol [ message %tmp.71 135 35 42 ];
+        jsr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_finally;
+        ret %tmp.71;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_69_136_24_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_24_136_24_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_131_24_136_24_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_129_39_137_20_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_129_20_137_20_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_129_20_137_20_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_127_48_138_16_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_127_16_144_16_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_127_16_144_16_if_false:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 138 23 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_138_23_144_16_if_stmt:
+        %tmp.72 = lgetv %data;
+        symbol [ data %tmp.72 138 27 31 ];
+        %tmp.73 = as %tmp.72 { (!Dictionary) && (!Null) };
+        symbol [ Lang %tmp.74 138 43 47 ];
+        %tmp.74 = getm $.Toybox.Lang;
+        symbol [ String %tmp.75 138 48 54 ];
+        %tmp.75 = getv %tmp.74 :String;
+        %tmp.76 = isa %tmp.73 %tmp.75;
+        bf %tmp.76 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_138_23_144_16_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_138_23_144_16_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_138_56_144_16_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 139 20 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_138_56_144_16_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_138_56_144_16_stop" ]
+        %strData.4 = local;
+        symbol [ strData %strData.4 139 24 31 ];
+        %tmp.77 = lgetv %data;
+        symbol [ data %tmp.77 139 34 38 ];
+        %tmp.78 = as %tmp.77 { (Lang.String) && (!Dictionary) && (!Null) };
+        lputv %strData.4 %tmp.78;
+        symbol [ strData %strData.4 139 24 31 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 140 20 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_140_20_142_20_if_stmt:
+        %tmp.79 = lgetv %strData.4;
+        symbol [ strData %tmp.79 140 24 31 ];
+        symbol [ length %tmp.80 140 32 38 ];
+        %tmp.80 = getv function %tmp.79 :length;
+        %tmp.81 = invoke %tmp.79 %tmp.80();
+        %tmp.82 = 50;
+        %tmp.83 = gt %tmp.81 %tmp.82;
+        bf %tmp.83 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_140_20_142_20_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_140_20_142_20_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_140_47_142_20_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 141 24 ]
+        %tmp.84 = lgetv %strData.4;
+        symbol [ strData %tmp.84 141 34 41 ];
+        symbol [ substring %tmp.85 141 42 51 ];
+        %tmp.85 = getv function %tmp.84 :substring;
+        %tmp.86 = 0;
+        %tmp.87 = 47;
+        %tmp.88 = invoke %tmp.84 %tmp.85(%tmp.86, %tmp.87);
+        %tmp.89 = "...";
+        %tmp.90 = add %tmp.88 %tmp.89;
+        lputv %strData.4 %tmp.90;
+        symbol [ strData %strData.4 141 24 31 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_140_47_142_20_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_140_20_142_20_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_140_20_142_20_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 143 20 ]
+        %tmp.91 = lgetv %strData.4;
+        symbol [ strData %tmp.91 143 27 34 ];
+        jsr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_finally;
+        ret %tmp.91;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_138_56_144_16_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_138_23_144_16_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_138_23_144_16_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_127_16_144_16_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_16_145_12_stop:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_endTry:
+        jsr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_finally;
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_catch:
+        %tmp.92 = exception;
+        push %tmp.92;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 145 14 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_catch" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_145_14_146_12_end" ]
+        %e.5 = local;
+        symbol [ e %e.5 145 21 22 ];
+        %tmp.93 = dup %tmp.92;
+        lputv %e.5 %tmp.93;
+        symbol [ e %e.5 145 21 22 ];
+        jsr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_finally;
+        pop;
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_145_14_146_12_end:
+        try @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_catch @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_145_14_146_12_end @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_145_14_146_12_end @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_finally;
+        jsr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_finally;
+        throw %tmp.92;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_finally:
+        jsrret;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_126_12_146_12_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_125_26_147_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_125_8_147_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_125_8_147_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc" 149 8 ]
+        %tmp.94 = lgetv %baseMsg.1;
+        symbol [ baseMsg %tmp.94 149 15 22 ];
+        ret %tmp.94;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_NviApiClient_mc_110_49_150_4_stop:
+    }
+}
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/NviApiClient.mc"; @line = 1; ]
+<init> {
+}

@@ -12,7 +12,8 @@ class ConversationView extends WatchUi.View {
     var errorMessage;
     var storage;
     var loadingDots;
-    var loadingTimer;
+    var viewWidth;
+    var viewHeight;
 
     function initialize(convId) {
         View.initialize();
@@ -22,7 +23,6 @@ class ConversationView extends WatchUi.View {
         errorMessage = null;
         storage = null;
         loadingDots = "";
-        loadingTimer = null;
 
         loadData(convId);
     }
@@ -48,31 +48,15 @@ class ConversationView extends WatchUi.View {
         if (storage == null) {
             storage = Application.getApp().getPropertyStore();
         }
+        viewWidth = dc.getWidth();
+        viewHeight = dc.getHeight();
     }
 
     function onExit() {
-        if (loadingTimer != null) {
-            System.cancelTimer(loadingTimer);
-        }
     }
 
     function startLoadingAnimation() {
-        if (loadingTimer != null) {
-            System.cancelTimer(loadingTimer);
-        }
-        loadingTimer = System.setTimer(500, method(:updateLoadingDots), null);
-    }
-
-    function updateLoadingDots(info) {
-        if (loadingDots.length() >= 3) {
-            loadingDots = "";
-        } else {
-            loadingDots = loadingDots + ".";
-        }
-        if (isLoading) {
-            View.requestUpdate();
-            loadingTimer = System.setTimer(500, method(:updateLoadingDots), null);
-        }
+        loadingDots = "...";
     }
 
     function onUpdate(dc) {
@@ -133,7 +117,7 @@ class ConversationView extends WatchUi.View {
 
             if (msg.isUser()) {
                 dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLUE);
-                var textWidth = dc.getTextWidth(msg.content, Graphics.FONT_SMALL);
+                var textWidth = dc.getTextWidthInPixels(msg.content, Graphics.FONT_SMALL);
                 var bubbleWidth = textWidth + 20;
                 if (bubbleWidth > width - 40) {
                     bubbleWidth = width - 40;
@@ -145,7 +129,7 @@ class ConversationView extends WatchUi.View {
                 dc.drawText(width - 15, y + 12, Graphics.FONT_SMALL, msg.content, Graphics.TEXT_JUSTIFY_RIGHT);
             } else if (msg.isAssistant()) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
-                var textWidth = dc.getTextWidth(msg.content, Graphics.FONT_SMALL);
+                var textWidth = dc.getTextWidthInPixels(msg.content, Graphics.FONT_SMALL);
                 var bubbleWidth = textWidth + 20;
                 if (bubbleWidth > width - 40) {
                     bubbleWidth = width - 40;
@@ -213,7 +197,7 @@ class ConversationView extends WatchUi.View {
 
     function estimateLineHeight(text, dc) {
         var width = dc.getWidth() - 60;
-        var textWidth = dc.getTextWidth(text, Graphics.FONT_SMALL);
+        var textWidth = dc.getTextWidthInPixels(text, Graphics.FONT_SMALL);
         var lines = (textWidth / width).toFloat().ceil().toNumber();
         if (lines < 1) {
             lines = 1;
@@ -227,8 +211,8 @@ class ConversationView extends WatchUi.View {
     function onTap(evt) {
         var x = evt.getX();
         var y = evt.getY();
-        var width = getWidth();
-        var height = getHeight();
+        var width = viewWidth;
+        var height = viewHeight;
 
         if (y < 30 && conversation != null) {
             openRenameInput();
@@ -276,16 +260,15 @@ class ConversationView extends WatchUi.View {
     }
 
     function openRenameInput() {
-        WatchUi.invokeTextInput(
-            new RenameTextInputDelegate(self),
-            { :title => "Rename conversation", :maxSize => 40 }
-        );
+        if (WatchUi has :TextPicker) {
+            WatchUi.pushView(new WatchUi.TextPicker(conversation.title), new RenameTextInputDelegate(self), WatchUi.SLIDE_DOWN);
+        }
     }
 
     function onRenameSubmitted(text) {
         if (text != null && text.length() > 0 && conversation != null) {
             conversation.setTitle(text);
-            View.requestUpdate();
+            WatchUi.requestUpdate();
         }
     }
 
@@ -306,19 +289,15 @@ class ConversationView extends WatchUi.View {
 
         scrollOffset = 0;
         errorMessage = null;
-        View.requestUpdate();
+        WatchUi.requestUpdate();
     }
 
     function onCancelRequest() {
         isLoading = false;
-        if (loadingTimer != null) {
-            System.cancelTimer(loadingTimer);
-            loadingTimer = null;
-        }
         loadingDots = "";
         conversation.removeLastMessage();
         errorMessage = "Request cancelled";
-        View.requestUpdate();
+        WatchUi.requestUpdate();
     }
 
     function onRetryRequest() {
@@ -335,7 +314,7 @@ class ConversationView extends WatchUi.View {
         isLoading = true;
         loadingDots = ".";
         startLoadingAnimation();
-        View.requestUpdate();
+        WatchUi.requestUpdate();
 
         var client = new NviApiClient();
         client.setApiKey(storage.getApiKey());
@@ -355,31 +334,27 @@ class ConversationView extends WatchUi.View {
         var direction = evt.getDirection();
         var messages = conversation.getMessages();
 
-        if (direction == WatchUi.SWIPE_DIRECTION_UP) {
+        if (direction == WatchUi.SWIPE_UP) {
             if (scrollOffset < messages.size() - 3) {
                 scrollOffset += 1;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
-        } else if (direction == WatchUi.SWIPE_DIRECTION_DOWN) {
+        } else if (direction == WatchUi.SWIPE_DOWN) {
             if (scrollOffset > 0) {
                 scrollOffset -= 1;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
         }
     }
 
     function onSendComplete(response, error) {
         isLoading = false;
-        if (loadingTimer != null) {
-            System.cancelTimer(loadingTimer);
-            loadingTimer = null;
-        }
         loadingDots = "";
 
         if (error != null) {
             errorMessage = error;
             try {
-                System.vibrate(200);
+                
             } catch (e) {
             }
         } else if (response != null) {
@@ -391,33 +366,29 @@ class ConversationView extends WatchUi.View {
             storage.setLastConversationId(conversation.id);
 
             try {
-                System.vibrate(100);
+                
             } catch (e) {
             }
         }
 
-        View.requestUpdate();
+        WatchUi.requestUpdate();
     }
 
     function setLoading(loading) {
         isLoading = loading;
         if (loading) {
-            loadingDots = ".";
+            loadingDots = "...";
             startLoadingAnimation();
         } else {
-            if (loadingTimer != null) {
-                System.cancelTimer(loadingTimer);
-                loadingTimer = null;
-            }
             loadingDots = "";
         }
-        View.requestUpdate();
+        WatchUi.requestUpdate();
     }
 
     function setError(msg) {
         errorMessage = msg;
         isLoading = false;
-        View.requestUpdate();
+        WatchUi.requestUpdate();
     }
 }
 
@@ -436,17 +407,22 @@ class ConversationSendCallback {
     }
 }
 
-class RenameTextInputDelegate extends WatchUi.TextConfirmationDelegate {
+class RenameTextInputDelegate extends WatchUi.TextPickerDelegate {
 
     var view;
 
     function initialize(convView) {
-        TextConfirmationDelegate.initialize();
+        TextPickerDelegate.initialize();
         view = convView;
     }
 
-    function onConfirmed(text) {
+    function onTextEntered(text, changed) {
         view.onRenameSubmitted(text);
+        return true;
+    }
+
+    function onCancel() {
+        return true;
     }
 }
 

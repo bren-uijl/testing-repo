@@ -1,7 +1,6 @@
-using Toybox.Communications;
-using Toybox.System;
-using Toybox.Lang;
-using Toybox.Json;
+import Toybox.Communications;
+import Toybox.System;
+import Toybox.Lang;
 
 class NviApiClient {
 
@@ -59,15 +58,13 @@ class NviApiClient {
         var options = {
             :method => Communications.HTTP_REQUEST_METHOD_POST,
             :headers => {
-                "Content-Type" => "application/json",
-                "Authorization" => "Bearer " + apiKey
+                "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
             },
-            :body => Json.encode(requestBody),
-            :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_STRING
+            :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
         };
 
         try {
-            Communications.makeWebRequest(baseUrl, options, new ApiResponseDelegate(self));
+            Communications.makeWebRequest(baseUrl, requestBody, options, method(:onResponse));
         } catch (e) {
             if (callback != null) {
                 callback.onComplete(null, "Network error: " + e.toString());
@@ -75,35 +72,32 @@ class NviApiClient {
         }
     }
 
-    function onResponse(responseCode, data) {
+    function onResponse(responseCode as Number, data as Dictionary or String or Null) as Void {
         if (callback == null) {
             return;
         }
 
         if (responseCode == 200 && data != null) {
             try {
-                var jsonData = parseDataToString(data);
-                if (jsonData == null || jsonData.length() == 0) {
-                    callback.onComplete(null, "Empty response");
-                    return;
-                }
-
-                var json = Json.decode(jsonData);
-                var choices = json.get(:choices);
-                if (choices != null && choices.size() > 0) {
-                    var choice = choices.get(0);
-                    if (choice != null) {
-                        var message = choice.get(:message);
-                        if (message != null) {
-                            var content = message.get(:content);
-                            if (content != null && content.length() > 0) {
-                                callback.onComplete(content, null);
-                                return;
+                if (data instanceof Dictionary) {
+                    var choices = data[:choices];
+                    if (choices != null && choices.size() > 0) {
+                        var choice = choices[0];
+                        if (choice != null) {
+                            var message = choice[:message];
+                            if (message != null) {
+                                var content = message[:content];
+                                if (content != null && content.length() > 0) {
+                                    callback.onComplete(content, null);
+                                    return;
+                                }
                             }
                         }
                     }
+                    callback.onComplete(null, "Invalid response format");
+                } else {
+                    callback.onComplete(null, "Unexpected response type");
                 }
-                callback.onComplete(null, "Invalid response format");
             } catch (e) {
                 callback.onComplete(null, "Parse error: " + e.toString());
             }
@@ -130,12 +124,10 @@ class NviApiClient {
 
         if (data != null) {
             try {
-                var jsonData = parseDataToString(data);
-                if (jsonData != null && jsonData.length() > 0) {
-                    var json = Json.decode(jsonData);
-                    var error = json.get(:error);
+                if (data instanceof Dictionary) {
+                    var error = data[:error];
                     if (error != null) {
-                        var message = error.get(:message);
+                        var message = error[:message];
                         if (message != null && message.length() > 0) {
                             if (message.length() > 50) {
                                 message = message.substring(0, 47) + "...";
@@ -143,52 +135,17 @@ class NviApiClient {
                             return message;
                         }
                     }
+                } else if (data instanceof Lang.String) {
+                    var strData = data;
+                    if (strData.length() > 50) {
+                        strData = strData.substring(0, 47) + "...";
+                    }
+                    return strData;
                 }
             } catch (e) {
             }
         }
 
         return baseMsg;
-    }
-
-    function onError(error) {
-        if (callback != null) {
-            var errorMsg = "Request failed";
-            if (error != null) {
-                errorMsg = errorMsg + ": " + error.toString();
-            }
-            callback.onComplete(null, errorMsg);
-        }
-    }
-
-    function parseDataToString(data) {
-        if (data == null) {
-            return null;
-        }
-        if (data instanceof Lang.String) {
-            return data;
-        }
-        if (data instanceof Blob) {
-            return data.toString();
-        }
-        return data.toString();
-    }
-}
-
-class ApiResponseDelegate extends Communications.WebResponseDelegate {
-
-    var client;
-
-    function initialize(apiClient) {
-        WebResponseDelegate.initialize();
-        client = apiClient;
-    }
-
-    function onResponse(responseCode, data) {
-        client.onResponse(responseCode, data);
-    }
-
-    function onError(error) {
-        client.onError(error);
     }
 }

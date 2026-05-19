@@ -11,7 +11,7 @@ class PropertyStore {
     static const API_KEY_SEGMENT_COUNT = 10;
 
     function initialize() {
-        store = Application.getApp().getAppProperty("AiChatStore");
+        store = Application.getApp().getProperty("AiChatStore");
         if (store == null) {
             store = {};
             store.put(:conversations, []);
@@ -56,7 +56,7 @@ class PropertyStore {
             return;
         }
         var parts = getApiKeyParts();
-        parts.set(index, value);
+        parts[index] = value;
         store.put(:apiKeyParts, parts);
         rebuildApiKey(parts);
         save();
@@ -212,6 +212,6 @@ class PropertyStore {
     }
 
     function save() {
-        Application.getApp().setAppProperty("AiChatStore", store);
+        Application.getApp().setProperty("AiChatStore", store);
     }
 }

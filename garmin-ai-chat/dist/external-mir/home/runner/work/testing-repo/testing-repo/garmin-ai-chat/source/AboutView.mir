@@ -1,0 +1,780 @@
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 1; @symbol_usingdef<0> = [Toybox,1,6,12]; @symbol_usingdef<1> = [WatchUi,1,13,20]; ]
+using Toybox.WatchUi;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 2; @symbol_usingdef<0> = [Toybox,2,6,12]; @symbol_usingdef<1> = [Graphics,2,13,21]; ]
+using Toybox.Graphics;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 3; @symbol_usingdef<0> = [Toybox,3,6,12]; @symbol_usingdef<1> = [Lang,3,13,17]; ]
+using Toybox.Lang;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 5; @symbol_classdef = [AboutView,5,6,15]; @symbol_extends<0> = [WatchUi,5,24,31]; @symbol_extends<1> = [View,5,32,36]; ]
+class AboutView extends WatchUi.View {
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 5; ]
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 5; ]
+    static
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 7; @position = 8; @symbol_vardef = [items,7,8,13]; ]
+    var items;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 8; @position = 8; @symbol_vardef = [scrollOffset,8,8,20]; ]
+    var scrollOffset;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 9; @position = 8; @symbol_vardef = [itemHeight,9,8,18]; ]
+    var itemHeight;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 10; @position = 8; @symbol_vardef = [headerHeight,10,8,20]; ]
+    var headerHeight;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 11; @position = 8; @symbol_vardef = [viewWidth,11,8,17]; ]
+    var viewWidth;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 12; @position = 8; @symbol_vardef = [viewHeight,12,8,18]; ]
+    var viewHeight;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 14; @symbol_functiondef = [initialize,14,13,23]; ]
+    function initialize() as Void {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_14_26_27_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 15 8 ]
+        symbol [ View %tmp.2 15 8 12 ];
+        %tmp.2 = getv ? :View;
+        symbol [ initialize %tmp.3 15 13 23 ];
+        %tmp.3 = getv function %tmp.2 :initialize;
+        invoke %tmp.2 %tmp.3();
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 16 8 ]
+        %tmp.4 = newa 0;
+        symbol [ items ? 16 8 13 ];
+        putv self :items %tmp.4;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 17 8 ]
+        %tmp.5 = 0;
+        symbol [ scrollOffset ? 17 8 20 ];
+        putv self :scrollOffset %tmp.5;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 18 8 ]
+        %tmp.6 = 45;
+        symbol [ itemHeight ? 18 8 18 ];
+        putv self :itemHeight %tmp.6;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 19 8 ]
+        %tmp.7 = 45;
+        symbol [ headerHeight ? 19 8 20 ];
+        putv self :headerHeight %tmp.7;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 21 8 ]
+        symbol [ items %tmp.9 21 8 13 ];
+        %tmp.9 = getv ? :items;
+        symbol [ add %tmp.10 21 14 17 ];
+        %tmp.10 = getv function %tmp.9 :add;
+        %tmp.11 = newd 2;
+        %tmp.13 = const :label;
+        symbol [ label %tmp.13 21 21 26 const ];
+        %tmp.14 = "Version";
+        %tmp.15 = dup %tmp.11;
+        %tmp.16 = aputv %tmp.15 %tmp.13 %tmp.14;
+        %tmp.18 = const :value;
+        symbol [ value %tmp.18 21 42 47 const ];
+        %tmp.19 = "1.2.0";
+        %tmp.20 = dup %tmp.16;
+        %tmp.21 = aputv %tmp.20 %tmp.18 %tmp.19;
+        invoke %tmp.9 %tmp.10(%tmp.21);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 22 8 ]
+        symbol [ items %tmp.23 22 8 13 ];
+        %tmp.23 = getv ? :items;
+        symbol [ add %tmp.24 22 14 17 ];
+        %tmp.24 = getv function %tmp.23 :add;
+        %tmp.25 = newd 2;
+        %tmp.27 = const :label;
+        symbol [ label %tmp.27 22 21 26 const ];
+        %tmp.28 = "Device";
+        %tmp.29 = dup %tmp.25;
+        %tmp.30 = aputv %tmp.29 %tmp.27 %tmp.28;
+        %tmp.32 = const :value;
+        symbol [ value %tmp.32 22 41 46 const ];
+        %tmp.33 = "vívoactive 5";
+        %tmp.34 = dup %tmp.30;
+        %tmp.35 = aputv %tmp.34 %tmp.32 %tmp.33;
+        invoke %tmp.23 %tmp.24(%tmp.35);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 23 8 ]
+        symbol [ items %tmp.37 23 8 13 ];
+        %tmp.37 = getv ? :items;
+        symbol [ add %tmp.38 23 14 17 ];
+        %tmp.38 = getv function %tmp.37 :add;
+        %tmp.39 = newd 2;
+        %tmp.41 = const :label;
+        symbol [ label %tmp.41 23 21 26 const ];
+        %tmp.42 = "API";
+        %tmp.43 = dup %tmp.39;
+        %tmp.44 = aputv %tmp.43 %tmp.41 %tmp.42;
+        %tmp.46 = const :value;
+        symbol [ value %tmp.46 23 38 43 const ];
+        %tmp.47 = "NVIDIA Chat";
+        %tmp.48 = dup %tmp.44;
+        %tmp.49 = aputv %tmp.48 %tmp.46 %tmp.47;
+        invoke %tmp.37 %tmp.38(%tmp.49);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 24 8 ]
+        symbol [ items %tmp.51 24 8 13 ];
+        %tmp.51 = getv ? :items;
+        symbol [ add %tmp.52 24 14 17 ];
+        %tmp.52 = getv function %tmp.51 :add;
+        %tmp.53 = newd 2;
+        %tmp.55 = const :label;
+        symbol [ label %tmp.55 24 21 26 const ];
+        %tmp.56 = "Models";
+        %tmp.57 = dup %tmp.53;
+        %tmp.58 = aputv %tmp.57 %tmp.55 %tmp.56;
+        %tmp.60 = const :value;
+        symbol [ value %tmp.60 24 41 46 const ];
+        %tmp.61 = "8 available";
+        %tmp.62 = dup %tmp.58;
+        %tmp.63 = aputv %tmp.62 %tmp.60 %tmp.61;
+        invoke %tmp.51 %tmp.52(%tmp.63);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 25 8 ]
+        symbol [ items %tmp.65 25 8 13 ];
+        %tmp.65 = getv ? :items;
+        symbol [ add %tmp.66 25 14 17 ];
+        %tmp.66 = getv function %tmp.65 :add;
+        %tmp.67 = newd 2;
+        %tmp.69 = const :label;
+        symbol [ label %tmp.69 25 21 26 const ];
+        %tmp.70 = "Built with";
+        %tmp.71 = dup %tmp.67;
+        %tmp.72 = aputv %tmp.71 %tmp.69 %tmp.70;
+        %tmp.74 = const :value;
+        symbol [ value %tmp.74 25 45 50 const ];
+        %tmp.75 = "Monkey C";
+        %tmp.76 = dup %tmp.72;
+        %tmp.77 = aputv %tmp.76 %tmp.74 %tmp.75;
+        invoke %tmp.65 %tmp.66(%tmp.77);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 26 8 ]
+        symbol [ items %tmp.79 26 8 13 ];
+        %tmp.79 = getv ? :items;
+        symbol [ add %tmp.80 26 14 17 ];
+        %tmp.80 = getv function %tmp.79 :add;
+        %tmp.81 = newd 2;
+        %tmp.83 = const :label;
+        symbol [ label %tmp.83 26 21 26 const ];
+        %tmp.84 = "License";
+        %tmp.85 = dup %tmp.81;
+        %tmp.86 = aputv %tmp.85 %tmp.83 %tmp.84;
+        %tmp.88 = const :value;
+        symbol [ value %tmp.88 26 42 47 const ];
+        %tmp.89 = "MIT";
+        %tmp.90 = dup %tmp.86;
+        %tmp.91 = aputv %tmp.90 %tmp.88 %tmp.89;
+        invoke %tmp.79 %tmp.80(%tmp.91);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_14_26_27_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 29; @symbol_functiondef = [onLayout,29,13,21]; @symbol_param<0> = [dc,29,22,24]; ]
+    function onLayout(dc) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_29_26_32_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 30 8 ]
+        %tmp.1 = lgetv %dc;
+        symbol [ dc %tmp.1 30 20 22 ];
+        symbol [ getWidth %tmp.2 30 23 31 ];
+        %tmp.2 = getv function %tmp.1 :getWidth;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        symbol [ viewWidth ? 30 8 17 ];
+        putv self :viewWidth %tmp.3;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 31 8 ]
+        %tmp.4 = lgetv %dc;
+        symbol [ dc %tmp.4 31 21 23 ];
+        symbol [ getHeight %tmp.5 31 24 33 ];
+        %tmp.5 = getv function %tmp.4 :getHeight;
+        %tmp.6 = invoke %tmp.4 %tmp.5();
+        symbol [ viewHeight ? 31 8 18 ];
+        putv self :viewHeight %tmp.6;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_29_26_32_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 34; @symbol_functiondef = [onUpdate,34,13,21]; @symbol_param<0> = [dc,34,22,24]; ]
+    function onUpdate(dc) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_34_26_77_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 35 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_34_26_77_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_34_26_77_4_stop" ]
+        %width.1 = local;
+        symbol [ width %width.1 35 12 17 ];
+        %tmp.1 = lgetv %dc;
+        symbol [ dc %tmp.1 35 20 22 ];
+        symbol [ getWidth %tmp.2 35 23 31 ];
+        %tmp.2 = getv function %tmp.1 :getWidth;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        lputv %width.1 %tmp.3;
+        symbol [ width %width.1 35 12 17 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 36 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_34_26_77_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_34_26_77_4_stop" ]
+        %height.2 = local;
+        symbol [ height %height.2 36 12 18 ];
+        %tmp.4 = lgetv %dc;
+        symbol [ dc %tmp.4 36 21 23 ];
+        symbol [ getHeight %tmp.5 36 24 33 ];
+        %tmp.5 = getv function %tmp.4 :getHeight;
+        %tmp.6 = invoke %tmp.4 %tmp.5();
+        lputv %height.2 %tmp.6;
+        symbol [ height %height.2 36 12 18 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 38 8 ]
+        %tmp.7 = lgetv %dc;
+        symbol [ dc %tmp.7 38 8 10 ];
+        symbol [ setColor %tmp.8 38 11 19 ];
+        %tmp.8 = getv function %tmp.7 :setColor;
+        symbol [ Graphics %tmp.9 38 20 28 ];
+        %tmp.9 = getm $.Toybox.Graphics;
+        symbol [ COLOR_BLACK %tmp.10 38 29 40 ];
+        %tmp.10 = getv %tmp.9 :COLOR_BLACK;
+        symbol [ Graphics %tmp.11 38 42 50 ];
+        %tmp.11 = getm $.Toybox.Graphics;
+        symbol [ COLOR_BLACK %tmp.12 38 51 62 ];
+        %tmp.12 = getv %tmp.11 :COLOR_BLACK;
+        invoke %tmp.7 %tmp.8(%tmp.10, %tmp.12);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 39 8 ]
+        %tmp.13 = lgetv %dc;
+        symbol [ dc %tmp.13 39 8 10 ];
+        symbol [ clear %tmp.14 39 11 16 ];
+        %tmp.14 = getv function %tmp.13 :clear;
+        invoke %tmp.13 %tmp.14();
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 41 8 ]
+        %tmp.15 = lgetv %dc;
+        symbol [ dc %tmp.15 41 8 10 ];
+        symbol [ setColor %tmp.16 41 11 19 ];
+        %tmp.16 = getv function %tmp.15 :setColor;
+        symbol [ Graphics %tmp.17 41 20 28 ];
+        %tmp.17 = getm $.Toybox.Graphics;
+        symbol [ COLOR_WHITE %tmp.18 41 29 40 ];
+        %tmp.18 = getv %tmp.17 :COLOR_WHITE;
+        symbol [ Graphics %tmp.19 41 42 50 ];
+        %tmp.19 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.20 41 51 68 ];
+        %tmp.20 = getv %tmp.19 :COLOR_TRANSPARENT;
+        invoke %tmp.15 %tmp.16(%tmp.18, %tmp.20);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 42 8 ]
+        %tmp.21 = lgetv %dc;
+        symbol [ dc %tmp.21 42 8 10 ];
+        symbol [ drawText %tmp.22 42 11 19 ];
+        %tmp.22 = getv function %tmp.21 :drawText;
+        %tmp.23 = lgetv %width.1;
+        symbol [ width %tmp.23 42 20 25 ];
+        %tmp.24 = 2;
+        %tmp.25 = div %tmp.23 %tmp.24;
+        %tmp.26 = 18;
+        symbol [ Graphics %tmp.27 42 35 43 ];
+        %tmp.27 = getm $.Toybox.Graphics;
+        symbol [ FONT_TINY %tmp.28 42 44 53 ];
+        %tmp.28 = getv %tmp.27 :FONT_TINY;
+        %tmp.29 = "About AI Chat";
+        symbol [ Graphics %tmp.30 42 72 80 ];
+        %tmp.30 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_CENTER %tmp.31 42 81 100 ];
+        %tmp.31 = getv %tmp.30 :TEXT_JUSTIFY_CENTER;
+        invoke %tmp.21 %tmp.22(%tmp.25, %tmp.26, %tmp.28, %tmp.29, %tmp.31);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 44 8 ]
+        %tmp.32 = lgetv %dc;
+        symbol [ dc %tmp.32 44 8 10 ];
+        symbol [ setColor %tmp.33 44 11 19 ];
+        %tmp.33 = getv function %tmp.32 :setColor;
+        symbol [ Graphics %tmp.34 44 20 28 ];
+        %tmp.34 = getm $.Toybox.Graphics;
+        symbol [ COLOR_DK_GRAY %tmp.35 44 29 42 ];
+        %tmp.35 = getv %tmp.34 :COLOR_DK_GRAY;
+        symbol [ Graphics %tmp.36 44 44 52 ];
+        %tmp.36 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.37 44 53 70 ];
+        %tmp.37 = getv %tmp.36 :COLOR_TRANSPARENT;
+        invoke %tmp.32 %tmp.33(%tmp.35, %tmp.37);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 45 8 ]
+        %tmp.38 = lgetv %dc;
+        symbol [ dc %tmp.38 45 8 10 ];
+        symbol [ drawLine %tmp.39 45 11 19 ];
+        %tmp.39 = getv function %tmp.38 :drawLine;
+        %tmp.40 = 0;
+        %tmp.41 = 35;
+        %tmp.42 = lgetv %width.1;
+        symbol [ width %tmp.42 45 27 32 ];
+        %tmp.43 = 35;
+        invoke %tmp.38 %tmp.39(%tmp.40, %tmp.41, %tmp.42, %tmp.43);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 47 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_34_26_77_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_34_26_77_4_stop" ]
+        %listTop.3 = local;
+        symbol [ listTop %listTop.3 47 12 19 ];
+        symbol [ headerHeight %tmp.45 47 22 34 ];
+        %tmp.45 = getv ? :headerHeight;
+        lputv %listTop.3 %tmp.45;
+        symbol [ listTop %listTop.3 47 12 19 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 48 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_34_26_77_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_34_26_77_4_stop" ]
+        %availableHeight.4 = local;
+        symbol [ availableHeight %availableHeight.4 48 12 27 ];
+        %tmp.46 = lgetv %height.2;
+        symbol [ height %tmp.46 48 30 36 ];
+        %tmp.47 = lgetv %listTop.3;
+        symbol [ listTop %tmp.47 48 39 46 ];
+        %tmp.48 = sub %tmp.46 %tmp.47;
+        %tmp.49 = 20;
+        %tmp.50 = sub %tmp.48 %tmp.49;
+        lputv %availableHeight.4 %tmp.50;
+        symbol [ availableHeight %availableHeight.4 48 12 27 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 49 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_34_26_77_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_34_26_77_4_stop" ]
+        %maxVisible.5 = local;
+        symbol [ maxVisible %maxVisible.5 49 12 22 ];
+        %tmp.51 = lgetv %availableHeight.4;
+        symbol [ availableHeight %tmp.51 49 25 40 ];
+        symbol [ itemHeight %tmp.53 49 43 53 ];
+        %tmp.53 = getv ? :itemHeight;
+        %tmp.54 = div %tmp.51 %tmp.53;
+        lputv %maxVisible.5 %tmp.54;
+        symbol [ maxVisible %maxVisible.5 49 12 22 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 51 8 ]
+        %tmp.55 = lgetv %dc;
+        symbol [ dc %tmp.55 51 8 10 ];
+        symbol [ setClip %tmp.56 51 11 18 ];
+        %tmp.56 = getv function %tmp.55 :setClip;
+        %tmp.57 = 0;
+        %tmp.58 = lgetv %listTop.3;
+        symbol [ listTop %tmp.58 51 22 29 ];
+        %tmp.59 = lgetv %width.1;
+        symbol [ width %tmp.59 51 31 36 ];
+        %tmp.60 = lgetv %availableHeight.4;
+        symbol [ availableHeight %tmp.60 51 38 53 ];
+        invoke %tmp.55 %tmp.56(%tmp.57, %tmp.58, %tmp.59, %tmp.60);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 53 8 ]
+        for @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_8_74_8_for_test @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_8_74_8_for_incr @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_8_74_8_for_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_8_74_8_for_init:
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_8_74_8_for_begin" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_8_74_8_for_end" ]
+        %i.6 = local;
+        symbol [ i %i.6 53 17 18 ];
+        symbol [ scrollOffset %tmp.62 53 21 33 ];
+        %tmp.62 = getv ? :scrollOffset;
+        lputv %i.6 %tmp.62;
+        symbol [ i %i.6 53 17 18 ];
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_8_74_8_for_test:
+        %tmp.63 = lgetv %i.6;
+        symbol [ i %tmp.63 53 35 36 ];
+        symbol [ items %tmp.65 53 39 44 ];
+        %tmp.65 = getv ? :items;
+        symbol [ size %tmp.66 53 45 49 ];
+        %tmp.66 = getv function %tmp.65 :size;
+        %tmp.67 = invoke %tmp.65 %tmp.66();
+        %tmp.68 = lt %tmp.63 %tmp.67;
+        bf %tmp.68 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_8_74_8_for_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_8_74_8_for_begin:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_58_74_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 54 12 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_54_12_56_12_if_stmt:
+        %tmp.69 = lgetv %i.6;
+        symbol [ i %tmp.69 54 16 17 ];
+        symbol [ scrollOffset %tmp.71 54 21 33 ];
+        %tmp.71 = getv ? :scrollOffset;
+        %tmp.72 = lgetv %maxVisible.5;
+        symbol [ maxVisible %tmp.72 54 36 46 ];
+        %tmp.73 = add %tmp.71 %tmp.72;
+        %tmp.74 = 1;
+        %tmp.75 = add %tmp.73 %tmp.74;
+        %tmp.76 = gte %tmp.69 %tmp.75;
+        bf %tmp.76 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_54_12_56_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_54_12_56_12_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_54_52_56_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 55 16 ]
+        goto break @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_8_74_8_for_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_54_52_56_12_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_54_12_56_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_54_12_56_12_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 58 12 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_58_74_8_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_58_74_8_stop" ]
+        %item.7 = local;
+        symbol [ item %item.7 58 16 20 ];
+        symbol [ items %tmp.78 58 23 28 ];
+        %tmp.78 = getv ? :items;
+        symbol [ get %tmp.79 58 29 32 ];
+        %tmp.79 = getv function %tmp.78 :get;
+        %tmp.80 = lgetv %i.6;
+        symbol [ i %tmp.80 58 33 34 ];
+        %tmp.81 = invoke %tmp.78 %tmp.79(%tmp.80);
+        lputv %item.7 %tmp.81;
+        symbol [ item %item.7 58 16 20 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 59 12 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_58_74_8_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_58_74_8_stop" ]
+        %y.8 = local;
+        symbol [ y %y.8 59 16 17 ];
+        %tmp.82 = lgetv %listTop.3;
+        symbol [ listTop %tmp.82 59 20 27 ];
+        %tmp.83 = lgetv %i.6;
+        symbol [ i %tmp.83 59 31 32 ];
+        symbol [ scrollOffset %tmp.85 59 35 47 ];
+        %tmp.85 = getv ? :scrollOffset;
+        %tmp.86 = sub %tmp.83 %tmp.85;
+        symbol [ itemHeight %tmp.88 59 51 61 ];
+        %tmp.88 = getv ? :itemHeight;
+        %tmp.89 = mul %tmp.86 %tmp.88;
+        %tmp.90 = add %tmp.82 %tmp.89;
+        lputv %y.8 %tmp.90;
+        symbol [ y %y.8 59 16 17 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 61 12 ]
+        %tmp.91 = lgetv %dc;
+        symbol [ dc %tmp.91 61 12 14 ];
+        symbol [ setColor %tmp.92 61 15 23 ];
+        %tmp.92 = getv function %tmp.91 :setColor;
+        symbol [ Graphics %tmp.93 61 24 32 ];
+        %tmp.93 = getm $.Toybox.Graphics;
+        symbol [ COLOR_WHITE %tmp.94 61 33 44 ];
+        %tmp.94 = getv %tmp.93 :COLOR_WHITE;
+        symbol [ Graphics %tmp.95 61 46 54 ];
+        %tmp.95 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.96 61 55 72 ];
+        %tmp.96 = getv %tmp.95 :COLOR_TRANSPARENT;
+        invoke %tmp.91 %tmp.92(%tmp.94, %tmp.96);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 62 12 ]
+        %tmp.97 = lgetv %dc;
+        symbol [ dc %tmp.97 62 12 14 ];
+        symbol [ drawText %tmp.98 62 15 23 ];
+        %tmp.98 = getv function %tmp.97 :drawText;
+        %tmp.99 = 15;
+        %tmp.100 = lgetv %y.8;
+        symbol [ y %tmp.100 62 28 29 ];
+        %tmp.101 = 14;
+        %tmp.102 = add %tmp.100 %tmp.101;
+        symbol [ Graphics %tmp.103 62 36 44 ];
+        %tmp.103 = getm $.Toybox.Graphics;
+        symbol [ FONT_SMALL %tmp.104 62 45 55 ];
+        %tmp.104 = getv %tmp.103 :FONT_SMALL;
+        %tmp.105 = lgetv %item.7;
+        symbol [ item %tmp.105 62 57 61 ];
+        symbol [ get %tmp.106 62 62 65 ];
+        %tmp.106 = getv function %tmp.105 :get;
+        %tmp.108 = const :label;
+        symbol [ label %tmp.108 62 67 72 const ];
+        %tmp.109 = invoke %tmp.105 %tmp.106(%tmp.108);
+        symbol [ Graphics %tmp.110 62 75 83 ];
+        %tmp.110 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_LEFT %tmp.111 62 84 101 ];
+        %tmp.111 = getv %tmp.110 :TEXT_JUSTIFY_LEFT;
+        invoke %tmp.97 %tmp.98(%tmp.99, %tmp.102, %tmp.104, %tmp.109, %tmp.111);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 64 12 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_58_74_8_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_58_74_8_stop" ]
+        %value.9 = local;
+        symbol [ value %value.9 64 16 21 ];
+        %tmp.112 = lgetv %item.7;
+        symbol [ item %tmp.112 64 24 28 ];
+        symbol [ get %tmp.113 64 29 32 ];
+        %tmp.113 = getv function %tmp.112 :get;
+        %tmp.115 = const :value;
+        symbol [ value %tmp.115 64 34 39 const ];
+        %tmp.116 = invoke %tmp.112 %tmp.113(%tmp.115);
+        lputv %value.9 %tmp.116;
+        symbol [ value %value.9 64 16 21 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 65 12 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_65_12_68_12_if_stmt:
+        %tmp.117 = lgetv %value.9;
+        symbol [ value %tmp.117 65 16 21 ];
+        %tmp.118 = null;
+        %tmp.119 = ne %tmp.117 %tmp.118;
+        bf %tmp.119 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_65_12_68_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_65_12_68_12_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_65_31_68_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 66 16 ]
+        %tmp.120 = lgetv %dc;
+        symbol [ dc %tmp.120 66 16 18 ];
+        symbol [ setColor %tmp.121 66 19 27 ];
+        %tmp.121 = getv function %tmp.120 :setColor;
+        symbol [ Graphics %tmp.122 66 28 36 ];
+        %tmp.122 = getm $.Toybox.Graphics;
+        symbol [ COLOR_LT_GRAY %tmp.123 66 37 50 ];
+        %tmp.123 = getv %tmp.122 :COLOR_LT_GRAY;
+        symbol [ Graphics %tmp.124 66 52 60 ];
+        %tmp.124 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.125 66 61 78 ];
+        %tmp.125 = getv %tmp.124 :COLOR_TRANSPARENT;
+        invoke %tmp.120 %tmp.121(%tmp.123, %tmp.125);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 67 16 ]
+        %tmp.126 = lgetv %dc;
+        symbol [ dc %tmp.126 67 16 18 ];
+        symbol [ drawText %tmp.127 67 19 27 ];
+        %tmp.127 = getv function %tmp.126 :drawText;
+        %tmp.128 = lgetv %width.1;
+        symbol [ width %tmp.128 67 28 33 ];
+        %tmp.129 = 15;
+        %tmp.130 = sub %tmp.128 %tmp.129;
+        %tmp.131 = lgetv %y.8;
+        symbol [ y %tmp.131 67 40 41 ];
+        %tmp.132 = 14;
+        %tmp.133 = add %tmp.131 %tmp.132;
+        symbol [ Graphics %tmp.134 67 48 56 ];
+        %tmp.134 = getm $.Toybox.Graphics;
+        symbol [ FONT_SMALL %tmp.135 67 57 67 ];
+        %tmp.135 = getv %tmp.134 :FONT_SMALL;
+        %tmp.136 = lgetv %value.9;
+        symbol [ value %tmp.136 67 69 74 ];
+        %tmp.137 = as %tmp.136 { (!Null) };
+        symbol [ Graphics %tmp.138 67 76 84 ];
+        %tmp.138 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_RIGHT %tmp.139 67 85 103 ];
+        %tmp.139 = getv %tmp.138 :TEXT_JUSTIFY_RIGHT;
+        invoke %tmp.126 %tmp.127(%tmp.130, %tmp.133, %tmp.135, %tmp.137, %tmp.139);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_65_31_68_12_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_65_12_68_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_65_12_68_12_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 70 12 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_70_12_73_12_if_stmt:
+        %tmp.140 = lgetv %i.6;
+        symbol [ i %tmp.140 70 16 17 ];
+        symbol [ items %tmp.142 70 20 25 ];
+        %tmp.142 = getv ? :items;
+        symbol [ size %tmp.143 70 26 30 ];
+        %tmp.143 = getv function %tmp.142 :size;
+        %tmp.144 = invoke %tmp.142 %tmp.143();
+        %tmp.145 = 1;
+        %tmp.146 = sub %tmp.144 %tmp.145;
+        %tmp.147 = lt %tmp.140 %tmp.146;
+        bf %tmp.147 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_70_12_73_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_70_12_73_12_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_70_38_73_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 71 16 ]
+        %tmp.148 = lgetv %dc;
+        symbol [ dc %tmp.148 71 16 18 ];
+        symbol [ setColor %tmp.149 71 19 27 ];
+        %tmp.149 = getv function %tmp.148 :setColor;
+        symbol [ Graphics %tmp.150 71 28 36 ];
+        %tmp.150 = getm $.Toybox.Graphics;
+        symbol [ COLOR_DK_GRAY %tmp.151 71 37 50 ];
+        %tmp.151 = getv %tmp.150 :COLOR_DK_GRAY;
+        symbol [ Graphics %tmp.152 71 52 60 ];
+        %tmp.152 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.153 71 61 78 ];
+        %tmp.153 = getv %tmp.152 :COLOR_TRANSPARENT;
+        invoke %tmp.148 %tmp.149(%tmp.151, %tmp.153);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 72 16 ]
+        %tmp.154 = lgetv %dc;
+        symbol [ dc %tmp.154 72 16 18 ];
+        symbol [ drawLine %tmp.155 72 19 27 ];
+        %tmp.155 = getv function %tmp.154 :drawLine;
+        %tmp.156 = 10;
+        %tmp.157 = lgetv %y.8;
+        symbol [ y %tmp.157 72 32 33 ];
+        symbol [ itemHeight %tmp.159 72 36 46 ];
+        %tmp.159 = getv ? :itemHeight;
+        %tmp.160 = add %tmp.157 %tmp.159;
+        %tmp.161 = 4;
+        %tmp.162 = sub %tmp.160 %tmp.161;
+        %tmp.163 = lgetv %width.1;
+        symbol [ width %tmp.163 72 52 57 ];
+        %tmp.164 = 10;
+        %tmp.165 = sub %tmp.163 %tmp.164;
+        %tmp.166 = lgetv %y.8;
+        symbol [ y %tmp.166 72 64 65 ];
+        symbol [ itemHeight %tmp.168 72 68 78 ];
+        %tmp.168 = getv ? :itemHeight;
+        %tmp.169 = add %tmp.166 %tmp.168;
+        %tmp.170 = 4;
+        %tmp.171 = sub %tmp.169 %tmp.170;
+        invoke %tmp.154 %tmp.155(%tmp.156, %tmp.162, %tmp.165, %tmp.171);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_70_38_73_12_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_70_12_73_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_70_12_73_12_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_58_74_8_stop:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_8_74_8_for_incr:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 53 ]
+        %tmp.174 = lgetv %i.6;
+        symbol [ i %tmp.174 53 53 54 ];
+        %tmp.175 = add %tmp.174 1;
+        lputv %i.6 %tmp.175;
+        symbol [ i %i.6 53 53 54 ];
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_8_74_8_for_test;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_53_8_74_8_for_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 76 8 ]
+        %tmp.176 = lgetv %dc;
+        symbol [ dc %tmp.176 76 8 10 ];
+        symbol [ clearClip %tmp.177 76 11 20 ];
+        %tmp.177 = getv function %tmp.176 :clearClip;
+        invoke %tmp.176 %tmp.177();
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_34_26_77_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 79; @symbol_functiondef = [onSwipe,79,13,20]; @symbol_param<0> = [evt,79,21,24]; ]
+    function onSwipe(evt) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_79_26_93_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 80 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_79_26_93_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_79_26_93_4_stop" ]
+        %direction.1 = local;
+        symbol [ direction %direction.1 80 12 21 ];
+        %tmp.1 = lgetv %evt;
+        symbol [ evt %tmp.1 80 24 27 ];
+        symbol [ getDirection %tmp.2 80 28 40 ];
+        %tmp.2 = getv function %tmp.1 :getDirection;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        lputv %direction.1 %tmp.3;
+        symbol [ direction %direction.1 80 12 21 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 82 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_82_8_92_8_if_stmt:
+        %tmp.4 = lgetv %direction.1;
+        symbol [ direction %tmp.4 82 12 21 ];
+        symbol [ WatchUi %tmp.5 82 25 32 ];
+        %tmp.5 = getm $.Toybox.WatchUi;
+        symbol [ SWIPE_UP %tmp.6 82 33 41 ];
+        %tmp.6 = getv %tmp.5 :SWIPE_UP;
+        %tmp.7 = eq %tmp.4 %tmp.6;
+        bf %tmp.7 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_82_8_92_8_if_false;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_82_8_92_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_82_43_87_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 83 12 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_83_12_86_12_if_stmt:
+        symbol [ scrollOffset %tmp.9 83 16 28 ];
+        %tmp.9 = getv ? :scrollOffset;
+        symbol [ viewHeight %tmp.11 83 32 42 ];
+        %tmp.11 = getv ? :viewHeight;
+        symbol [ headerHeight %tmp.13 83 45 57 ];
+        %tmp.13 = getv ? :headerHeight;
+        %tmp.14 = sub %tmp.11 %tmp.13;
+        %tmp.15 = 20;
+        %tmp.16 = sub %tmp.14 %tmp.15;
+        symbol [ itemHeight %tmp.18 83 66 76 ];
+        %tmp.18 = getv ? :itemHeight;
+        %tmp.19 = div %tmp.16 %tmp.18;
+        %tmp.20 = add %tmp.9 %tmp.19;
+        symbol [ items %tmp.22 83 79 84 ];
+        %tmp.22 = getv ? :items;
+        symbol [ size %tmp.23 83 85 89 ];
+        %tmp.23 = getv function %tmp.22 :size;
+        %tmp.24 = invoke %tmp.22 %tmp.23();
+        %tmp.25 = lt %tmp.20 %tmp.24;
+        bf %tmp.25 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_83_12_86_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_83_12_86_12_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_83_93_86_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 84 16 ]
+        symbol [ scrollOffset %tmp.26 84 16 28 ];
+        %tmp.26 = getv self :scrollOffset;
+        %tmp.27 = 1;
+        %tmp.28 = add %tmp.26 %tmp.27;
+        symbol [ scrollOffset ? 84 16 28 ];
+        putv self :scrollOffset dup %tmp.28;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 85 16 ]
+        symbol [ WatchUi %tmp.29 85 16 23 ];
+        %tmp.29 = getm $.Toybox.WatchUi;
+        symbol [ requestUpdate %tmp.30 85 24 37 ];
+        %tmp.30 = getv function %tmp.29 :requestUpdate;
+        invoke %tmp.29 %tmp.30();
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_83_93_86_12_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_83_12_86_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_83_12_86_12_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_82_43_87_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_82_8_92_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_82_8_92_8_if_false:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 87 15 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_87_15_92_8_if_stmt:
+        %tmp.31 = lgetv %direction.1;
+        symbol [ direction %tmp.31 87 19 28 ];
+        symbol [ WatchUi %tmp.32 87 32 39 ];
+        %tmp.32 = getm $.Toybox.WatchUi;
+        symbol [ SWIPE_DOWN %tmp.33 87 40 50 ];
+        %tmp.33 = getv %tmp.32 :SWIPE_DOWN;
+        %tmp.34 = eq %tmp.31 %tmp.33;
+        bf %tmp.34 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_87_15_92_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_87_15_92_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_87_52_92_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 88 12 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_88_12_91_12_if_stmt:
+        symbol [ scrollOffset %tmp.36 88 16 28 ];
+        %tmp.36 = getv ? :scrollOffset;
+        %tmp.37 = 0;
+        %tmp.38 = gt %tmp.36 %tmp.37;
+        bf %tmp.38 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_88_12_91_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_88_12_91_12_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_88_34_91_12_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 89 16 ]
+        symbol [ scrollOffset %tmp.39 89 16 28 ];
+        %tmp.39 = getv self :scrollOffset;
+        %tmp.40 = 1;
+        %tmp.41 = sub %tmp.39 %tmp.40;
+        symbol [ scrollOffset ? 89 16 28 ];
+        putv self :scrollOffset dup %tmp.41;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 90 16 ]
+        symbol [ WatchUi %tmp.42 90 16 23 ];
+        %tmp.42 = getm $.Toybox.WatchUi;
+        symbol [ requestUpdate %tmp.43 90 24 37 ];
+        %tmp.43 = getv function %tmp.42 :requestUpdate;
+        invoke %tmp.42 %tmp.43();
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_88_34_91_12_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_88_12_91_12_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_88_12_91_12_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_87_52_92_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_87_15_92_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_87_15_92_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_82_8_92_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_79_26_93_4_stop:
+    }
+}
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 96; @symbol_classdef = [AboutInputDelegate,96,6,24]; @symbol_extends<0> = [WatchUi,96,33,40]; @symbol_extends<1> = [BehaviorDelegate,96,41,57]; ]
+class AboutInputDelegate extends WatchUi.BehaviorDelegate {
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 96; ]
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 96; ]
+    static
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 98; @position = 8; @symbol_vardef = [view,98,8,12]; ]
+    var view;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 100; @symbol_functiondef = [initialize,100,13,23]; @symbol_param<0> = [aboutView,100,24,33]; ]
+    function initialize(aboutView) as Void {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_100_35_103_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 101 8 ]
+        symbol [ BehaviorDelegate %tmp.2 101 8 24 ];
+        %tmp.2 = getv ? :BehaviorDelegate;
+        symbol [ initialize %tmp.3 101 25 35 ];
+        %tmp.3 = getv function %tmp.2 :initialize;
+        invoke %tmp.2 %tmp.3();
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 102 8 ]
+        %tmp.4 = lgetv %aboutView;
+        symbol [ aboutView %tmp.4 102 15 24 ];
+        symbol [ view ? 102 8 12 ];
+        putv self :view %tmp.4;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_100_35_103_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 105; @symbol_functiondef = [onSwipe,105,13,20]; @symbol_param<0> = [evt,105,21,24]; ]
+    function onSwipe(evt) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_105_26_110_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 106 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_8_108_8_if_stmt:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_12_106_38_begin:
+        symbol [ view %tmp.2 106 12 16 ];
+        %tmp.2 = getv ? :view;
+        %tmp.3 = null;
+        %tmp.4 = ne %tmp.2 %tmp.3;
+        bf %tmp.4 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_8_108_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_28_106_38_true:
+        symbol [ view %tmp.6 106 28 32 ];
+        %tmp.6 = getv ? :view;
+        %tmp.7 = as %tmp.6 { (!Null) };
+        %tmp.9 = const :onSwipe;
+        symbol [ onSwipe %tmp.9 106 38 45 const ];
+        %tmp.10 = canhazplz %tmp.7 %tmp.9;
+        push %tmp.10;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_28_106_38_end:
+        %tmp.11 = phi [%tmp.4 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_12_106_38_begin] [%tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_28_106_38_true] [%tmp.11 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_28_106_38_end];
+        bf %tmp.11 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_8_108_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_8_108_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_47_108_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 107 12 ]
+        symbol [ view %tmp.13 107 12 16 ];
+        %tmp.13 = getv ? :view;
+        %tmp.14 = as %tmp.13 { (interface { var onSwipe; }) && (!Null) };
+        symbol [ onSwipe %tmp.15 107 17 24 ];
+        %tmp.15 = getv function %tmp.14 :onSwipe;
+        %tmp.16 = lgetv %evt;
+        symbol [ evt %tmp.16 107 25 28 ];
+        invoke %tmp.14 %tmp.15(%tmp.16);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_47_108_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_8_108_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_106_8_108_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 109 8 ]
+        %tmp.17 = true;
+        ret %tmp.17;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_105_26_110_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 112; @symbol_functiondef = [onBack,112,13,19]; ]
+    function onBack() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_112_22_115_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 113 8 ]
+        symbol [ WatchUi %tmp.1 113 8 15 ];
+        %tmp.1 = getm $.Toybox.WatchUi;
+        symbol [ popView %tmp.2 113 16 23 ];
+        %tmp.2 = getv function %tmp.1 :popView;
+        symbol [ WatchUi %tmp.3 113 24 31 ];
+        %tmp.3 = getm $.Toybox.WatchUi;
+        symbol [ SLIDE_IMMEDIATE %tmp.4 113 32 47 ];
+        %tmp.4 = getv %tmp.3 :SLIDE_IMMEDIATE;
+        invoke %tmp.1 %tmp.2(%tmp.4);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc" 114 8 ]
+        %tmp.5 = true;
+        ret %tmp.5;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_source_AboutView_mc_112_22_115_4_stop:
+    }
+}
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/source/AboutView.mc"; @line = 1; ]
+<init> {
+}

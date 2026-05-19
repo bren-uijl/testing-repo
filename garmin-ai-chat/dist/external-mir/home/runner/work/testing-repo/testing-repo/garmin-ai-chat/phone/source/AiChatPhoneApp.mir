@@ -1,0 +1,294 @@
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 1; @symbol_usingdef<0> = [Toybox,1,6,12]; @symbol_usingdef<1> = [Application,1,13,24]; ]
+using Toybox.Application;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 2; @symbol_usingdef<0> = [Toybox,2,6,12]; @symbol_usingdef<1> = [Communications,2,13,27]; ]
+using Toybox.Communications;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 3; @symbol_usingdef<0> = [Toybox,3,6,12]; @symbol_usingdef<1> = [System,3,13,19]; ]
+using Toybox.System;
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 5; @symbol_classdef = [AiChatPhoneApp,5,6,20]; @symbol_extends<0> = [Application,5,29,40]; @symbol_extends<1> = [AppBase,5,41,48]; ]
+class AiChatPhoneApp extends Application.AppBase {
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 5; ]
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 5; ]
+    static
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 7; @position = 8; @symbol_vardef = [propertyStore,7,8,21]; ]
+    var propertyStore;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 9; @symbol_functiondef = [initialize,9,13,23]; ]
+    function initialize() as Void {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_9_26_12_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 10 8 ]
+        symbol [ AppBase %tmp.2 10 8 15 ];
+        %tmp.2 = getv ? :AppBase;
+        symbol [ initialize %tmp.3 10 16 26 ];
+        %tmp.3 = getv function %tmp.2 :initialize;
+        invoke %tmp.2 %tmp.3();
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 11 8 ]
+        %tmp.4 = null;
+        symbol [ propertyStore ? 11 8 21 ];
+        putv self :propertyStore %tmp.4;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_9_26_12_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 14; @symbol_functiondef = [onStart,14,13,20]; @symbol_param<0> = [state,14,21,26]; ]
+    function onStart(state) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_14_28_16_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 15 8 ]
+        symbol [ PhonePropertyStore %tmp.4 15 28 46 ];
+        %tmp.4 = getv ? :PhonePropertyStore;
+        %tmp.1 = newc %tmp.4 ();
+        symbol [ propertyStore ? 15 8 21 ];
+        putv self :propertyStore %tmp.1;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_14_28_16_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 18; @symbol_functiondef = [onStop,18,13,19]; @symbol_param<0> = [state,18,20,25]; ]
+    function onStop(state) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_18_27_22_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 19 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_19_8_21_8_if_stmt:
+        symbol [ propertyStore %tmp.2 19 12 25 ];
+        %tmp.2 = getv ? :propertyStore;
+        %tmp.3 = null;
+        %tmp.4 = ne %tmp.2 %tmp.3;
+        bf %tmp.4 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_19_8_21_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_19_8_21_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_19_35_21_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 20 12 ]
+        symbol [ propertyStore %tmp.6 20 12 25 ];
+        %tmp.6 = getv ? :propertyStore;
+        %tmp.7 = as %tmp.6 { (!Null) };
+        symbol [ save %tmp.8 20 26 30 ];
+        %tmp.8 = getv function %tmp.7 :save;
+        invoke %tmp.7 %tmp.8();
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_19_35_21_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_19_8_21_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_19_8_21_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_18_27_22_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 24; @symbol_functiondef = [getInitialView,24,13,27]; ]
+    function getInitialView() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_24_30_28_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 25 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_24_30_28_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_24_30_28_4_stop" ]
+        %view.1 = local;
+        symbol [ view %view.1 25 12 16 ];
+        symbol [ PhoneSettingsView %tmp.4 25 23 40 ];
+        %tmp.4 = getv ? :PhoneSettingsView;
+        %tmp.1 = newc %tmp.4 ();
+        lputv %view.1 %tmp.1;
+        symbol [ view %view.1 25 12 16 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 26 8 ]
+        [ "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_24_30_28_4_start" "_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_24_30_28_4_stop" ]
+        %delegate.2 = local;
+        symbol [ delegate %delegate.2 26 12 20 ];
+        symbol [ PhoneInputDelegate %tmp.8 26 27 45 ];
+        %tmp.8 = getv ? :PhoneInputDelegate;
+        %tmp.9 = lgetv %view.1;
+        symbol [ view %tmp.9 26 46 50 ];
+        %tmp.5 = newc %tmp.8 (%tmp.9);
+        lputv %delegate.2 %tmp.5;
+        symbol [ delegate %delegate.2 26 12 20 ];
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 27 8 ]
+        %tmp.10 = newa 2;
+        %tmp.11 = lgetv %view.1;
+        symbol [ view %tmp.11 27 16 20 ];
+        %tmp.12 = dup %tmp.10;
+        %tmp.13 = aputv %tmp.12 0 %tmp.11;
+        %tmp.14 = lgetv %delegate.2;
+        symbol [ delegate %tmp.14 27 22 30 ];
+        %tmp.15 = dup %tmp.13;
+        %tmp.16 = aputv %tmp.15 1 %tmp.14;
+        ret %tmp.16;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_24_30_28_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 30; @symbol_functiondef = [getPropertyStore,30,13,29]; ]
+    function getPropertyStore() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_30_32_35_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 31 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_31_8_33_8_if_stmt:
+        symbol [ propertyStore %tmp.2 31 12 25 ];
+        %tmp.2 = getv ? :propertyStore;
+        %tmp.3 = null;
+        %tmp.4 = eq %tmp.2 %tmp.3;
+        bf %tmp.4 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_31_8_33_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_31_8_33_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_31_35_33_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 32 12 ]
+        symbol [ PhonePropertyStore %tmp.8 32 32 50 ];
+        %tmp.8 = getv ? :PhonePropertyStore;
+        %tmp.5 = newc %tmp.8 ();
+        symbol [ propertyStore ? 32 12 25 ];
+        putv self :propertyStore %tmp.5;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_31_35_33_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_31_8_33_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_31_8_33_8_if_end:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 34 8 ]
+        symbol [ propertyStore %tmp.10 34 15 28 ];
+        %tmp.10 = getv ? :propertyStore;
+        ret %tmp.10;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_30_32_35_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 37; @symbol_functiondef = [syncToWatch,37,13,24]; ]
+    function syncToWatch() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_37_27_39_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 38 8 ]
+        symbol [ System %tmp.1 38 8 14 ];
+        %tmp.1 = getm $.Toybox.System;
+        symbol [ println %tmp.2 38 15 22 ];
+        %tmp.2 = getv function %tmp.1 :println;
+        %tmp.3 = "Sync to watch not supported in SDK 9.1.0";
+        invoke %tmp.1 %tmp.2(%tmp.3);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_37_27_39_4_stop:
+    }
+}
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 42; @symbol_classdef = [PhonePropertyStore,42,6,24]; ]
+class PhonePropertyStore {
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 42; ]
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 42; ]
+    static
+    <init> {
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 44; @position = 8; @symbol_vardef = [store,44,8,13]; ]
+    var store;
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 46; @symbol_functiondef = [initialize,46,13,23]; ]
+    function initialize() as Void {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_46_26_53_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 47 8 ]
+        symbol [ Application %tmp.1 47 16 27 ];
+        %tmp.1 = getm $.Toybox.Application;
+        symbol [ getApp %tmp.2 47 28 34 ];
+        %tmp.2 = getv function %tmp.1 :getApp;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        symbol [ getProperty %tmp.4 47 37 48 ];
+        %tmp.4 = getv function %tmp.3 :getProperty;
+        %tmp.5 = "AiChatPhoneStore";
+        %tmp.6 = invoke %tmp.3 %tmp.4(%tmp.5);
+        symbol [ store ? 47 8 13 ];
+        putv self :store %tmp.6;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 48 8 ]
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_48_8_52_8_if_stmt:
+        symbol [ store %tmp.8 48 12 17 ];
+        %tmp.8 = getv ? :store;
+        %tmp.9 = null;
+        %tmp.10 = eq %tmp.8 %tmp.9;
+        bf %tmp.10 @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_48_8_52_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_48_8_52_8_if_true:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_48_27_52_8_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 49 12 ]
+        %tmp.11 = newd 0;
+        symbol [ store ? 49 12 17 ];
+        putv self :store %tmp.11;
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 50 12 ]
+        symbol [ store %tmp.13 50 12 17 ];
+        %tmp.13 = getv ? :store;
+        symbol [ put %tmp.14 50 18 21 ];
+        %tmp.14 = getv function %tmp.13 :put;
+        %tmp.16 = const :apiKey;
+        symbol [ apiKey %tmp.16 50 23 29 const ];
+        %tmp.17 = "";
+        invoke %tmp.13 %tmp.14(%tmp.16, %tmp.17);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 51 12 ]
+        symbol [ store %tmp.19 51 12 17 ];
+        %tmp.19 = getv ? :store;
+        symbol [ put %tmp.20 51 18 21 ];
+        %tmp.20 = getv function %tmp.19 :put;
+        %tmp.22 = const :model;
+        symbol [ model %tmp.22 51 23 28 const ];
+        %tmp.23 = "nvidia/nemotron-nano-9b-v2";
+        invoke %tmp.19 %tmp.20(%tmp.22, %tmp.23);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_48_27_52_8_stop:
+        goto @_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_48_8_52_8_if_end;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_48_8_52_8_if_end:
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_46_26_53_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 55; @symbol_functiondef = [getApiKey,55,13,22]; ]
+    function getApiKey() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_55_25_57_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 56 8 ]
+        symbol [ store %tmp.2 56 15 20 ];
+        %tmp.2 = getv ? :store;
+        symbol [ get %tmp.3 56 21 24 ];
+        %tmp.3 = getv function %tmp.2 :get;
+        %tmp.5 = const :apiKey;
+        symbol [ apiKey %tmp.5 56 26 32 const ];
+        %tmp.6 = invoke %tmp.2 %tmp.3(%tmp.5);
+        ret %tmp.6;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_55_25_57_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 59; @symbol_functiondef = [setApiKey,59,13,22]; @symbol_param<0> = [key,59,23,26]; ]
+    function setApiKey(key) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_59_28_62_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 60 8 ]
+        symbol [ store %tmp.2 60 8 13 ];
+        %tmp.2 = getv ? :store;
+        symbol [ put %tmp.3 60 14 17 ];
+        %tmp.3 = getv function %tmp.2 :put;
+        %tmp.5 = const :apiKey;
+        symbol [ apiKey %tmp.5 60 19 25 const ];
+        %tmp.6 = lgetv %key;
+        symbol [ key %tmp.6 60 27 30 ];
+        invoke %tmp.2 %tmp.3(%tmp.5, %tmp.6);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 61 8 ]
+        %tmp.7 = self;
+        symbol [ save %tmp.8 61 8 12 ];
+        %tmp.8 = getv function %tmp.7 :save;
+        invoke %tmp.7 %tmp.8();
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_59_28_62_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 64; @symbol_functiondef = [getModel,64,13,21]; ]
+    function getModel() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_64_24_66_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 65 8 ]
+        symbol [ store %tmp.2 65 15 20 ];
+        %tmp.2 = getv ? :store;
+        symbol [ get %tmp.3 65 21 24 ];
+        %tmp.3 = getv function %tmp.2 :get;
+        %tmp.5 = const :model;
+        symbol [ model %tmp.5 65 26 31 const ];
+        %tmp.6 = invoke %tmp.2 %tmp.3(%tmp.5);
+        ret %tmp.6;
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_64_24_66_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 68; @symbol_functiondef = [setModel,68,13,21]; @symbol_param<0> = [model,68,22,27]; ]
+    function setModel(model) {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_68_29_71_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 69 8 ]
+        symbol [ store %tmp.2 69 8 13 ];
+        %tmp.2 = getv ? :store;
+        symbol [ put %tmp.3 69 14 17 ];
+        %tmp.3 = getv function %tmp.2 :put;
+        %tmp.5 = const :model;
+        symbol [ model %tmp.5 69 19 24 const ];
+        %tmp.6 = lgetv %model;
+        symbol [ model %tmp.6 69 26 31 ];
+        invoke %tmp.2 %tmp.3(%tmp.5, %tmp.6);
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 70 8 ]
+        %tmp.7 = self;
+        symbol [ save %tmp.8 70 8 12 ];
+        %tmp.8 = getv function %tmp.7 :save;
+        invoke %tmp.7 %tmp.8();
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_68_29_71_4_stop:
+    }
+    [ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 73; @symbol_functiondef = [save,73,13,17]; ]
+    function save() {
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_73_20_75_4_start:
+[ "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc" 74 8 ]
+        symbol [ Application %tmp.1 74 8 19 ];
+        %tmp.1 = getm $.Toybox.Application;
+        symbol [ getApp %tmp.2 74 20 26 ];
+        %tmp.2 = getv function %tmp.1 :getApp;
+        %tmp.3 = invoke %tmp.1 %tmp.2();
+        symbol [ setProperty %tmp.4 74 29 40 ];
+        %tmp.4 = getv function %tmp.3 :setProperty;
+        %tmp.5 = "AiChatPhoneStore";
+        symbol [ store %tmp.7 74 61 66 ];
+        %tmp.7 = getv ? :store;
+        invoke %tmp.3 %tmp.4(%tmp.5, %tmp.7);
+_home_runner_work_testing_repo_testing_repo_garmin_ai_chat_phone_source_AiChatPhoneApp_mc_73_20_75_4_stop:
+    }
+}
+[ @file = "/home/runner/work/testing-repo/testing-repo/garmin-ai-chat/phone/source/AiChatPhoneApp.mc"; @line = 1; ]
+<init> {
+}

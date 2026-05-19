@@ -8,6 +8,8 @@ class AboutView extends WatchUi.View {
     var scrollOffset;
     var itemHeight;
     var headerHeight;
+    var viewWidth;
+    var viewHeight;
 
     function initialize() {
         View.initialize();
@@ -22,6 +24,11 @@ class AboutView extends WatchUi.View {
         items.add({ :label => "Models", :value => "8 available" });
         items.add({ :label => "Built with", :value => "Monkey C" });
         items.add({ :label => "License", :value => "MIT" });
+    }
+
+    function onLayout(dc) {
+        viewWidth = dc.getWidth();
+        viewHeight = dc.getHeight();
     }
 
     function onUpdate(dc) {
@@ -72,15 +79,15 @@ class AboutView extends WatchUi.View {
     function onSwipe(evt) {
         var direction = evt.getDirection();
 
-        if (direction == WatchUi.SWIPE_DIRECTION_UP) {
-            if (scrollOffset + (getHeight() - headerHeight - 20) / itemHeight < items.size()) {
+        if (direction == WatchUi.SWIPE_UP) {
+            if (scrollOffset + (viewHeight - headerHeight - 20) / itemHeight < items.size()) {
                 scrollOffset += 1;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
-        } else if (direction == WatchUi.SWIPE_DIRECTION_DOWN) {
+        } else if (direction == WatchUi.SWIPE_DOWN) {
             if (scrollOffset > 0) {
                 scrollOffset -= 1;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
         }
     }

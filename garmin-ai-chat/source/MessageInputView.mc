@@ -4,7 +4,6 @@ using Toybox.Application;
 using Toybox.Communications;
 using Toybox.System;
 using Toybox.Lang;
-using Toybox.Json;
 
 class MessageInputView extends WatchUi.View {
 
@@ -12,9 +11,9 @@ class MessageInputView extends WatchUi.View {
     var isLoading;
     var errorMessage;
     var conversation;
-    var cursorVisible;
-    var cursorTimer;
     var storage;
+    var viewWidth;
+    var viewHeight;
 
     function initialize(existingConv) {
         View.initialize();
@@ -22,30 +21,15 @@ class MessageInputView extends WatchUi.View {
         isLoading = false;
         errorMessage = null;
         conversation = existingConv;
-        cursorVisible = true;
-        cursorTimer = null;
         storage = Application.getApp().getPropertyStore();
     }
 
     function onLayout(dc) {
-        startCursorBlink();
+        viewWidth = dc.getWidth();
+        viewHeight = dc.getHeight();
     }
 
     function onExit() {
-        if (cursorTimer != null) {
-            System.cancelTimer(cursorTimer);
-            cursorTimer = null;
-        }
-    }
-
-    function startCursorBlink() {
-        cursorTimer = System.setTimer(500, method(:toggleCursor), null);
-    }
-
-    function toggleCursor(info) {
-        cursorVisible = !cursorVisible;
-        View.requestUpdate();
-        cursorTimer = System.setTimer(500, method(:toggleCursor), null);
     }
 
     function onUpdate(dc) {
@@ -67,7 +51,7 @@ class MessageInputView extends WatchUi.View {
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         var displayText = currentText;
-        if (cursorVisible && currentText.length() < 100) {
+        if (currentText.length() < 100) {
             displayText = displayText + "|";
         }
         dc.drawText(20, inputY + 35, Graphics.FONT_SMALL, displayText, Graphics.TEXT_JUSTIFY_LEFT);
@@ -110,8 +94,8 @@ class MessageInputView extends WatchUi.View {
     function onTap(evt) {
         var x = evt.getX();
         var y = evt.getY();
-        var width = getWidth();
-        var height = getHeight();
+        var width = viewWidth;
+        var height = viewHeight;
 
         var sendBtnY = height - 45;
         var sendBtnWidth = 80;
@@ -133,21 +117,15 @@ class MessageInputView extends WatchUi.View {
     }
 
     function openTextInput() {
-        var options = {
-            :title => Rez.Strings.TypeMessage,
-            :maxSize => 500
-        };
-
-        WatchUi.invokeTextInput(
-            new TextInputDelegate(self),
-            options
-        );
+        if (WatchUi has :TextPicker) {
+            WatchUi.pushView(new WatchUi.TextPicker(currentText), new TextInputDelegate(self), WatchUi.SLIDE_DOWN);
+        }
     }
 
     function onTextSubmitted(text) {
         if (text != null && text.length() > 0) {
             currentText = text;
-            View.requestUpdate();
+            WatchUi.requestUpdate();
         }
     }
 
@@ -158,13 +136,13 @@ class MessageInputView extends WatchUi.View {
 
         if (!storage.isApiKeySet()) {
             errorMessage = Rez.Strings.NoApiKey;
-            View.requestUpdate();
+            WatchUi.requestUpdate();
             return;
         }
 
         isLoading = true;
         errorMessage = null;
-        View.requestUpdate();
+        WatchUi.requestUpdate();
 
         if (conversation == null) {
             conversation = Conversation.create(currentText);
@@ -177,7 +155,7 @@ class MessageInputView extends WatchUi.View {
         conversation.addMessage(loadingMsg);
 
         try {
-            System.vibrate(100);
+            
         } catch (e) {
         }
 
@@ -195,18 +173,18 @@ class MessageInputView extends WatchUi.View {
 
     function setLoading(loading) {
         isLoading = loading;
-        View.requestUpdate();
+        WatchUi.requestUpdate();
     }
 
     function setError(msg) {
         errorMessage = msg;
         isLoading = false;
-        View.requestUpdate();
+        WatchUi.requestUpdate();
     }
 
     function setInitialText(text) {
         currentText = text;
-        View.requestUpdate();
+        WatchUi.requestUpdate();
     }
 }
 
@@ -228,17 +206,22 @@ class SendCallback {
     }
 }
 
-class TextInputDelegate extends WatchUi.TextConfirmationDelegate {
+class TextInputDelegate extends WatchUi.TextPickerDelegate {
 
     var view;
 
     function initialize(msgView) {
-        TextConfirmationDelegate.initialize();
+        TextPickerDelegate.initialize();
         view = msgView;
     }
 
-    function onConfirmed(text) {
+    function onTextEntered(text, changed) {
         view.onTextSubmitted(text);
+        return true;
+    }
+
+    function onCancel() {
+        return true;
     }
 }
 

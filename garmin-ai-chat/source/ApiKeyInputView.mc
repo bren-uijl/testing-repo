@@ -14,6 +14,8 @@ class ApiKeyInputView extends WatchUi.View {
     var headerHeight;
     var segmentHeight;
     var scrollOffset;
+    var viewWidth;
+    var viewHeight;
 
     function initialize() {
         View.initialize();
@@ -30,6 +32,8 @@ class ApiKeyInputView extends WatchUi.View {
     function onLayout(dc) {
         storage = Application.getApp().getPropertyStore();
         loadKeyParts();
+        viewWidth = dc.getWidth();
+        viewHeight = dc.getHeight();
     }
 
     function loadKeyParts() {
@@ -125,8 +129,8 @@ class ApiKeyInputView extends WatchUi.View {
     function onTap(evt) {
         var x = evt.getX();
         var y = evt.getY();
-        var width = getWidth();
-        var height = getHeight();
+        var width = viewWidth;
+        var height = viewHeight;
 
         var saveBtnY = height - 40;
         var saveBtnWidth = 80;
@@ -144,29 +148,23 @@ class ApiKeyInputView extends WatchUi.View {
             if (idx >= 0 && idx < segmentCount) {
                 selectedPart = idx;
                 openSegmentInput(idx);
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
         }
     }
 
     function openSegmentInput(idx) {
-        var options = {
-            :title => "Part " + (idx + 1) + "/10 (7 chars)",
-            :maxSize => charsPerSegment
-        };
-
-        WatchUi.invokeTextInput(
-            new ApiKeyTextInputDelegate(self, idx),
-            options
-        );
+        if (WatchUi has :TextPicker) {
+            WatchUi.pushView(new WatchUi.TextPicker(keyParts[idx]), new ApiKeyTextInputDelegate(self, idx), WatchUi.SLIDE_DOWN);
+        }
     }
 
     function onSegmentSubmitted(idx, text) {
         if (text != null) {
-            keyParts.set(idx, text);
+            keyParts[idx] = text;
             storage.setApiKeyPart(idx, text);
         }
-        View.requestUpdate();
+        WatchUi.requestUpdate();
     }
 
     function saveKey() {
@@ -180,33 +178,38 @@ class ApiKeyInputView extends WatchUi.View {
     function onSwipe(evt) {
         var direction = evt.getDirection();
 
-        if (direction == WatchUi.SWIPE_DIRECTION_UP) {
-            if (scrollOffset + (getHeight() - headerHeight - 60) / segmentHeight < segmentCount) {
+        if (direction == WatchUi.SWIPE_UP) {
+            if (scrollOffset + (viewHeight - headerHeight - 60) / segmentHeight < segmentCount) {
                 scrollOffset += 1;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
-        } else if (direction == WatchUi.SWIPE_DIRECTION_DOWN) {
+        } else if (direction == WatchUi.SWIPE_DOWN) {
             if (scrollOffset > 0) {
                 scrollOffset -= 1;
-                View.requestUpdate();
+                WatchUi.requestUpdate();
             }
         }
     }
 }
 
-class ApiKeyTextInputDelegate extends WatchUi.TextConfirmationDelegate {
+class ApiKeyTextInputDelegate extends WatchUi.TextPickerDelegate {
 
     var view;
     var segmentIdx;
 
     function initialize(apiKeyView, idx) {
-        TextConfirmationDelegate.initialize();
+        TextPickerDelegate.initialize();
         view = apiKeyView;
         segmentIdx = idx;
     }
 
-    function onConfirmed(text) {
+    function onTextEntered(text, changed) {
         view.onSegmentSubmitted(segmentIdx, text);
+        return true;
+    }
+
+    function onCancel() {
+        return true;
     }
 }
 
