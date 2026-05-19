@@ -45,6 +45,7 @@ jobs:
             xvfb \
             fluxbox \
             xdotool \
+            x11-utils \
             scrot \
             imagemagick \
             curl \
