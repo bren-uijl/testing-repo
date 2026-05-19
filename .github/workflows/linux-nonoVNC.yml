@@ -11,16 +11,15 @@ jobs:
     steps:
       - name: Install desktop and tools
         run: |
-
           sudo apt-get install -y \
             xfce4 \
             xfce4-goodies \
+            dbus-x11 \
             xvfb \
             x11vnc \
             xdotool \
             scrot \
             imagemagick \
-            xterm \
             wget \
             curl \
             python3
@@ -33,33 +32,26 @@ jobs:
 
       - name: Start virtual display
         run: |
-          Xvfb :0 -screen 0 1280x800x24 &
+          Xvfb :0 -screen 0 1280x800x24 -ac &
           echo "DISPLAY=:0" >> $GITHUB_ENV
-          sleep 2
+          sleep 3
 
-      - name: Start XFCE desktop
-        run: |
-          export DISPLAY=:0
-          startxfce4 &
-          sleep 5
-
-      - name: Open browser or terminal
+      - name: Start XFCE desktop only
         run: |
           export DISPLAY=:0
 
-          if command -v google-chrome >/dev/null 2>&1; then
-            google-chrome \
-              --no-sandbox \
-              --disable-dev-shm-usage \
-              --disable-gpu \
-              https://example.com &
-          elif command -v firefox >/dev/null 2>&1; then
-            firefox https://example.com &
-          else
-            xterm &
-          fi
+          dbus-launch --exit-with-session startxfce4 > xfce.log 2>&1 &
 
-          sleep 5
+          sleep 12
+
+          echo "XFCE log:"
+          cat xfce.log || true
+
+          echo "Visible windows:"
+          xdotool search --onlyvisible --name ".*" getwindowname %@ || true
+
+          echo "Mouse position:"
+          xdotool getmouselocation || true
 
       - name: Create stream folder
         run: |
@@ -87,7 +79,7 @@ jobs:
           EOF
 
           chmod +x screenshot.sh
-          nohup ./screenshot.sh >/dev/null 2>&1 &
+          nohup ./screenshot.sh > screenshot.log 2>&1 &
 
       - name: Create webpage
         run: |
@@ -114,16 +106,12 @@ jobs:
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-
                 width: auto;
                 height: auto;
-
                 max-width: calc(100vw - 105px);
                 max-height: 100vh;
-
                 object-fit: contain;
                 cursor: crosshair;
-
                 user-select: none;
                 -webkit-user-select: none;
               }
@@ -132,35 +120,26 @@ jobs:
                 position: fixed;
                 top: 0;
                 right: 0;
-
                 width: 105px;
                 height: 100vh;
-
                 background: #111;
                 border-left: 1px solid #333;
-
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-
                 padding-top: 10px;
                 box-sizing: border-box;
-
                 z-index: 9999;
               }
 
               .btn {
                 width: 85px;
                 height: 32px;
-
                 margin-bottom: 7px;
-
                 border: none;
                 border-radius: 8px;
-
                 background: #222;
                 color: white;
-
                 cursor: pointer;
                 font-size: 12px;
               }
@@ -172,10 +151,8 @@ jobs:
               #slider {
                 writing-mode: vertical-lr;
                 direction: rtl;
-
                 width: 30px;
                 height: 220px;
-
                 margin-top: 12px;
               }
 
@@ -207,6 +184,7 @@ jobs:
               <button class="btn" id="enter">ENTER</button>
               <button class="btn" id="tab">TAB</button>
               <button class="btn" id="esc">ESC</button>
+              <button class="btn" id="bksp">BKSP</button>
 
               <input
                 id="slider"
@@ -235,7 +213,6 @@ jobs:
               let remoteHeight = 800;
 
               let mouseDown = false;
-
               const held = new Set();
 
               async function send(path) {
@@ -250,7 +227,6 @@ jobs:
 
               async function refresh() {
                 if (loading) return;
-
                 loading = true;
 
                 try {
@@ -274,8 +250,7 @@ jobs:
                     URL.revokeObjectURL(old);
                   }
 
-                  statusBox.innerText =
-                    remoteWidth + "x" + remoteHeight;
+                  statusBox.innerText = remoteWidth + "x" + remoteHeight;
                 } catch (e) {
                   statusBox.innerText = "waiting...";
                 }
@@ -306,7 +281,11 @@ jobs:
                 return {
                   x: Math.round(relX * remoteWidth),
                   y: Math.round(relY * remoteHeight),
-                  inside: relX >= 0 && relX <= 1 && relY >= 0 && relY <= 1
+                  inside:
+                    relX >= 0 &&
+                    relX <= 1 &&
+                    relY >= 0 &&
+                    relY <= 1
                 };
               }
 
@@ -333,12 +312,12 @@ jobs:
               });
 
               screen.addEventListener("mousemove", async (e) => {
-                if (!mouseDown) return;
-
                 const c = coords(e);
                 if (!c.inside) return;
 
-                await send(`/mousemove?x=${c.x}&y=${c.y}`);
+                if (mouseDown) {
+                  await send(`/mousemove?x=${c.x}&y=${c.y}`);
+                }
               });
 
               screen.addEventListener("contextmenu", (e) => {
@@ -350,9 +329,11 @@ jobs:
                 async (e) => {
                   e.preventDefault();
 
-                  const direction = e.deltaY > 0 ? "down" : "up";
+                  const c = coords(e);
+                  if (!c.inside) return;
 
-                  await send(`/scroll?direction=${direction}`);
+                  const direction = e.deltaY > 0 ? "down" : "up";
+                  await send(`/scroll?x=${c.x}&y=${c.y}&direction=${direction}`);
                 },
                 { passive: false }
               );
@@ -382,10 +363,12 @@ jobs:
                   if (held.has(key)) {
                     held.delete(key);
                     btn.classList.remove("active");
+
                     await send(`/keyup?key=${encodeURIComponent(key)}`);
                   } else {
                     held.add(key);
                     btn.classList.add("active");
+
                     await send(`/keydown?key=${encodeURIComponent(key)}`);
                   }
                 });
@@ -396,9 +379,21 @@ jobs:
               toggleButton("shift", "Shift");
               toggleButton("super", "Meta");
 
-              document.getElementById("enter").onclick = () => send("/press?key=Enter");
-              document.getElementById("tab").onclick = () => send("/press?key=Tab");
-              document.getElementById("esc").onclick = () => send("/press?key=Escape");
+              document.getElementById("enter").onclick = () => {
+                send("/press?key=Enter");
+              };
+
+              document.getElementById("tab").onclick = () => {
+                send("/press?key=Tab");
+              };
+
+              document.getElementById("esc").onclick = () => {
+                send("/press?key=Escape");
+              };
+
+              document.getElementById("bksp").onclick = () => {
+                send("/press?key=Backspace");
+              };
 
               startLoop();
               refresh();
@@ -412,22 +407,28 @@ jobs:
           cat > control.py << 'EOF'
           from http.server import BaseHTTPRequestHandler, HTTPServer
           from socketserver import ThreadingMixIn
-
           import os
           import urllib.parse
           import subprocess
 
           ROOT = "stream"
+
           DISPLAY_ENV = dict(os.environ)
           DISPLAY_ENV["DISPLAY"] = ":0"
 
           def run_cmd(args):
-              subprocess.run(
-                  args,
-                  env=DISPLAY_ENV,
-                  stdout=subprocess.DEVNULL,
-                  stderr=subprocess.DEVNULL
-              )
+              try:
+                  print("RUN:", " ".join(args), flush=True)
+
+                  subprocess.run(
+                      args,
+                      env=DISPLAY_ENV,
+                      stdout=subprocess.DEVNULL,
+                      stderr=subprocess.DEVNULL,
+                      timeout=5
+                  )
+              except Exception as e:
+                  print("ERROR:", e, flush=True)
 
           def key_to_xdotool(key):
               mapping = {
@@ -435,22 +436,44 @@ jobs:
                   "Backspace": "BackSpace",
                   "Tab": "Tab",
                   "Escape": "Escape",
+                  "Esc": "Escape",
+
                   "ArrowUp": "Up",
                   "ArrowDown": "Down",
                   "ArrowLeft": "Left",
                   "ArrowRight": "Right",
+
                   "Delete": "Delete",
+                  "Insert": "Insert",
                   "Home": "Home",
                   "End": "End",
                   "PageUp": "Page_Up",
                   "PageDown": "Page_Down",
+
                   "Control": "Control_L",
                   "Alt": "Alt_L",
                   "Shift": "Shift_L",
-                  "Meta": "Super_L"
+                  "Meta": "Super_L",
+
+                  " ": "space",
+                  "Spacebar": "space"
               }
 
               return mapping.get(key, key)
+
+          def mouse_button(browser_button):
+              # Browser MouseEvent.button:
+              # 0 = left
+              # 1 = middle
+              # 2 = right
+              if browser_button == "0":
+                  return "1"
+              if browser_button == "1":
+                  return "2"
+              if browser_button == "2":
+                  return "3"
+
+              return "1"
 
           class Handler(BaseHTTPRequestHandler):
               def log_message(self, format, *args):
@@ -472,13 +495,11 @@ jobs:
                       y = query.get("y", ["0"])[0]
                       button = query.get("button", ["0"])[0]
 
-                      btn = "1"
-                      if button == "2":
-                          btn = "2"
-                      elif button == "1":
-                          btn = "3"
+                      btn = mouse_button(button)
 
-                      run_cmd(["xdotool", "mousemove", x, y, "mousedown", btn])
+                      run_cmd(["xdotool", "mousemove", x, y])
+                      run_cmd(["xdotool", "mousedown", btn])
+
                       self.ok()
                       return
 
@@ -487,13 +508,11 @@ jobs:
                       y = query.get("y", ["0"])[0]
                       button = query.get("button", ["0"])[0]
 
-                      btn = "1"
-                      if button == "2":
-                          btn = "2"
-                      elif button == "1":
-                          btn = "3"
+                      btn = mouse_button(button)
 
-                      run_cmd(["xdotool", "mousemove", x, y, "mouseup", btn])
+                      run_cmd(["xdotool", "mousemove", x, y])
+                      run_cmd(["xdotool", "mouseup", btn])
+
                       self.ok()
                       return
 
@@ -502,11 +521,16 @@ jobs:
                       y = query.get("y", ["0"])[0]
 
                       run_cmd(["xdotool", "mousemove", x, y])
+
                       self.ok()
                       return
 
                   if path == "/scroll":
+                      x = query.get("x", ["0"])[0]
+                      y = query.get("y", ["0"])[0]
                       direction = query.get("direction", ["down"])[0]
+
+                      run_cmd(["xdotool", "mousemove", x, y])
 
                       if direction == "up":
                           run_cmd(["xdotool", "click", "4"])
@@ -519,10 +543,11 @@ jobs:
                   if path == "/keydown":
                       key = query.get("key", [""])[0]
 
-                      if len(key) == 1:
-                          run_cmd(["xdotool", "type", "--delay", "0", key])
-                      else:
-                          run_cmd(["xdotool", "keydown", key_to_xdotool(key)])
+                      if key:
+                          if len(key) == 1:
+                              run_cmd(["xdotool", "type", "--delay", "0", key])
+                          else:
+                              run_cmd(["xdotool", "keydown", key_to_xdotool(key)])
 
                       self.ok()
                       return
@@ -530,8 +555,9 @@ jobs:
                   if path == "/keyup":
                       key = query.get("key", [""])[0]
 
-                      if len(key) != 1:
-                          run_cmd(["xdotool", "keyup", key_to_xdotool(key)])
+                      if key:
+                          if len(key) != 1:
+                              run_cmd(["xdotool", "keyup", key_to_xdotool(key)])
 
                       self.ok()
                       return
@@ -539,7 +565,8 @@ jobs:
                   if path == "/press":
                       key = query.get("key", [""])[0]
 
-                      run_cmd(["xdotool", "key", key_to_xdotool(key)])
+                      if key:
+                          run_cmd(["xdotool", "key", key_to_xdotool(key)])
 
                       self.ok()
                       return
@@ -576,6 +603,7 @@ jobs:
           class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
               daemon_threads = True
 
+          print("Control server running on 0.0.0.0:8080", flush=True)
           ThreadedHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()
           EOF
 
@@ -585,6 +613,8 @@ jobs:
           sleep 2
 
           curl -I http://localhost:8080 || true
+
+          echo "Server log:"
           cat server.log || true
 
       - name: Start Cloudflare tunnel
@@ -610,9 +640,11 @@ jobs:
           echo "$URL"
 
           echo ""
-          echo "NO noVNC"
-          echo "NO WebSockets in the browser page"
-          echo "Plain HTTP image polling"
+          echo "Desktop only."
+          echo "No browser."
+          echo "No terminal."
+          echo "No app opened."
+          echo "Plain HTTP image polling."
           echo "================================="
 
           cat cloudflare.log || true
@@ -622,5 +654,7 @@ jobs:
           while true
           do
             echo "alive $(date)"
+            echo "Mouse:"
+            DISPLAY=:0 xdotool getmouselocation || true
             sleep 60
           done
