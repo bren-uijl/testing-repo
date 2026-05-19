@@ -102,15 +102,54 @@ jobs:
           cat > ~/.config/openbox/rc.xml << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <openbox_config xmlns="http://openbox.org/3.4/rc">
+            <resistance>
+              <strength>10</strength>
+              <screen_edge_strength>20</screen_edge_strength>
+            </resistance>
+
+            <focus>
+              <focusNew>yes</focusNew>
+              <followMouse>no</followMouse>
+              <focusLast>yes</focusLast>
+              <underMouse>no</underMouse>
+              <focusDelay>200</focusDelay>
+              <raiseOnFocus>no</raiseOnFocus>
+            </focus>
+
+            <theme>
+              <name>Clearlooks</name>
+              <titleLayout>NLIMC</titleLayout>
+            </theme>
+
+            <desktops>
+              <number>1</number>
+              <firstdesk>1</firstdesk>
+              <names>
+                <name>Desktop</name>
+              </names>
+            </desktops>
+
             <mouse>
               <context name="Root">
-                Press
+                <mousebind button="Right" action="Press">
                   <action name="ShowMenu">
                     <menu>root-menu</menu>
                   </action>
                 </mousebind>
+
+                <mousebind button="Left" action="Press">
+                  <action name="Focus"/>
+                </mousebind>
               </context>
             </mouse>
+
+            <keyboard>
+              <keybind key="A-space">
+                <action name="ShowMenu">
+                  <menu>root-menu</menu>
+                </action>
+              </keybind>
+            </keyboard>
           </openbox_config>
           EOF
 
