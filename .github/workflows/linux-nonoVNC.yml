@@ -1,4 +1,4 @@
-name: Openbox Input Diagnostics
+name: Openbox Input Diagnostics Fixed
 
 on:
   workflow_dispatch:
@@ -25,6 +25,7 @@ jobs:
             xdotool \
             scrot \
             imagemagick \
+            libxml2-utils \
             python3
 
       - name: Start Xvfb with shared auth
@@ -67,13 +68,13 @@ jobs:
         run: |
           set -euxo pipefail
 
-          mkdir -p ~/.config/openbox
+          mkdir -p ~/.config/openbox artifacts
 
           cat > ~/.config/openbox/menu.xml << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <openbox_menu xmlns="http://openbox.org/3.4/menu">
             <menu id="root-menu" label="Openbox">
-              <item label="Input works">
+              <item label="Write marker file">
                 <action name="Execute">
                   <command>sh -lc 'echo INPUT_WORKS > "$HOME/input_works.txt"'</command>
                 </action>
@@ -127,7 +128,10 @@ jobs:
           echo "=== menu.xml ==="
           cat ~/.config/openbox/menu.xml
 
-      - name: Start Openbox
+          xmllint --noout ~/.config/openbox/rc.xml
+          xmllint --noout ~/.config/openbox/menu.xml
+
+      - name: Start Openbox with explicit config
         run: |
           set -euxo pipefail
 
@@ -136,9 +140,11 @@ jobs:
 
           xsetroot -solid '#202020'
 
-          nohup openbox > openbox.log 2>&1 &
-
+          nohup openbox --config-file "$HOME/.config/openbox/rc.xml" > openbox.log 2>&1 &
           sleep 3
+
+          openbox --reconfigure || true
+          sleep 1
 
           echo "=== openbox.log ==="
           cat openbox.log || true
@@ -150,8 +156,6 @@ jobs:
         run: |
           set -euxo pipefail
 
-          mkdir -p artifacts
-
           cat > screenshot.sh << 'EOF'
           #!/usr/bin/env bash
           set -euo pipefail
@@ -161,11 +165,8 @@ jobs:
           name="$1"
 
           scrot "artifacts/${name}.png"
-
-          echo "Saved artifacts/${name}.png"
           identify "artifacts/${name}.png" || true
 
-          # sample center pixel
           convert "artifacts/${name}.png" \
             -format "%[pixel:p{640,400}]\n" info: \
             > "artifacts/${name}.center-pixel.txt" || true
@@ -186,8 +187,7 @@ jobs:
           export XAUTHORITY=/tmp/xvfb.auth
 
           xdotool mousemove --sync 640 400
-          xdotool getmouselocation > artifacts/02_mouse_after_move.txt
-          cat artifacts/02_mouse_after_move.txt
+          xdotool getmouselocation | tee artifacts/02_mouse_after_move.txt
 
           ./screenshot.sh 02_after_move
 
@@ -200,42 +200,11 @@ jobs:
 
           xdotool mousemove --sync 640 400
           xdotool click 3
-
           sleep 1
 
           ./screenshot.sh 03_menu_opened
 
-      - name: Self-test 3 - select second menu item by keyboard
-        run: |
-          set -euxo pipefail
-
-          export DISPLAY=:0
-          export XAUTHORITY=/tmp/xvfb.auth
-
-          # open menu first
-          xdotool mousemove --sync 640 400
-          xdotool click 3
-          sleep 0.5
-
-          # move from first item ("Input works") to second item ("Blue background")
-          xdotool key Down
-          xdotool key Return
-
-          sleep 1
-
-          ./screenshot.sh 04_after_select_blue
-
-      - name: Self-test 4 - verify pixel changed
-        run: |
-          set -euxo pipefail
-
-          echo "=== Center pixel baseline ==="
-          cat artifacts/01_baseline.center-pixel.txt || true
-
-          echo "=== Center pixel after blue selection ==="
-          cat artifacts/04_after_select_blue.center-pixel.txt || true
-
-      - name: Self-test 5 - select first item and verify command executed
+      - name: Self-test 3 - activate first menu item by keyboard
         run: |
           set -euxo pipefail
 
@@ -244,21 +213,68 @@ jobs:
 
           rm -f "$HOME/input_works.txt"
 
+          # Open the menu
           xdotool mousemove --sync 640 400
           xdotool click 3
-          sleep 0.5
+          sleep 1
 
-          # first item is already selected by default
+          # First item should be selected by default
           xdotool key Return
-          sleep 0.5
+          sleep 1
 
           if [ -f "$HOME/input_works.txt" ]; then
-            echo "Input works marker created."
-            cat "$HOME/input_works.txt"
+            echo "INPUT_WORKS marker created."
+            cat "$HOME/input_works.txt" | tee artifacts/04_marker_contents.txt
           else
-            echo "Marker file NOT created." >&2
+            echo "Marker file was NOT created." | tee artifacts/04_marker_contents.txt
             exit 1
           fi
+
+          ./screenshot.sh 04_after_marker
+
+      - name: Self-test 4 - activate blue background by keyboard
+        run: |
+          set -euxo pipefail
+
+          export DISPLAY=:0
+          export XAUTHORITY=/tmp/xvfb.auth
+
+          # Reset to black first
+          xsetroot -solid '#000000'
+          sleep 1
+          ./screenshot.sh 05_reset_black
+
+          # Open menu
+          xdotool mousemove --sync 640 400
+          xdotool click 3
+          sleep 1
+
+          # Go to "Blue background"
+          xdotool key Down
+          xdotool key Down
+          xdotool key Return
+          sleep 1
+
+          ./screenshot.sh 06_after_select_blue
+
+      - name: Compare pixels
+        run: |
+          set -euxo pipefail
+
+          echo "=== baseline center pixel ===" | tee artifacts/07_pixel_compare.txt
+          cat artifacts/01_baseline.center-pixel.txt | tee -a artifacts/07_pixel_compare.txt || true
+
+          echo "" | tee -a artifacts/07_pixel_compare.txt
+          echo "=== menu-opened center pixel ===" | tee -a artifacts/07_pixel_compare.txt
+          cat artifacts/03_menu_opened.center-pixel.txt | tee -a artifacts/07_pixel_compare.txt || true
+
+          echo "" | tee -a artifacts/07_pixel_compare.txt
+          echo "=== reset-black center pixel ===" | tee -a artifacts/07_pixel_compare.txt
+          cat artifacts/05_reset_black.center-pixel.txt | tee -a artifacts/07_pixel_compare.txt || true
+
+          echo "" | tee -a artifacts/07_pixel_compare.txt
+          echo "=== after-blue center pixel ===" | tee -a artifacts/07_pixel_compare.txt
+          cat artifacts/06_after_select_blue.center-pixel.txt | tee -a artifacts/07_pixel_compare.txt || true
 
       - name: Collect debug info
         if: always()
@@ -268,36 +284,38 @@ jobs:
           export DISPLAY=:0
           export XAUTHORITY=/tmp/xvfb.auth
 
-          echo "=== xdotool mouse location ===" > artifacts/debug.txt
-          xdotool getmouselocation >> artifacts/debug.txt 2>&1
+          {
+            echo "=== xdotool mouse location ==="
+            xdotool getmouselocation
 
-          echo "" >> artifacts/debug.txt
-          echo "=== visible windows ===" >> artifacts/debug.txt
-          xdotool search --onlyvisible --name ".*" getwindowname %@ >> artifacts/debug.txt 2>&1 || true
+            echo
+            echo "=== visible windows ==="
+            xdotool search --onlyvisible --name ".*" getwindowname %@
 
-          echo "" >> artifacts/debug.txt
-          echo "=== processes ===" >> artifacts/debug.txt
-          ps aux | grep -E 'openbox|Xvfb|xdotool' | grep -v grep >> artifacts/debug.txt 2>&1 || true
+            echo
+            echo "=== processes ==="
+            ps aux | grep -E 'openbox|Xvfb|xdotool' | grep -v grep
 
-          echo "" >> artifacts/debug.txt
-          echo "=== rc.xml ===" >> artifacts/debug.txt
-          cat ~/.config/openbox/rc.xml >> artifacts/debug.txt 2>&1 || true
+            echo
+            echo "=== rc.xml ==="
+            cat ~/.config/openbox/rc.xml
 
-          echo "" >> artifacts/debug.txt
-          echo "=== menu.xml ===" >> artifacts/debug.txt
-          cat ~/.config/openbox/menu.xml >> artifacts/debug.txt 2>&1 || true
+            echo
+            echo "=== menu.xml ==="
+            cat ~/.config/openbox/menu.xml
 
-          echo "" >> artifacts/debug.txt
-          echo "=== xvfb.log ===" >> artifacts/debug.txt
-          cat xvfb.log >> artifacts/debug.txt 2>&1 || true
+            echo
+            echo "=== xvfb.log ==="
+            cat xvfb.log
 
-          echo "" >> artifacts/debug.txt
-          echo "=== openbox.log ===" >> artifacts/debug.txt
-          cat openbox.log >> artifacts/debug.txt 2>&1 || true
+            echo
+            echo "=== openbox.log ==="
+            cat openbox.log
+          } > artifacts/debug.txt 2>&1
 
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: openbox-input-diagnostics
+          name: openbox-input-diagnostics-fixed
           path: artifacts/
