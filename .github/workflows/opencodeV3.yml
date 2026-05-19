@@ -530,6 +530,8 @@ jobs:
           sudo ln -sf /tmp/ui /usr/local/bin/ui
 
       - name: Run OpenCode with GUI access
+        env:
+          USER_PROMPT: ${{ inputs.prompt }}
         working-directory: ${{ github.workspace }}/${{ inputs.working_directory }}
         run: |
           echo "Live side-by-side UI and terminal stream:"
@@ -548,14 +550,10 @@ jobs:
             echo ""
           } | tee -a /tmp/opencode-output.log
 
-          opencode run --model "${{ inputs.model }}" "$(cat <<'PROMPT'
-          ${{ inputs.prompt }}
-
+          cat > /tmp/opencode-extra-prompt.txt <<'PROMPT'
           You are running in GitHub Actions on Linux with a virtual desktop.
 
-          The desktop is available on DISPLAY=:99.
-
-          The desktop is ${SCREEN_WIDTH}x${SCREEN_HEIGHT}
+          The desktop is available on DISPLAY=:99, and it is 1440×900
 
           You can control the UI with these shell commands:
           - ui screenshot
@@ -569,6 +567,8 @@ jobs:
 
           Use screenshots before clicking.
           If you need to launch a GUI app, launch it with DISPLAY=:99.
+          FULL_PROMPT="$(printf '%s\n\n%s\n' "$USER_PROMPT" "$(cat /tmp/opencode-extra-prompt.txt)")"
+          opencode run "$FULL_PROMPT" --model "${{ inputs.model }}" 2>&1 | tee -a /tmp/opencode-output.log
 
       - name: Upload UI logs and screenshots
         if: always()
