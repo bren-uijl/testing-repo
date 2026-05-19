@@ -153,6 +153,54 @@ monkeyc -w -y developer_key.der -f monkey.jungle -o dist/AIChat.prg \
   -z resources/ -z phone/resources/
 ```
 
+## Simulator Setup (Important!)
+
+The Connect IQ SDK requires device files to compile and run the simulator. These files are NOT included in the SDK download and must be downloaded separately via the SDK Manager.
+
+### SDK Setup Steps
+1. Download SDK from: https://developer.garmin.com/connect-iq/sdk/
+2. The SDK manager GUI is required to download device files
+3. On Linux, the SDK manager has dependency issues with libsoup2/libsoup3 conflict on Ubuntu 24.04
+4. Device files are stored at: `~/.Garmin/ConnectIQ/Devices/`
+5. Each device has a folder with `compiler.json`, `simulator.json`, and other files
+
+### Alternative: Use pcolby's AppImage
+For Linux systems, use the AppImage versions from https://github.com/pcolby/connectiq-sdk-manager:
+```bash
+curl -sL https://raw.githubusercontent.com/pcolby/connectiq-sdk-manager/main/install.sh | bash -r
+```
+This installs AppImages at `~/.Garmin/ConnectIQ/AppImages/`
+
+### Running the Simulator
+```bash
+# Start Xvfb for headless display
+Xvfb :99 -screen 0 1920x1080x24 &
+export DISPLAY=:99
+
+# Run simulator with AppImage
+~/.Garmin/ConnectIQ/AppImages/Connect_IQ_Simulator-9.1.0+159-x86_64.AppImage --appimage-extract-and-run
+
+# Or use monkeydo with SDK
+export CONNECTIQ_SDK_DIR=/path/to/connectiq-sdk
+$CONNECTIQ_SDK_DIR/bin/monkeydo dist/AIChat.prg vivoactive5
+```
+
+### Known SDK Issues on Ubuntu 24.04
+- SDK manager crashes due to libsoup2/libsoup3 conflict
+- Workaround: Use pcolby's AppImage which bundles dependencies
+- Device files require authentication to download from Garmin API
+- Manual device file creation is possible but complex (requires specific JSON structure)
+
+## Bugs Fixed
+
+### v1.2.1 - Critical Bug Fixes
+1. **Missing onSendComplete method in MessageInputView**: The `SendCallback` class was calling `view.onSendComplete(response, error)` but this method didn't exist in `MessageInputView`. This caused a runtime crash when the API response was received. Fixed by adding the method.
+
+2. **Empty try-catch blocks**: Removed empty try-catch blocks in:
+   - `MessageInputView.sendMessage()` (lines 157-160)
+   - `ConversationView.onSendComplete()` (lines 356-359, 368-371)
+   These were likely leftover from removed code and served no purpose.
+
 ## Next Steps for Future Self
 
 ### Completed Features (v1.2.0)
