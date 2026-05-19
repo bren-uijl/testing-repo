@@ -138,7 +138,7 @@ jobs:
           echo ""
 
           opencode run -- "$FULL_PROMPT" \
-            --model "$INPUT_MODEL" \
+            --model "opencode/qwen3.6-plus-free" \
             --thinking \
             --dangerously-skip-permissions
 
