@@ -30,7 +30,7 @@ jobs:
     env:
       DISPLAY: ":99"
       STREAM_PORT: "8765"
-      SCREEN_WIDTH: "1280"
+      SCREEN_WIDTH: "1440"
       SCREEN_HEIGHT: "900"
 
     steps:
@@ -41,7 +41,6 @@ jobs:
 
       - name: Install Linux GUI, automation, and HTTP stream dependencies
         run: |
-          sudo apt-get update
           sudo apt-get install -y \
             xvfb \
             fluxbox \
@@ -530,10 +529,6 @@ jobs:
           sudo ln -sf /tmp/ui /usr/local/bin/ui
 
       - name: Run OpenCode with GUI access
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY }}
         working-directory: ${{ github.workspace }}/${{ inputs.working_directory }}
         run: |
           echo "Live side-by-side UI and terminal stream:"
@@ -559,12 +554,7 @@ jobs:
 
           The desktop is available on DISPLAY=:99.
 
-          The user can watch the live side-by-side GUI and terminal stream here:
-          ${{ env.STREAM_URL }}
-
-          The stream uses HTTP only. It does not use WebSockets.
-
-          The GUI stream is 1:1 pixel size.
+          The desktop is ${SCREEN_WIDTH}x${SCREEN_HEIGHT}
 
           You can control the UI with these shell commands:
           - ui screenshot
@@ -578,10 +568,6 @@ jobs:
 
           Use screenshots before clicking.
           If you need to launch a GUI app, launch it with DISPLAY=:99.
-
-          If a captcha appears, do not solve or bypass it. Report that a captcha blocked automation and suggest using test or development captcha settings.
-          PROMPT
-          )" 2>&1 | tee -a /tmp/opencode-output.log
 
       - name: Upload UI logs and screenshots
         if: always()
