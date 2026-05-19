@@ -137,7 +137,7 @@ jobs:
           echo "Prompt length: ${#FULL_PROMPT} characters"
           echo ""
 
-          opencode run -- "$FULL_PROMPT" --model "opencode/qwen3.6-plus-free" --thinking --dangerously-skip-permissions
+          opencode run -- "$FULL_PROMPT" --model opencode/qwen3.6-plus-free --thinking --dangerously-skip-permissions
 
       - name: Capture run summary
         if: always()
