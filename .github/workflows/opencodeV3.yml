@@ -1,4 +1,4 @@
-name: OpenCode Auto Run v2
+name: OpenCode Auto Run v3
 
 on:
   workflow_dispatch:
