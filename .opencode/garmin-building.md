@@ -1,26 +1,25 @@
 # Garmin AI Chat - Building Guide (SDK 9.1.0)
 
-> Updated: May 18, 2026 | SDK 9.1.0 | API Level 5.2+
+> Updated: May 19, 2026 | SDK 9.1.0 | API Level 5.2+ | BUILD STATUS: SUCCESSFUL
 
 ## Status
 
-The app has been updated for SDK 9.1.0 syntax compatibility. The following changes were made:
+The app has been successfully migrated to SDK 9.1.0 and builds without errors.
 
-### Syntax Fixes Applied
+### Build Command
 
-1. **Class declarations** - Added missing opening braces `{` after class declarations
-2. **Closing braces** - Replaced `end` keywords with `}` (SDK 9.1.0 requires brace syntax)
+```bash
+cd garmin-ai-chat
+/opt/connectiq-sdk/bin/monkeyc -w -y /tmp/developer_key.der -f monkey.jungle -o dist/AIChat.prg -b /opt/connectiq-sdk/bin/api.mir
+```
 
-### Remaining Build Issues
+### Output
 
-The build does not complete successfully due to API changes in SDK 9.1.0:
+- `dist/AIChat.prg` - 147KB watch app PRG file
 
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| `Toybox.Json` module not found | JSON moved to `Toybox.Communications` | Use `Communications.makeWebRequest()` |
-| `TextConfirmationDelegate` not found | Renamed to `ConfirmationDelegate` | Update class references |
-| `WebResponseDelegate` not found | API restructured | Check SDK 9.1.0 API docs |
-| Phone app compilation | Phone API differs from watch | Build watch app separately |
+## Migration Details
+
+See `.opencode/garmin-sdk-910-migration.md` for complete API change documentation.
 
 ## Build Environment Setup
 
