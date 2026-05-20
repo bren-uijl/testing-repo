@@ -1,0 +1,13 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "gui-controller": {
+      "type": "local",
+      "command": ["python3", "gui-controller/mcp_server.py"],
+      "enabled": false,
+      "environment": {
+        "DISPLAY": ":99"
+      }
+    }
+  }
+}
