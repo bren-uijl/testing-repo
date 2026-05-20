@@ -15,14 +15,14 @@ class GUIController:
     def __init__(self, resolution: Resolution = None):
         self.display_manager = DisplayManager(resolution or Resolution.full_hd())
         self.input = None
-        self.screenshot = None
+        self.screenshot_manager = None
         self._started = False
 
     def start(self):
         display = self.display_manager.start()
         os.environ["DISPLAY"] = display
         self.input = InputController(self.display_manager)
-        self.screenshot = ScreenshotManager(self.display_manager)
+        self.screenshot_manager = ScreenshotManager(self.display_manager)
         self._started = True
         return self
 
@@ -43,12 +43,15 @@ class GUIController:
         return process
 
     def wait_for_window(self, window_name: str, timeout: int = 30) -> bool:
+        env = os.environ.copy()
+        env["DISPLAY"] = self.display_manager.display
         start = time.time()
         while time.time() - start < timeout:
             result = subprocess.run(
-                ["xdotool", "--display", self.display_manager.display, "search", "--name", window_name],
+                ["xdotool", "search", "--name", window_name],
                 capture_output=True,
                 text=True,
+                env=env,
             )
             if result.stdout.strip():
                 return True
@@ -56,16 +59,20 @@ class GUIController:
         return False
 
     def focus_window(self, window_name: str) -> bool:
+        env = os.environ.copy()
+        env["DISPLAY"] = self.display_manager.display
         result = subprocess.run(
-            ["xdotool", "--display", self.display_manager.display, "search", "--name", window_name],
+            ["xdotool", "search", "--name", window_name],
             capture_output=True,
             text=True,
+            env=env,
         )
         window_id = result.stdout.strip().split("\n")[0]
         if window_id:
             subprocess.run(
-                ["xdotool", "--display", self.display_manager.display, "windowactivate", "--sync", window_id],
+                ["xdotool", "windowactivate", "--sync", window_id],
                 capture_output=True,
+                env=env,
             )
             return True
         return False
@@ -86,10 +93,10 @@ class GUIController:
         self.input.key_combo(*keys)
 
     def screenshot(self, filename: str = None) -> str:
-        return self.screenshot.capture_and_save(filename)
+        return self.screenshot_manager.capture_and_save(filename)
 
     def get_pixel(self, x: int, y: int) -> tuple:
-        return self.screenshot.get_pixel_color(x, y)
+        return self.screenshot_manager.get_pixel_color(x, y)
 
     def __enter__(self):
         self.start()

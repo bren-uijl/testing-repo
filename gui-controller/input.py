@@ -1,3 +1,4 @@
+import os
 import subprocess
 import time
 from display import DisplayManager
@@ -7,10 +8,12 @@ class InputController:
     def __init__(self, display_manager: DisplayManager):
         self.display = display_manager.display
         self.display_manager = display_manager
+        self._env = os.environ.copy()
+        self._env["DISPLAY"] = self.display
 
     def _run_xdotool(self, *args):
-        cmd = ["xdotool", "--display", self.display] + list(args)
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        cmd = ["xdotool"] + list(args)
+        result = subprocess.run(cmd, capture_output=True, text=True, env=self._env)
         return result
 
     def _run_xte(self, *args):
