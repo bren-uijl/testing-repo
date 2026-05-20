@@ -13,13 +13,58 @@ gui-controller/
 ├── input.py            # InputController for mouse/keyboard
 ├── screenshot.py       # ScreenshotManager for screen capture
 ├── minesweeper.py      # Minesweeper game player (demo)
+├── mcp_server.py       # MCP server exposing GUI operations
 ├── test_gui.py         # Unit tests
 ├── test_visual.py      # Visual tests with x11 apps
 ├── test_minesweeper_grid.py  # Grid interaction test
 └── requirements.txt    # Python dependencies
 ```
 
-## Quick Start
+## MCP Server (Primary Interface)
+
+When GUI tools are enabled in the workflow, an MCP server is automatically configured and available. Use it as the primary interface for GUI operations.
+
+### Available MCP Tools
+
+| Tool | Description | Example |
+|------|-------------|---------|
+| `screenshot` | Take a screenshot | `use gui-controller to take a screenshot` |
+| `click` | Click at (x, y) | `use gui-controller to click at 400 300` |
+| `move_mouse` | Move mouse to position | `use gui-controller to move mouse to 600 400` |
+| `double_click` | Double-click at position | `use gui-controller to double click at 400 300` |
+| `drag` | Drag from one point to another | `use gui-controller to drag from 100 100 to 500 500` |
+| `type_text` | Type text | `use gui-controller to type "Hello World"` |
+| `press_key` | Press a single key | `use gui-controller to press Return` |
+| `key_combo` | Press key combination | `use gui-controller to press ctrl+c` |
+| `scroll` | Scroll up/down | `use gui-controller to scroll 5` |
+| `launch_app` | Launch a GUI app | `use gui-controller to launch xeyes` |
+| `wait_for_window` | Wait for window to appear | `use gui-controller to wait for Calculator` |
+| `focus_window` | Focus/activate a window | `use gui-controller to focus Calculator` |
+| `get_pixel_color` | Get RGB color at pixel | `use gui-controller to get pixel color at 400 300` |
+| `get_mouse_position` | Get current mouse position | `use gui-controller to get mouse position` |
+| `get_display_info` | Get display info | `use gui-controller to get display info` |
+
+### Usage Pattern
+
+1. Launch an application using `launch_app`
+2. Wait for the window using `wait_for_window`
+3. Interact using `click`, `type_text`, `key_combo`, etc.
+4. Take screenshots using `screenshot` to verify state
+
+### Example Workflow
+
+```
+use gui-controller to launch gnome-calculator
+use gui-controller to wait for Calculator
+use gui-controller to click at 400 300
+use gui-controller to take a screenshot
+```
+
+## Python Framework (Fallback)
+
+For complex automation or when MCP is not available, use the Python framework directly.
+
+### Quick Start
 
 ```python
 from gui_controller import GUIController, Resolution
