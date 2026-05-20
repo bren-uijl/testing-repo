@@ -60,6 +60,11 @@ jobs:
           echo "body<<EOF" >> $GITHUB_OUTPUT
           echo "${{ github.event.issue.body }}" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+          gh issue view "$ISSUE_NUMBER" >> $FULL_ISSUE_BODY
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
 
       - name: Create issue branch
         id: branch
@@ -67,11 +72,11 @@ jobs:
           BRANCH="opencode/issue-${ISSUE_NUMBER}"
           git checkout -b "$BRANCH"
           echo "branch=$BRANCH" >> $GITHUB_OUTPUT
-
+          
       - name: comment starting work
         run: |
           gh issue comment "$ISSUE_NUMBER" \
-            --body "🤖 OpenCode is analyzing this issue and will decide how to proceed..."
+            --body ":copilot: Vinkbot is analyzing this issue and will decide how to proceed..."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -85,6 +90,9 @@ jobs:
 
           ISSUE DESCRIPTION:
           ${{ steps.issue.outputs.body }}
+
+          FULL ISSUE DISCUSSION:
+          $FULL_ISSUE_BODY
 
           PHASE 1 - DECISION (do this first):
           Analyze the issue and decide one of:
@@ -154,7 +162,7 @@ jobs:
         if: steps.decision.outputs.decision != 'ACCEPT'
         run: |
           gh issue comment "$ISSUE_NUMBER" \
-            --body "🤖 OpenCode analysis complete.
+            --body "🦉 Vinkbot analysis complete.
 
             **Decision:** ${{ steps.decision.outputs.decision }}
             **Reason:** ${{ steps.decision.outputs.reason }}
