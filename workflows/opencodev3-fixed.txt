@@ -132,23 +132,7 @@ jobs:
           HEIGHT=$(echo $RESOLUTION | cut -d'x' -f2)
 
           if [ -f opencode.json ]; then
-            python3 -c "
-            import json
-            with open('opencode.json', 'r') as f:
-                config = json.load(f)
-            config['mcp']['gui-controller']['enabled'] = True
-            config['mcp']['gui-controller']['environment']['DISPLAY'] = ':99'
-            config['mcp']['gui-controller']['environment']['GUI_WIDTH'] = '${WIDTH}'
-            config['mcp']['gui-controller']['environment']['GUI_HEIGHT'] = '${HEIGHT}'
-            config['permission'] = {
-                'edit': {
-                    '*.j**ml': 'deny',
-                    '**': 'allow'
-                }
-            }
-            with open('opencode.json', 'w') as f:
-                json.dump(config, f, indent=2)
-            "
+            python3 -c "import json,os;f=open('opencode.json','r');config=json.load(f);f.close();config['mcp']['gui-controller']={'enabled':True,'environment':{'DISPLAY':':99','GUI_WIDTH':os.environ.get('GUI_WIDTH','1280'),'GUI_HEIGHT':os.environ.get('GUI_HEIGHT','720')}};config['permission']={'edit':{'*.j**ml':'deny','**':'allow'}};f=open('opencode.json','w');json.dump(config,f,indent=2);f.close()"
             echo "MCP server enabled in opencode.json"
             cat opencode.json
           fi
