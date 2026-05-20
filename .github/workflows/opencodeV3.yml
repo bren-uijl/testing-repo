@@ -123,6 +123,33 @@ jobs:
           xdotool getmouselocation --shell
           echo "GUI tools verified successfully"
 
+      - name: Configure GUI MCP server
+        if: github.event.inputs.enable_gui == 'true'
+        run: |
+          echo "=== Configuring GUI MCP Server ==="
+          RESOLUTION="${{ github.event.inputs.gui_resolution }}"
+          WIDTH=$(echo $RESOLUTION | cut -d'x' -f1)
+          HEIGHT=$(echo $RESOLUTION | cut -d'x' -f2)
+
+          if [ -f opencode.json ]; then
+            python3 -c "
+            import json
+            with open('opencode.json', 'r') as f:
+                config = json.load(f)
+            config['mcp']['gui-controller']['enabled'] = True
+            config['mcp']['gui-controller']['environment']['DISPLAY'] = ':99'
+            config['mcp']['gui-controller']['environment']['GUI_WIDTH'] = '${WIDTH}'
+            config['mcp']['gui-controller']['environment']['GUI_HEIGHT'] = '${HEIGHT}'
+            with open('opencode.json', 'w') as f:
+                json.dump(config, f, indent=2)
+            "
+            echo "MCP server enabled in opencode.json"
+            cat opencode.json
+          fi
+
+          pip3 install --user mcp
+          echo "GUI MCP server configured successfully"
+
       - name: Install OpenCode
         run: |
           curl -fsSL https://opencode.ai/install | bash
@@ -135,8 +162,8 @@ jobs:
 
       - name: Configure git
         run: |
-          git config user.name "Vinkbot"
-          git config user.email "272188895+Vinkbot@users.noreply.github.com"
+          git config user.name "opencode-agent[bot]"
+          git config user.email "opencode-agent@users.noreply.github.com"
 
       - name: Run OpenCode
         id: opencode_run
@@ -187,35 +214,59 @@ jobs:
 
           TIME CONSTRAINT: You have 6 hours to complete your task. thats pretty much. check how late it is when you start, i want you to work for at least 2 hours."
 
-          if [ "$INPUT_ENABLE_GUI" = "true" ]; then
-            GUI_CAPABILITIES="
-            GUI CAPABILITIES:
-            You have access to a virtual X11 display (DISPLAY=:99) with GUI interaction tools.
-            The gui-controller/ directory contains a Python-based GUI automation framework:
+           if [ "$INPUT_ENABLE_GUI" = "true" ]; then
+             GUI_CAPABILITIES="
+             GUI CAPABILITIES:
+             You have access to a virtual X11 display (DISPLAY=:99) with GUI interaction tools.
 
-            - DisplayManager: Manages Xvfb virtual display with configurable resolution
-            - InputController: Mouse/keyboard control via xdotool (click, move, drag, type, keys)
-            - ScreenshotManager: Screen capture via mss library with pixel analysis
-            - GUIController: Main orchestrator combining all components
+             PRIMARY: Use the gui-controller MCP server for all GUI operations.
+             The MCP server is already configured and provides these tools:
+             - screenshot: Take a screenshot and save to gui-controller/screenshots/
+             - click: Click at (x, y) coordinates
+             - move_mouse: Move mouse to (x, y)
+             - double_click: Double-click at (x, y)
+             - drag: Drag from (x1, y1) to (x2, y2)
+             - type_text: Type text via virtual keyboard
+             - press_key: Press a single key
+             - key_combo: Press key combinations (e.g., ctrl+c)
+             - scroll: Scroll up/down
+             - launch_app: Launch a GUI application
+             - wait_for_window: Wait for a window to appear
+             - focus_window: Focus/activate a window
+             - get_pixel_color: Get RGB color at (x, y)
+             - get_mouse_position: Get current mouse position
+             - get_display_info: Get display resolution info
 
-            Usage example:
-            \`\`\`python
-            from gui_controller import GUIController, Resolution
+             Use MCP tools by referencing gui-controller in your prompts, e.g.:
+             'use gui-controller to take a screenshot'
+             'use gui-controller to click at 400 300'
+             'use gui-controller to launch xeyes'
 
-            with GUIController(Resolution(1280, 720)) as controller:
-                controller.launch_app('xeyes')
-                controller.click_at(400, 300)
-                controller.screenshot('output.png')
-            \`\`\`
+             FALLBACK: The gui-controller/ directory also contains a Python framework:
+             - DisplayManager: Manages Xvfb virtual display
+             - InputController: Mouse/keyboard control via xdotool
+             - ScreenshotManager: Screen capture via mss with pixel analysis
+             - GUIController: Main orchestrator combining all components
+             - MinesweeperPlayer: Demo game player for gnome-mines
 
-            Available tools in the environment:
-            - xdotool: Mouse/keyboard simulation
-            - xvfb: Virtual framebuffer (running on :99)
-            - scrot: Screenshot capture
-            - Python libraries: Pillow, mss, pyautogui
+             Python usage example:
+             \`\`\`python
+             from gui_controller import GUIController, Resolution
 
-            You can use these to interact with GUI applications, take screenshots,
-            automate testing, or play games like minesweeper."
+             with GUIController(Resolution(1280, 720)) as controller:
+                 controller.launch_app('xeyes')
+                 controller.click_at(400, 300)
+                 controller.screenshot('output.png')
+             \`\`\`
+
+             Environment tools available:
+             - xdotool: Mouse/keyboard simulation
+             - xvfb: Virtual framebuffer (running on :99)
+             - scrot: Screenshot capture
+             - Python libraries: Pillow, mss, pyautogui
+
+             You can use these to interact with GUI applications, take screenshots,
+             automate testing, or play games like minesweeper."
           else
             GUI_CAPABILITIES=""
           fi
