@@ -1,0 +1,300 @@
+name: OpenCode Auto Run v3 - GUI Enabled
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: "What should OpenCode do? Be specific for best results."
+        required: true
+        default: "Inspect this project and improve it where useful."
+      branch:
+        description: "Branch to run on"
+        required: true
+        default: "main"
+      model:
+        description: "AI model to use"
+        required: false
+        default: "opencode/qwen3.6-plus-free"
+      working_directory:
+        description: "Subdirectory to work in (leave empty for repo root)"
+        required: false
+        default: ""
+      enable_gui:
+        description: "Enable GUI interaction capabilities (xdotool, xvfb, etc.)"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      gui_resolution:
+        description: "Virtual display resolution (width x height)"
+        required: false
+        default: "1280x720"
+
+permissions: write-all
+
+jobs:
+  opencode:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Pre-flight checks
+        id: preflight
+        run: |
+          echo "=== Environment Info ==="
+          echo "Runner OS: $RUNNER_OS"
+          echo "Node version: $(node --version 2>/dev/null || echo 'not installed')"
+          echo "Python version: $(python3 --version 2>/dev/null || echo 'not installed')"
+          echo "Disk space: $(df -h / | tail -1)"
+          echo "Memory: $(free -h | grep Mem)"
+          echo ""
+          echo "=== Repository State ==="
+          echo "Current branch: $(git branch --show-current)"
+          echo "Last commit: $(git log -1 --oneline)"
+          echo "File count: $(find . -not -path './.git/*' -type f | wc -l)"
+          echo ""
+
+          if [ -n "${{ github.event.inputs.working_directory }}" ]; then
+            if [ ! -d "${{ github.event.inputs.working_directory }}" ]; then
+              echo "::error::Working directory '${{ github.event.inputs.working_directory }}' does not exist"
+              exit 1
+            fi
+            echo "Working directory verified: ${{ github.event.inputs.working_directory }}"
+          fi
+
+      - name: Install base dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends curl git jq
+
+      - name: Install GUI dependencies
+        if: github.event.inputs.enable_gui == 'true'
+        run: |
+          echo "=== Installing GUI Dependencies ==="
+          sudo apt-get install -y --no-install-recommends \
+            xvfb \
+            xdotool \
+            x11-utils \
+            x11-xserver-utils \
+            x11-apps \
+            scrot \
+            python3-pip \
+            python3-venv
+
+          pip3 install --user Pillow mss pyautogui python-xlib
+
+          echo "GUI dependencies installed successfully"
+
+      - name: Setup virtual display
+        if: github.event.inputs.enable_gui == 'true'
+        run: |
+          echo "=== Setting up Virtual Display ==="
+          RESOLUTION="${{ github.event.inputs.gui_resolution }}"
+          WIDTH=$(echo $RESOLUTION | cut -d'x' -f1)
+          HEIGHT=$(echo $RESOLUTION | cut -d'x' -f2)
+
+          Xvfb :99 -screen 0 "${WIDTH}x${HEIGHT}x24" -ac +extension GLX +render -noreset &
+          sleep 2
+
+          export DISPLAY=:99
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+
+          echo "Virtual display started at :99 with resolution ${RESOLUTION}"
+          xdpyinfo -display :99 | head -20 || true
+
+      - name: Verify GUI tools
+        if: github.event.inputs.enable_gui == 'true'
+        run: |
+          echo "=== Verifying GUI Tools ==="
+          export DISPLAY=:99
+
+          echo "xdotool version: $(xdotool --version 2>&1 || echo 'not found')"
+          echo "Testing mouse movement..."
+          xdotool mousemove 100 100
+          xdotool getmouselocation --shell
+          echo "GUI tools verified successfully"
+
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Verify OpenCode
+        run: |
+          opencode --version
+          echo "OpenCode installed successfully"
+
+      - name: Configure git
+        run: |
+          git config user.name "opencode-agent[bot]"
+          git config user.email "opencode-agent@users.noreply.github.com"
+
+      - name: Run OpenCode
+        id: opencode_run
+        env:
+          INPUT_PROMPT: ${{ github.event.inputs.prompt }}
+          INPUT_MODEL: ${{ github.event.inputs.model }}
+          INPUT_DIR: ${{ github.event.inputs.working_directory }}
+          INPUT_ENABLE_GUI: ${{ github.event.inputs.enable_gui }}
+          INPUT_GUI_RESOLUTION: ${{ github.event.inputs.gui_resolution }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TARGET_DIR="."
+          if [ -n "$INPUT_DIR" ]; then
+            TARGET_DIR="$INPUT_DIR"
+          fi
+
+          cd "$TARGET_DIR"
+
+          SYSTEM_PROMPT="You are an autonomous AI agent running in GitHub Actions. You have the following characteristics and constraints:
+          ROLE: You are a skilled software engineer with expertise in code review, refactoring, bug fixing, and feature implementation.
+          BEHAVIOR RULES:
+          1. Always read and understand existing code before making changes
+          2. Follow the existing code style and conventions of the project
+          3. Make incremental, well-tested changes
+          4. Never break existing functionality
+          5. Write clear, concise code without unnecessary comments
+          6. Prefer editing existing files over creating new ones
+          7. Always verify your changes work before committing
+          WORKFLOW:
+          1. Explore the codebase to understand structure and conventions
+          2. Plan your changes mentally before executing
+          3. Make one logical change at a time
+          4. After each file edit, commit immediately with a descriptive message
+          5. Run any available tests or linting after changes
+          6. If something fails, diagnose and fix before proceeding
+          7. Push before you stop.
+
+          COMMIT STANDARDS:
+          - Use conventional commit format when possible (feat:, fix:, refactor:, docs:, chore:)
+          - Keep commits atomic - one logical change per commit
+          - Write meaningful commit messages that explain WHAT and WHY
+          - Git config is already done.
+
+          ERROR HANDLING:
+          - If a tool fails, retry once with adjusted parameters
+          - If stuck, document the issue in a comment and move on
+          - Never leave the codebase in a broken state
+
+          TIME CONSTRAINT: You have 6 hours to complete your task. thats pretty much. check how late it is when you start, i want you to work for at least 2 hours."
+
+          if [ "$INPUT_ENABLE_GUI" = "true" ]; then
+            GUI_CAPABILITIES="
+            GUI CAPABILITIES:
+            You have access to a virtual X11 display (DISPLAY=:99) with GUI interaction tools.
+            The gui-controller/ directory contains a Python-based GUI automation framework:
+
+            - DisplayManager: Manages Xvfb virtual display with configurable resolution
+            - InputController: Mouse/keyboard control via xdotool (click, move, drag, type, keys)
+            - ScreenshotManager: Screen capture via mss library with pixel analysis
+            - GUIController: Main orchestrator combining all components
+
+            Usage example:
+            ```python
+            from gui_controller import GUIController, Resolution
+
+            with GUIController(Resolution(1280, 720)) as controller:
+                controller.launch_app('xeyes')
+                controller.click_at(400, 300)
+                controller.screenshot('output.png')
+            ```
+
+            Available tools in the environment:
+            - xdotool: Mouse/keyboard simulation
+            - xvfb: Virtual framebuffer (running on :99)
+            - scrot: Screenshot capture
+            - Python libraries: Pillow, mss, pyautogui
+
+            You can use these to interact with GUI applications, take screenshots,
+            automate testing, or play games like minesweeper."
+          else
+            GUI_CAPABILITIES=""
+          fi
+
+          FULL_PROMPT="${SYSTEM_PROMPT}${GUI_CAPABILITIES}
+          USER REQUEST: ${INPUT_PROMPT}
+          Remember: After each edit, commit what you've done. Write instructions for your future self down in a .opencode folder."
+
+          echo "=== Starting OpenCode Run ==="
+          echo "Model: $INPUT_MODEL"
+          echo "Working directory: $TARGET_DIR"
+          echo "GUI enabled: $INPUT_ENABLE_GUI"
+          echo "GUI resolution: $INPUT_GUI_RESOLUTION"
+          printf 'User prompt: %s\n' "$INPUT_PROMPT"
+          echo "Prompt length: ${#FULL_PROMPT} characters"
+          echo ""
+
+          opencode run "$FULL_PROMPT" --model opencode/qwen3.6-plus-free --thinking --dangerously-skip-permissions
+
+      - name: Capture run summary
+        if: always()
+        run: |
+          echo "=== Run Summary ==="
+          echo "Status: ${{ steps.opencode_run.outcome }}"
+          echo "Branch: ${{ github.event.inputs.branch }}"
+          echo "Model: ${{ github.event.inputs.model }}"
+          echo "GUI enabled: ${{ github.event.inputs.enable_gui }}"
+          echo ""
+          echo "=== Git Status ==="
+          git status
+          echo ""
+          echo "=== Recent Commits ==="
+          git log --oneline -10 || true
+          echo ""
+          echo "=== Changes Summary ==="
+          git diff --stat HEAD~1..HEAD 2>/dev/null || echo "No previous commit to compare"
+
+      - name: Capture GUI screenshots
+        if: always() && github.event.inputs.enable_gui == 'true'
+        run: |
+          echo "=== Capturing Final GUI State ==="
+          export DISPLAY=:99
+          if command -v scrot &> /dev/null; then
+            scrot /tmp/final_gui_state.png || true
+            echo "Final GUI screenshot saved"
+          fi
+
+      - name: Commit remaining changes
+        if: always()
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add -A
+
+          git commit -m "opencode: automated changes from workflow run
+
+          Triggered by: ${{ github.actor }}
+          Model: ${{ github.event.inputs.model }}
+          Branch: ${{ github.event.inputs.branch }}
+          GUI enabled: ${{ github.event.inputs.enable_gui }}"
+
+      - name: Push changes
+        if: always()
+        run: |
+          git push origin HEAD:${{ github.event.inputs.branch }}
+
+      - name: Upload run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencode-run-output
+          path: |
+            **/*.md
+            **/*.txt
+            **/*.png
+            **/*.jpg
+            **/screenshots/**
+          retention-days: 30
+          if-no-files-found: ignore
