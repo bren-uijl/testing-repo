@@ -1,7 +1,7 @@
 <h1 align="center">Testing Repo</h1>
 
 <p align="center">
-  An experimental repository for AI-driven development workflows and applications.
+  A sandbox for playing around with AI coding tools and workflows.
 </p>
 
 <p align="center">
@@ -12,15 +12,15 @@
 
 ---
 
-## Overview
+## What's Here
 
-This repository contains experimental projects and automation workflows powered by AI coding agents. It serves as a testing ground for autonomous development pipelines using OpenCode.
+A bunch of experimental projects and GitHub Actions workflows where I test out AI coding agents like OpenCode.
 
 ## Projects
 
 ### [Nexus Browser](opencode/browser/README.md)
 
-A next-generation Chromium-based browser built on Electron with full Chrome Web Store extension support.
+A Chromium-based browser built on Electron with Chrome Web Store extension support.
 
 - Chrome Web Store extension support
 - Built-in privacy shield (tracker & ad blocker)
@@ -29,7 +29,7 @@ A next-generation Chromium-based browser built on Electron with full Chrome Web 
 
 ### [Garmin AI Chat](garmin-ai-chat/README.md)
 
-A Connect IQ app that brings conversational AI to your Garmin vívoactive 5, powered by NVIDIA's API.
+A Connect IQ app that brings AI chat to your Garmin vívoactive 5, using NVIDIA's API.
 
 - Start and continue AI conversations on your watch
 - Multiple AI models (NVIDIA, Meta, Mistral, Google, OpenAI)
@@ -38,7 +38,7 @@ A Connect IQ app that brings conversational AI to your Garmin vívoactive 5, pow
 
 ### [GUI Controller](gui-controller/)
 
-A Python-based GUI automation framework for Ubuntu with virtual display support.
+A Python GUI automation framework for Ubuntu with virtual display support.
 
 - Virtual framebuffer (Xvfb) and Openbox window manager integration
 - Screenshot capture and visual verification
@@ -47,7 +47,7 @@ A Python-based GUI automation framework for Ubuntu with virtual display support.
 
 ## Workflows
 
-This repository uses GitHub Actions for automation:
+GitHub Actions running the show:
 
 | Workflow | Description |
 |----------|-------------|
