@@ -2,7 +2,14 @@ name: OpenCode Issue Solver
 
 on:
   issues:
-    types: [opened, edited, reopened]
+    types:
+      - opened
+      - reopened
+      - edited
+  issue_comment:
+    types:
+      - created
+      - edited
 
 permissions:
   contents: write
@@ -64,13 +71,14 @@ jobs:
       - name: comment starting work
         run: |
           gh issue comment "$ISSUE_NUMBER" \
-            --body "🤖 OpenCode started working on this issue..."
+            --body "🤖 OpenCode is analyzing this issue and will decide how to proceed..."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run OpenCode
+        id: opencode_run
         run: |
-          SYSTEM_PROMPT="You are an autonomous AI developer solving a GitHub issue.
+          SYSTEM_PROMPT="You are an autonomous AI developer analyzing a GitHub issue.
 
           ISSUE TITLE:
           $ISSUE_TITLE
@@ -78,16 +86,37 @@ jobs:
           ISSUE DESCRIPTION:
           ${{ steps.issue.outputs.body }}
 
-          TASK:
-          - Understand the issue
+          PHASE 1 - DECISION (do this first):
+          Analyze the issue and decide one of:
+          - ACCEPT: The issue is valid, clear, and you can implement it
+          - DENY: The issue is invalid, spam, duplicate, or cannot be solved
+          - NEEDS_INFO: The issue lacks critical details to proceed
+
+          Write your decision to a file called 'opencode-decision.json' with this format:
+          {
+            \"decision\": \"ACCEPT\" | \"DENY\" | \"NEEDS_INFO\",
+            \"reason\": \"Brief explanation of your decision\",
+            \"labels\": [\"label1\", \"label2\"]
+          }
+
+          Suggested labels by decision type:
+          - ACCEPT: [\"opencode-working\", \"in-progress\"]
+          - DENY: [\"wontfix\", \"invalid\", or \"spam\" as appropriate]
+          - NEEDS_INFO: [\"needs-more-info\", \"blocked\"]
+
+          PHASE 2 - ACTION (only if ACCEPT):
+          - Understand the issue fully
           - Implement a correct fix or feature
           - Keep changes safe and minimal
+          - Commit after each logical change
+          - Use clear commit messages
 
           RULES:
-          - Commit after each change
-          - Use clear commit messages
+          - You only get ONE run - make all decisions now
+          - Always create the opencode-decision.json file
           - Do not break the project
-          - Stay focused on this issue only"
+          - Stay focused on this issue only
+          - If you implement changes, commit them before finishing"
 
           opencode run "$SYSTEM_PROMPT" \
             --model "$MODEL" \
@@ -96,19 +125,62 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Final commit if needed
+      - name: Read decision
+        id: decision
+        run: |
+          if [ -f "opencode-decision.json" ]; then
+            DECISION=$(jq -r '.decision' opencode-decision.json)
+            REASON=$(jq -r '.reason' opencode-decision.json)
+            LABELS=$(jq -r '.labels | join(",")' opencode-decision.json)
+            echo "decision=$DECISION" >> $GITHUB_OUTPUT
+            echo "reason=$REASON" >> $GITHUB_OUTPUT
+            echo "labels=$LABELS" >> $GITHUB_OUTPUT
+          else
+            echo "decision=ACCEPT" >> $GITHUB_OUTPUT
+            echo "reason=No decision file found, defaulting to ACCEPT" >> $GITHUB_OUTPUT
+            echo "labels=opencode-working" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Apply labels
+        run: |
+          IFS=',' read -ra LABELS <<< "${{ steps.decision.outputs.labels }}"
+          for label in "${LABELS[@]}"; do
+            gh issue edit "$ISSUE_NUMBER" --add-label "$label" || true
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment decision
+        if: steps.decision.outputs.decision != 'ACCEPT'
+        run: |
+          gh issue comment "$ISSUE_NUMBER" \
+            --body "🤖 OpenCode analysis complete.
+
+            **Decision:** ${{ steps.decision.outputs.decision }}
+            **Reason:** ${{ steps.decision.outputs.reason }}
+
+            Labels have been applied automatically."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Final commit if changes were made
+        if: steps.decision.outputs.decision == 'ACCEPT'
         run: |
           if ! git diff --quiet || ! git diff --cached --quiet; then
             git add -A
             git commit -m "fix(issue #$ISSUE_NUMBER): finalize solution"
           fi
 
-      - name: Push branch
+      - name: Try push branch
+        id: push
+        if: steps.decision.outputs.decision == 'ACCEPT'
+        continue-on-error: true
         run: |
-          git push origin ${{ steps.branch.outputs.branch }}
+          git push origin ${{ steps.branch.outputs.branch }} 2>&1 || echo "push_failed=true" >> $GITHUB_OUTPUT
 
-      - name: Create PR
+      - name: Create PR if push succeeded
         id: pr
+        if: steps.decision.outputs.decision == 'ACCEPT' && steps.push.outputs.push_failed != 'true'
         run: |
           URL=$(gh pr create \
             --title "Fix: $ISSUE_TITLE" \
@@ -121,6 +193,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Comment PR link
+        if: steps.pr.outputs.pr_url != ''
         run: |
           gh issue comment "$ISSUE_NUMBER" \
             --body "✅ Fix created: ${{ steps.pr.outputs.pr_url }}"
@@ -128,6 +201,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Merge PR
+        if: steps.pr.outputs.pr_url != ''
         run: |
           gh pr merge "${{ steps.pr.outputs.pr_url }}" \
             --squash \
@@ -136,9 +210,43 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Close issue
+      - name: Fallback - Create PR with patch if push failed
+        if: steps.decision.outputs.decision == 'ACCEPT' && steps.push.outputs.push_failed == 'true'
+        run: |
+          echo "Push failed, creating fallback issue with changes..."
+
+          PATCH_FILE="/tmp/changes.patch"
+          git diff HEAD > "$PATCH_FILE" 2>/dev/null || echo "No diff available"
+
+          CHANGES_SUMMARY=$(git diff --stat HEAD 2>/dev/null || echo "Unable to generate diff")
+
+          gh issue create \
+            --title "FALLBACK: Changes for issue #$ISSUE_NUMBER - $ISSUE_TITLE" \
+            --body "OpenCode attempted to solve issue #$ISSUE_NUMBER but could not push changes.
+
+            **Original issue:** #$ISSUE_NUMBER
+            **Decision:** ${{ steps.decision.outputs.decision }}
+            **Reason:** ${{ steps.decision.outputs.reason }}
+
+            **Changes that were made:**
+            \`\`\`
+            $CHANGES_SUMMARY
+            \`\`\`
+
+            A human developer needs to apply these changes manually.
+
+            **Decision file content:**
+            \`\`\`json
+            $(cat opencode-decision.json 2>/dev/null || echo 'No decision file')
+            \`\`\`" \
+            --label "opencode-fallback,needs-manual-review"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Close issue if accepted and PR created
+        if: steps.decision.outputs.decision == 'ACCEPT' && steps.pr.outputs.pr_url != ''
         run: |
           gh issue close "$ISSUE_NUMBER" \
-            --comment "✅ Issue solved automatically by OpenCode."
+            --comment "✅ Issue solved automatically by OpenCode. PR: ${{ steps.pr.outputs.pr_url }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
