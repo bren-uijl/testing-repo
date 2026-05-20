@@ -18,19 +18,22 @@ permissions:
 
 jobs:
   opencode:
-    name: Analyze Issue
+    name: Run Vinkbot
     runs-on: ubuntu-latest
     timeout-minutes: 360
 
     if: |
       github.actor != 'github-actions[bot]' &&
-      github.actor != 'Vinkbot'
+      github.actor != 'Vinkbot' &&
+      github.event.issue.pull_request == null
 
     env:
       MODEL: "opencode/qwen3.6-plus-free"
       ISSUE_NUMBER: ${{ github.event.issue.number }}
       ISSUE_TITLE: ${{ github.event.issue.title }}
       BASE_BRANCH: "main"
+      EVENT_NAME: ${{ github.event_name }}
+      LATEST_COMMENT: ${{ github.event.comment.body || '' }}
 
     steps:
       - name: Checkout repository
@@ -41,20 +44,26 @@ jobs:
 
       - name: Install dependencies
         run: |
+          set -euo pipefail
+
           sudo apt-get update -qq
           sudo apt-get install -y curl git jq
 
       - name: Install OpenCode
         run: |
+          set -euo pipefail
+
           curl -fsSL https://opencode.ai/install | bash
           echo "$HOME/.opencode/bin" >> "$GITHUB_PATH"
 
       - name: Configure git bot
         run: |
+          set -euo pipefail
+
           git config user.name "Vinkbot"
           git config user.email "272188895+Vinkbot@users.noreply.github.com"
 
-      - name: Read issue safely
+      - name: Read issue context
         id: issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -62,271 +71,184 @@ jobs:
           set -euo pipefail
 
           gh issue view "$ISSUE_NUMBER" \
-            --json title,body,comments,labels,state,author,createdAt,updatedAt \
-            > issue-context.json
+            --json title,body,comments,labels,state,author,createdAt,updatedAt,url \
+            > /tmp/issue-context.json
 
-          ISSUE_BODY="$(jq -r '.body // ""' issue-context.json)"
-          FULL_ISSUE_BODY="$(jq -r '.' issue-context.json)"
+          ISSUE_BODY="$(jq -r '.body // ""' /tmp/issue-context.json)"
+          FULL_ISSUE_CONTEXT="$(jq -r '.' /tmp/issue-context.json)"
+          ISSUE_URL="$(jq -r '.url // ""' /tmp/issue-context.json)"
 
           {
             echo "body<<ISSUE_BODY_EOF"
             echo "$ISSUE_BODY"
             echo "ISSUE_BODY_EOF"
 
-            echo "full_issue_body<<FULL_ISSUE_BODY_EOF"
-            echo "$FULL_ISSUE_BODY"
-            echo "FULL_ISSUE_BODY_EOF"
+            echo "full_context<<FULL_CONTEXT_EOF"
+            echo "$FULL_ISSUE_CONTEXT"
+            echo "FULL_CONTEXT_EOF"
+
+            echo "url=$ISSUE_URL"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Create issue branch
+      - name: Create work branch
         id: branch
         run: |
           set -euo pipefail
 
-          BRANCH="opencode/issue-${ISSUE_NUMBER}"
+          BRANCH="opencode/issue-${ISSUE_NUMBER}-${GITHUB_RUN_ID}"
           git checkout -B "$BRANCH"
 
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
 
-      - name: Comment starting work
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh issue comment "$ISSUE_NUMBER" \
-            --body ":copilot: Vinkbot is analyzing this issue. Final solving and closing are reserved for humans."
-
       - name: Build OpenCode prompt
         env:
           ISSUE_BODY: ${{ steps.issue.outputs.body }}
-          FULL_ISSUE_BODY: ${{ steps.issue.outputs.full_issue_body }}
+          FULL_ISSUE_CONTEXT: ${{ steps.issue.outputs.full_context }}
+          ISSUE_URL: ${{ steps.issue.outputs.url }}
         run: |
           set -euo pipefail
 
-          cat > opencode-prompt.md <<'PROMPT_EOF'
-          You are an autonomous AI developer analyzing a GitHub issue.
+          cat > /tmp/opencode-prompt.md <<'PROMPT_EOF'
+          You are Vinkbot, an automated GitHub issue assistant running inside a GitHub Actions workflow.
 
-          Important rule:
-          You may analyze, propose changes, create commits, and prepare a pull request.
-          You must not treat the issue as finally solved.
-          Final solving, merging, and closing are reserved for human maintainers.
+          You have access to the GitHub CLI through `gh`.
 
-          ISSUE TITLE:
+          You can:
+          - read issues and comments
+          - reply to comments using `gh issue comment`
+          - add helpful labels using `gh issue edit`
+          - inspect the repository
+          - make code changes when the issue clearly asks for code or file changes
+          - commit changes when needed
+
+          You must not:
+          - close issues
+          - merge pull requests
+          - claim that an issue is finally solved
+          - treat every comment as a coding request
+          - create code changes for a simple ping, test, or status-check comment
+
+          Humans decide when an issue is actually solved.
+
+          Tone:
+          - Be friendly
+          - Be short when the user only asks for a simple response
+          - Do not sound overly formal
+          - Do not write long explanations unless useful
+
+          Simple ping/test behavior:
+          If the latest comment is only asking whether you are working, whether you can read the comment, or asking for a simple response, then:
+          - reply briefly with `gh issue comment`
+          - do not edit files
+          - do not commit
+          - do not create a pull request
+          - do not add a `solved` label
+
+          Good example response for a ping:
+          "Yes — I'm here and working 🙂"
+
+          For real issues:
+          - If the issue is clear and actionable, make the smallest safe change.
+          - If the issue asks to update a workflow file, you may edit the workflow file.
+          - If the issue is unclear, ask a friendly question using `gh issue comment`.
+          - If the issue should not be implemented, explain briefly and optionally add a label such as `wontfix`.
+          - If you prepare code changes, commit them with a clear commit message.
+          - Do not create a pull request yourself; the workflow will do that if files changed.
+          - Do not write `opencode-decision.json`; it is not used.
+
+          Important GitHub CLI rules:
+          - Use `gh issue comment "$ISSUE_NUMBER" --body "..."`
+          - Use `gh issue edit "$ISSUE_NUMBER" --add-label "label-name"` when useful.
+          - The environment variable `GH_TOKEN` is available.
+
+          Current event:
+          __EVENT_NAME__
+
+          Issue number:
+          __ISSUE_NUMBER__
+
+          Issue title:
           __ISSUE_TITLE__
 
-          ISSUE DESCRIPTION:
+          Issue URL:
+          __ISSUE_URL__
+
+          Latest comment, if this run was triggered by a comment:
+          __LATEST_COMMENT__
+
+          Issue body:
           __ISSUE_BODY__
 
-          FULL ISSUE DISCUSSION:
-          __FULL_ISSUE_BODY__
-
-          PHASE 1 - DECISION:
-          Analyze the issue and decide one of:
-
-          - ACCEPT: The issue is valid, clear, and you can propose an implementation
-          - DENY: The issue is invalid, spam, duplicate, out of scope, or should not be implemented
-          - NEEDS_INFO: The issue lacks critical details to proceed
-
-          You must write your decision to a file called:
-
-          opencode-decision.json
-
-          The file must contain valid JSON in this format:
-
-          {
-            "decision": "ACCEPT",
-            "reason": "Brief explanation of your decision",
-            "labels": ["opencode-working", "in-progress"]
-          }
-
-          Valid decision values are:
-
-          - ACCEPT
-          - DENY
-          - NEEDS_INFO
-
-          Suggested labels by decision type:
-
-          ACCEPT:
-          - opencode-working
-          - in-progress
-
-          DENY:
-          - wontfix
-
-          NEEDS_INFO:
-          - needs-more-info
-          - blocked
-
-          PHASE 2 - ACTION:
-          Only if the decision is ACCEPT:
-
-          - Understand the issue fully
-          - Implement a safe proposed fix or feature
-          - Keep changes minimal
-          - Commit after each logical change
-          - Use clear commit messages
-
-          RULES:
-
-          - Always create opencode-decision.json
-          - Do not close the issue
-          - Do not mark the issue as finally solved in comments
-          - Do not merge pull requests
-          - Do not break the project
-          - Stay focused on this issue only
-          - If you implement changes, commit them before finishing
-          - Do not modify unrelated files
-          - Do not change workflow files unless the issue explicitly asks for it
+          Full issue context as JSON:
+          __FULL_ISSUE_CONTEXT__
           PROMPT_EOF
 
           python3 - <<'PY'
           from pathlib import Path
           import os
 
-          prompt = Path("opencode-prompt.md").read_text()
+          prompt_path = Path("/tmp/opencode-prompt.md")
+          prompt = prompt_path.read_text()
 
           replacements = {
+              "__EVENT_NAME__": os.environ.get("EVENT_NAME", ""),
+              "__ISSUE_NUMBER__": os.environ.get("ISSUE_NUMBER", ""),
               "__ISSUE_TITLE__": os.environ.get("ISSUE_TITLE", ""),
+              "__ISSUE_URL__": os.environ.get("ISSUE_URL", ""),
+              "__LATEST_COMMENT__": os.environ.get("LATEST_COMMENT", ""),
               "__ISSUE_BODY__": os.environ.get("ISSUE_BODY", ""),
-              "__FULL_ISSUE_BODY__": os.environ.get("FULL_ISSUE_BODY", ""),
+              "__FULL_ISSUE_CONTEXT__": os.environ.get("FULL_ISSUE_CONTEXT", ""),
           }
 
           for key, value in replacements.items():
               prompt = prompt.replace(key, value)
 
-          Path("opencode-prompt.md").write_text(prompt)
+          prompt_path.write_text(prompt)
           PY
 
       - name: Run OpenCode
         id: opencode_run
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
-          opencode run "$(cat opencode-prompt.md)" \
+          opencode run "$(cat /tmp/opencode-prompt.md)" \
             --model "$MODEL" \
             --thinking \
             --dangerously-skip-permissions
 
-      - name: Read decision
-        id: decision
+      - name: Check for repository changes
+        id: changes
         run: |
           set -euo pipefail
 
-          if [ ! -f "opencode-decision.json" ]; then
-            cat > opencode-decision.json <<'EOF'
-          {
-            "decision": "NEEDS_INFO",
-            "reason": "No decision file was created by OpenCode.",
-            "labels": ["needs-more-info", "blocked"]
-          }
-          EOF
-          fi
-
-          if ! jq empty opencode-decision.json >/dev/null 2>&1; then
-            cat > opencode-decision.json <<'EOF'
-          {
-            "decision": "NEEDS_INFO",
-            "reason": "OpenCode created an invalid decision file.",
-            "labels": ["needs-more-info", "blocked"]
-          }
-          EOF
-          fi
-
-          DECISION="$(jq -r '.decision // "NEEDS_INFO"' opencode-decision.json)"
-          REASON="$(jq -r '.reason // "No reason provided."' opencode-decision.json)"
-          LABELS="$(jq -r 'if (.labels | type) == "array" then .labels | join(",") else "needs-more-info" end' opencode-decision.json)"
-
-          case "$DECISION" in
-            ACCEPT)
-              LABELS="$LABELS,in-progress"
-              ;;
-            DENY)
-              LABELS="$LABELS,wontfix"
-              ;;
-            NEEDS_INFO)
-              LABELS="$LABELS,question"
-              ;;
-            *)
-              DECISION="NEEDS_INFO"
-              REASON="Decision value was invalid. Defaulting to NEEDS_INFO."
-              LABELS="needs-more-info,blocked"
-              ;;
-          esac
-
-          {
-            echo "decision=$DECISION"
-
-            echo "reason<<REASON_EOF"
-            echo "$REASON"
-            echo "REASON_EOF"
-
-            echo "labels=$LABELS"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Apply decision labels
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-
-          IFS=',' read -ra LABELS <<< "${{ steps.decision.outputs.labels }}"
-
-          for label in "${LABELS[@]}"; do
-            label="$(echo "$label" | xargs)"
-
-            if [ -n "$label" ]; then
-              gh issue edit "$ISSUE_NUMBER" --add-label "$label" || true
-            fi
-          done
-
-      - name: Comment decision if not accepted
-        if: steps.decision.outputs.decision != 'ACCEPT'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh issue comment "$ISSUE_NUMBER" \
-            --body "$(cat <<EOF
-          🦉 Vinkbot analysis complete.
-
-          **Decision:** ${{ steps.decision.outputs.decision }}
-
-          **Reason:** ${{ steps.decision.outputs.reason }}
-
-          Labels have been applied automatically.
-
-          This issue has not been closed. Final solving and closing are reserved for human maintainers.
-          EOF
-          )"
-
-      - name: Final commit if changes were made
-        id: final_commit
-        if: steps.decision.outputs.decision == 'ACCEPT'
-        run: |
-          set -euo pipefail
-
-          if ! git diff --quiet || ! git diff --cached --quiet; then
-            git add -A
-            git commit -m "fix(issue #$ISSUE_NUMBER): propose solution"
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
-          elif [ "$(git rev-list --count "$BASE_BRANCH"..HEAD)" -gt 0 ]; then
+          if [ -n "$(git status --porcelain)" ]; then
             echo "has_changes=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Comment if accepted but no changes were made
-        if: steps.decision.outputs.decision == 'ACCEPT' && steps.final_commit.outputs.has_changes == 'false'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Stop if no files changed
+        if: steps.changes.outputs.has_changes == 'false'
         run: |
-          gh issue comment "$ISSUE_NUMBER" \
-            --body "🦉 Vinkbot accepted this issue, but no repository changes were produced. The issue remains open for human review."
+          echo "No repository changes were made. Nothing to push or turn into a PR."
+
+      - name: Commit changes
+        id: commit
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          set -euo pipefail
+
+          git add -A
+          git commit -m "fix(issue #$ISSUE_NUMBER): proposed update"
+
+          echo "committed=true" >> "$GITHUB_OUTPUT"
 
       - name: Try push branch
         id: push
-        if: steps.decision.outputs.decision == 'ACCEPT' && steps.final_commit.outputs.has_changes == 'true'
+        if: steps.changes.outputs.has_changes == 'true'
         continue-on-error: true
         run: |
           set -euo pipefail
@@ -337,9 +259,9 @@ jobs:
             echo "push_failed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create PR if push succeeded
+      - name: Create pull request
         id: pr
-        if: steps.decision.outputs.decision == 'ACCEPT' && steps.final_commit.outputs.has_changes == 'true' && steps.push.outputs.push_failed != 'true'
+        if: steps.changes.outputs.has_changes == 'true' && steps.push.outputs.push_failed != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -348,101 +270,78 @@ jobs:
           PR_BODY="$(cat <<EOF
           Related to #$ISSUE_NUMBER
 
-          Vinkbot/OpenCode prepared a proposed fix for human review.
+          I prepared a proposed change for review.
 
-          This does not automatically solve or close the issue.
-
-          Human maintainers should review, test, merge if appropriate, and close the issue manually.
-
-          Decision reason:
-
-          ${{ steps.decision.outputs.reason }}
+          I will not close the issue myself.
           EOF
           )"
 
           URL="$(gh pr create \
-            --title "Proposed fix: $ISSUE_TITLE" \
+            --title "Proposed update: $ISSUE_TITLE" \
             --body "$PR_BODY" \
             --base "$BASE_BRANCH" \
             --head "${{ steps.branch.outputs.branch }}")"
 
           echo "pr_url=$URL" >> "$GITHUB_OUTPUT"
 
-      - name: Apply solved label when PR is ready for review
+      - name: Add ready-for-review label
         if: steps.pr.outputs.pr_url != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh issue edit "$ISSUE_NUMBER" --add-label "solved" || true
+          gh issue edit "$ISSUE_NUMBER" --add-label "ready-for-review" || true
 
-      - name: Comment PR link
+      - name: Comment pull request link
         if: steps.pr.outputs.pr_url != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh issue comment "$ISSUE_NUMBER" \
             --body "$(cat <<EOF
-          ✅ Proposed fix created: ${{ steps.pr.outputs.pr_url }}
+          I opened a proposed update: ${{ steps.pr.outputs.pr_url }}
 
-          The issue remains open.
-
-          A human maintainer should review the pull request and decide whether this issue is solved.
+          Please review it when you can. I won’t close the issue myself.
           EOF
           )"
 
-      - name: Fallback - Create issue with patch if push failed
-        if: steps.decision.outputs.decision == 'ACCEPT' && steps.final_commit.outputs.has_changes == 'true' && steps.push.outputs.push_failed == 'true'
+      - name: Fallback if push failed
+        if: steps.changes.outputs.has_changes == 'true' && steps.push.outputs.push_failed == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
 
-          echo "Push failed, creating fallback issue with changes..."
-
-          PATCH_FILE="/tmp/opencode-issue-${ISSUE_NUMBER}.patch"
           SUMMARY_FILE="/tmp/opencode-issue-${ISSUE_NUMBER}-summary.txt"
-          DECISION_FILE="/tmp/opencode-issue-${ISSUE_NUMBER}-decision.json"
+          PATCH_FILE="/tmp/opencode-issue-${ISSUE_NUMBER}.patch"
 
-          git diff "$BASE_BRANCH"...HEAD > "$PATCH_FILE" || echo "No diff available" > "$PATCH_FILE"
-          git diff --stat "$BASE_BRANCH"...HEAD > "$SUMMARY_FILE" || echo "Unable to generate diff summary" > "$SUMMARY_FILE"
-
-          if [ -f opencode-decision.json ]; then
-            cp opencode-decision.json "$DECISION_FILE"
-          else
-            echo '{"decision":"ACCEPT","reason":"No decision file found.","labels":["opencode-working"]}' > "$DECISION_FILE"
-          fi
+          git diff --stat "$BASE_BRANCH"...HEAD > "$SUMMARY_FILE" || echo "Unable to generate diff summary." > "$SUMMARY_FILE"
+          git diff "$BASE_BRANCH"...HEAD > "$PATCH_FILE" || echo "Unable to generate patch." > "$PATCH_FILE"
 
           CHANGES_SUMMARY="$(cat "$SUMMARY_FILE")"
-          DECISION_CONTENT="$(cat "$DECISION_FILE")"
 
           FALLBACK_BODY="$(cat <<EOF
-          OpenCode attempted to prepare changes for issue #$ISSUE_NUMBER but could not push the branch.
+          I prepared changes for #$ISSUE_NUMBER, but I could not push the branch.
 
-          **Original issue:** #$ISSUE_NUMBER
+          This can happen when the workflow tries to change protected workflow files.
 
-          **Decision:** ${{ steps.decision.outputs.decision }}
+          Original issue: #$ISSUE_NUMBER
 
-          **Reason:** ${{ steps.decision.outputs.reason }}
-
-          **Changes that were made:**
+          Changes summary:
 
           \`\`\`
           $CHANGES_SUMMARY
           \`\`\`
 
-          A human developer needs to review and apply these changes manually.
+          A human needs to apply or push these changes manually.
 
-          **Decision file content:**
-
-          \`\`\`json
-          $DECISION_CONTENT
-          \`\`\`
-
-          The original issue has not been closed.
+          I did not close the original issue.
           EOF
           )"
 
           gh issue create \
-            --title "FALLBACK: Proposed changes for issue #$ISSUE_NUMBER - $ISSUE_TITLE" \
+            --title "Manual review needed for issue #$ISSUE_NUMBER - $ISSUE_TITLE" \
             --body "$FALLBACK_BODY" \
-            --label "opencode-fallback,needs-manual-review"
+            --label "needs-manual-review" || true
+
+          gh issue comment "$ISSUE_NUMBER" \
+            --body "I prepared changes, but I couldn’t push them. I created a manual-review fallback issue instead."
