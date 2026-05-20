@@ -1,4 +1,4 @@
-name: OpenCode Auto Run v3
+name: OpenCode Auto Run v3 - GUI Enabled
 
 on:
   workflow_dispatch:
@@ -19,6 +19,18 @@ on:
         description: "Subdirectory to work in (leave empty for repo root)"
         required: false
         default: ""
+      enable_gui:
+        description: "Enable GUI interaction capabilities (xdotool, xvfb, etc.)"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      gui_resolution:
+        description: "Virtual display resolution (width x height)"
+        required: false
+        default: "1280x720"
 
 permissions: write-all
 
@@ -27,507 +39,104 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
 
-    env:
-      DISPLAY: ":99"
-      STREAM_PORT: "8765"
-      SCREEN_WIDTH: "1440"
-      SCREEN_HEIGHT: "900"
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.branch }}
+          ref: ${{ github.event.inputs.branch }}
+          persist-credentials: true
+          fetch-depth: 0
 
-      - name: Install Linux GUI, automation, and HTTP stream dependencies
+      - name: Pre-flight checks
+        id: preflight
         run: |
-          sudo apt-get install -y \
+          echo "=== Environment Info ==="
+          echo "Runner OS: $RUNNER_OS"
+          echo "Node version: $(node --version 2>/dev/null || echo 'not installed')"
+          echo "Python version: $(python3 --version 2>/dev/null || echo 'not installed')"
+          echo "Disk space: $(df -h / | tail -1)"
+          echo "Memory: $(free -h | grep Mem)"
+          echo ""
+          echo "=== Repository State ==="
+          echo "Current branch: $(git branch --show-current)"
+          echo "Last commit: $(git log -1 --oneline)"
+          echo "File count: $(find . -not -path './.git/*' -type f | wc -l)"
+          echo ""
+
+          if [ -n "${{ github.event.inputs.working_directory }}" ]; then
+            if [ ! -d "${{ github.event.inputs.working_directory }}" ]; then
+              echo "::error::Working directory '${{ github.event.inputs.working_directory }}' does not exist"
+              exit 1
+            fi
+            echo "Working directory verified: ${{ github.event.inputs.working_directory }}"
+          fi
+
+      - name: Install base dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends curl git jq
+
+      - name: Install GUI dependencies
+        if: github.event.inputs.enable_gui == 'true'
+        run: |
+          echo "=== Installing GUI Dependencies ==="
+          sudo apt-get install -y --no-install-recommends \
             xvfb \
-            fluxbox \
             xdotool \
             x11-utils \
+            x11-xserver-utils \
+            x11-apps \
             scrot \
-            imagemagick \
-            curl \
-            wget \
-            jq \
-            python3 \
-            python3-aiohttp
+            python3-pip \
+            python3-venv
 
-      - name: Start virtual Linux desktop
+          pip3 install --user Pillow mss pyautogui python-xlib
+
+          echo "GUI dependencies installed successfully"
+
+      - name: Setup virtual display
+        if: github.event.inputs.enable_gui == 'true'
         run: |
-          Xvfb :99 -screen 0 ${SCREEN_WIDTH}x${SCREEN_HEIGHT}x24 > /tmp/xvfb.log 2>&1 &
+          echo "=== Setting up Virtual Display ==="
+          RESOLUTION="${{ github.event.inputs.gui_resolution }}"
+          WIDTH=$(echo $RESOLUTION | cut -d'x' -f1)
+          HEIGHT=$(echo $RESOLUTION | cut -d'x' -f2)
+
+          Xvfb :99 -screen 0 "${WIDTH}x${HEIGHT}x24" -ac +extension GLX +render -noreset &
           sleep 2
 
-          fluxbox > /tmp/fluxbox.log 2>&1 &
-          sleep 2
+          export DISPLAY=:99
+          echo "DISPLAY=:99" >> $GITHUB_ENV
 
-          xdpyinfo -display :99 >/dev/null
+          echo "Virtual display started at :99 with resolution ${RESOLUTION}"
+          xdpyinfo -display :99 | head -20 || true
 
-      - name: Create HTTP image and terminal streaming server
+      - name: Verify GUI tools
+        if: github.event.inputs.enable_gui == 'true'
         run: |
-          cat > /tmp/http_stream.py <<'PY'
-          import asyncio
-          import json
-          import os
-          import subprocess
-          import time
-          from aiohttp import web
-
-          DISPLAY = os.environ.get("DISPLAY", ":99")
-          STREAM_PORT = int(os.environ.get("STREAM_PORT", "8765"))
-          SCREEN_WIDTH = int(os.environ.get("SCREEN_WIDTH", "1280"))
-          SCREEN_HEIGHT = int(os.environ.get("SCREEN_HEIGHT", "900"))
-
-          SCREENSHOT_PATH = "/tmp/http-screen.jpg"
-          OPENCODE_LOG_PATH = "/tmp/opencode-output.log"
-
-          INDEX_HTML = f"""
-          <!doctype html>
-          <html>
-          <head>
-            <meta charset="utf-8" />
-            <title>OpenCode Live UI + Terminal</title>
-            <style>
-              html, body {{
-                margin: 0;
-                padding: 0;
-                background: #111;
-                color: #eee;
-                font-family: Arial, sans-serif;
-                overflow: auto;
-              }}
-
-              #bar {{
-                padding: 8px 12px;
-                background: #222;
-                position: sticky;
-                top: 0;
-                z-index: 10;
-                border-bottom: 1px solid #333;
-              }}
-
-              #layout {{
-                display: flex;
-                align-items: flex-start;
-                gap: 12px;
-                padding: 12px;
-              }}
-
-              #screen-wrap {{
-                flex: 0 0 auto;
-                background: #000;
-                border: 1px solid #444;
-                width: {SCREEN_WIDTH}px;
-                height: {SCREEN_HEIGHT}px;
-                overflow: hidden;
-              }}
-
-              #screen {{
-                display: block;
-                width: {SCREEN_WIDTH}px;
-                height: {SCREEN_HEIGHT}px;
-                max-width: none;
-                max-height: none;
-                object-fit: none;
-                cursor: crosshair;
-              }}
-
-              #terminal-wrap {{
-                flex: 0 0 700px;
-                height: {SCREEN_HEIGHT}px;
-                background: #050505;
-                border: 1px solid #444;
-                overflow: hidden;
-                display: flex;
-                flex-direction: column;
-              }}
-
-              #terminal-title {{
-                padding: 8px;
-                background: #181818;
-                border-bottom: 1px solid #333;
-                font-weight: bold;
-              }}
-
-              #terminal {{
-                margin: 0;
-                padding: 10px;
-                flex: 1;
-                overflow: auto;
-                white-space: pre-wrap;
-                word-break: break-word;
-                font-family: Consolas, Monaco, monospace;
-                font-size: 13px;
-                line-height: 1.35;
-                color: #d8d8d8;
-              }}
-
-              .small {{
-                color: #aaa;
-                font-size: 12px;
-              }}
-            </style>
-          </head>
-          <body>
-            <div id="bar">
-              <strong>OpenCode Live View</strong>
-              <span class="small">
-                — NO WebSockets
-                — GUI is 1:1 at {SCREEN_WIDTH}x{SCREEN_HEIGHT}
-                — HTTP MJPEG stream + HTTP terminal polling
-              </span>
-            </div>
-
-            <div id="layout">
-              <div id="screen-wrap">
-                <img id="screen" src="/stream.mjpg" />
-              </div>
-
-              <div id="terminal-wrap">
-                <div id="terminal-title">OpenCode terminal output</div>
-                <pre id="terminal">Waiting for OpenCode output...</pre>
-              </div>
-            </div>
-
-            <script>
-              const img = document.getElementById("screen");
-              const terminal = document.getElementById("terminal");
-
-              let userScrolledTerminal = false;
-
-              terminal.addEventListener("scroll", () => {{
-                const nearBottom =
-                  terminal.scrollHeight - terminal.scrollTop - terminal.clientHeight < 40;
-                userScrolledTerminal = !nearBottom;
-              }});
-
-              async function refreshTerminal() {{
-                try {{
-                  const response = await fetch("/terminal", {{
-                    cache: "no-store"
-                  }});
-
-                  const text = await response.text();
-                  terminal.textContent = text || "Waiting for OpenCode output...";
-
-                  if (!userScrolledTerminal) {{
-                    terminal.scrollTop = terminal.scrollHeight;
-                  }}
-                }} catch (error) {{
-                  terminal.textContent = "Could not load terminal output: " + error;
-                }}
-              }}
-
-              setInterval(refreshTerminal, 1000);
-              refreshTerminal();
-
-              img.addEventListener("click", async (event) => {{
-                const rect = img.getBoundingClientRect();
-
-                const x = Math.round((event.clientX - rect.left) * {SCREEN_WIDTH} / rect.width);
-                const y = Math.round((event.clientY - rect.top) * {SCREEN_HEIGHT} / rect.height);
-
-                await fetch("/click", {{
-                  method: "POST",
-                  headers: {{
-                    "Content-Type": "application/json"
-                  }},
-                  body: JSON.stringify({{
-                    x,
-                    y
-                  }})
-                }});
-              }});
-
-              window.addEventListener("keydown", async (event) => {{
-                const allowed = [
-                  "ArrowUp",
-                  "ArrowDown",
-                  "ArrowLeft",
-                  "ArrowRight",
-                  "Enter",
-                  "Escape",
-                  "Backspace",
-                  "Tab",
-                  " "
-                ];
-
-                if (!allowed.includes(event.key)) {{
-                  return;
-                }}
-
-                event.preventDefault();
-
-                await fetch("/key", {{
-                  method: "POST",
-                  headers: {{
-                    "Content-Type": "application/json"
-                  }},
-                  body: JSON.stringify({{
-                    key: event.key
-                  }})
-                }});
-              }});
-            </script>
-          </body>
-          </html>
-          """
-
-          def run_cmd(args):
-              env = os.environ.copy()
-              env["DISPLAY"] = DISPLAY
-
-              return subprocess.run(
-                  args,
-                  env=env,
-                  stdout=subprocess.PIPE,
-                  stderr=subprocess.PIPE,
-                  text=True,
-              )
-
-          def take_jpeg_screenshot():
-              png_path = "/tmp/http-screen.png"
-
-              result = run_cmd(["scrot", png_path])
-
-              if result.returncode != 0:
-                  raise RuntimeError(result.stderr or result.stdout or "scrot failed")
-
-              convert = run_cmd([
-                  "convert",
-                  png_path,
-                  "-quality",
-                  "80",
-                  SCREENSHOT_PATH
-              ])
-
-              if convert.returncode != 0:
-                  raise RuntimeError(convert.stderr or convert.stdout or "convert failed")
-
-              with open(SCREENSHOT_PATH, "rb") as f:
-                  return f.read()
-
-          def read_terminal_log():
-              if not os.path.exists(OPENCODE_LOG_PATH):
-                  return "Waiting for OpenCode output..."
-
-              try:
-                  with open(OPENCODE_LOG_PATH, "rb") as f:
-                      f.seek(0, os.SEEK_END)
-                      size = f.tell()
-                      f.seek(max(size - 60000, 0), os.SEEK_SET)
-                      return f.read().decode("utf-8", errors="replace")
-              except Exception as e:
-                  return f"Could not read OpenCode log: {e}"
-
-          async def index(request):
-              return web.Response(
-                  text=INDEX_HTML,
-                  content_type="text/html"
-              )
-
-          async def stream_mjpeg(request):
-              response = web.StreamResponse(
-                  status=200,
-                  reason="OK",
-                  headers={
-                      "Content-Type": "multipart/x-mixed-replace; boundary=frame",
-                      "Cache-Control": "no-cache, no-store, must-revalidate",
-                      "Pragma": "no-cache",
-                      "Expires": "0",
-                  },
-              )
-
-              await response.prepare(request)
-
-              while True:
-                  try:
-                      jpg = take_jpeg_screenshot()
-
-                      await response.write(b"--frame\r\n")
-                      await response.write(b"Content-Type: image/jpeg\r\n")
-                      await response.write(f"Content-Length: {len(jpg)}\r\n\r\n".encode("ascii"))
-                      await response.write(jpg)
-                      await response.write(b"\r\n")
-
-                      await asyncio.sleep(0.5)
-                  except asyncio.CancelledError:
-                      break
-                  except Exception as e:
-                      error = str(e).encode("utf-8", errors="replace")
-                      await response.write(b"--frame\r\n")
-                      await response.write(b"Content-Type: text/plain\r\n\r\n")
-                      await response.write(error)
-                      await response.write(b"\r\n")
-                      await asyncio.sleep(1)
-
-              return response
-
-          async def terminal(request):
-              return web.Response(
-                  text=read_terminal_log(),
-                  content_type="text/plain"
-              )
-
-          async def click(request):
-              data = await request.json()
-              x = str(int(data.get("x", 0)))
-              y = str(int(data.get("y", 0)))
-
-              run_cmd(["xdotool", "mousemove", x, y, "click", "1"])
-
-              return web.json_response({
-                  "ok": True,
-                  "x": x,
-                  "y": y
-              })
-
-          async def key(request):
-              data = await request.json()
-              key_name = str(data.get("key", ""))
-
-              key_map = {
-                  "ArrowUp": "Up",
-                  "ArrowDown": "Down",
-                  "ArrowLeft": "Left",
-                  "ArrowRight": "Right",
-                  "Enter": "Return",
-                  "Escape": "Escape",
-                  "Backspace": "BackSpace",
-                  "Tab": "Tab",
-                  " ": "space",
-              }
-
-              mapped = key_map.get(key_name)
-
-              if mapped:
-                  run_cmd(["xdotool", "key", mapped])
-
-              return web.json_response({
-                  "ok": True,
-                  "key": key_name,
-                  "mapped": mapped
-              })
-
-          async def health(request):
-              return web.Response(text="ok\n")
-
-          app = web.Application()
-          app.router.add_get("/", index)
-          app.router.add_get("/index.html", index)
-          app.router.add_get("/stream.mjpg", stream_mjpeg)
-          app.router.add_get("/terminal", terminal)
-          app.router.add_post("/click", click)
-          app.router.add_post("/key", key)
-          app.router.add_get("/health", health)
-
-          if __name__ == "__main__":
-              web.run_app(app, host="0.0.0.0", port=STREAM_PORT)
-          PY
-
-      - name: Start HTTP image and terminal stream
-        run: |
-          touch /tmp/opencode-output.log
-
-          python3 /tmp/http_stream.py > /tmp/http-stream.log 2>&1 &
-          sleep 3
-
-          curl -f http://localhost:${STREAM_PORT}/health
-
-      - name: Install cloudflared
-        run: |
-          wget -q -O cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
-          chmod +x cloudflared
-          sudo mv cloudflared /usr/local/bin/cloudflared
-          cloudflared --version
-
-      - name: Start Cloudflare tunnel to HTTP stream
-        run: |
-          cloudflared tunnel --url http://localhost:${STREAM_PORT} --no-autoupdate > /tmp/cloudflared.log 2>&1 &
-
-          for i in {1..60}; do
-            URL="$(grep -o 'https://[-a-z0-9.]*trycloudflare.com' /tmp/cloudflared.log | head -n 1 || true)"
-
-            if [ -n "$URL" ]; then
-              echo "STREAM_URL=$URL" >> "$GITHUB_ENV"
-              echo "::notice title=Live OpenCode UI + Terminal::$URL"
-              exit 0
-            fi
-
-            sleep 2
-          done
-
-          echo "Cloudflare tunnel did not start correctly."
-          cat /tmp/cloudflared.log
-          exit 1
+          echo "=== Verifying GUI Tools ==="
+          export DISPLAY=:99
+
+          echo "xdotool version: $(xdotool --version 2>&1 || echo 'not found')"
+          echo "Testing mouse movement..."
+          xdotool mousemove 100 100
+          xdotool getmouselocation --shell
+          echo "GUI tools verified successfully"
 
       - name: Install OpenCode
         run: |
           curl -fsSL https://opencode.ai/install | bash
-          echo "$HOME/.opencode/bin" >> "$GITHUB_PATH"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
 
-      - name: Create UI helper commands for OpenCode
+      - name: Verify OpenCode
         run: |
-          cat > /tmp/ui <<'EOF'
-          #!/usr/bin/env bash
-          set -euo pipefail
+          opencode --version
+          echo "OpenCode installed successfully"
 
-          export DISPLAY="${DISPLAY:-:99}"
-
-          case "${1:-}" in
-            screenshot)
-              scrot /tmp/ui-screenshot.png
-              echo "/tmp/ui-screenshot.png"
-              ;;
-
-            click)
-              xdotool mousemove "$2" "$3" click 1
-              ;;
-
-            rightclick)
-              xdotool mousemove "$2" "$3" click 3
-              ;;
-
-            doubleclick)
-              xdotool mousemove "$2" "$3" click --repeat 2 --delay 100 1
-              ;;
-
-            key)
-              xdotool key "$2"
-              ;;
-
-            type)
-              shift
-              xdotool type --delay 20 "$*"
-              ;;
-
-            mousemove)
-              xdotool mousemove "$2" "$3"
-              ;;
-
-            window-list)
-              xdotool search --onlyvisible --name ".*" getwindowname %@ || true
-              ;;
-
-            *)
-              echo "Usage:"
-              echo "  ui screenshot"
-              echo "  ui click X Y"
-              echo "  ui rightclick X Y"
-              echo "  ui doubleclick X Y"
-              echo "  ui key KEY"
-              echo "  ui type TEXT"
-              echo "  ui mousemove X Y"
-              echo "  ui window-list"
-              exit 1
-              ;;
-          esac
-          EOF
-
-          chmod +x /tmp/ui
-          sudo ln -sf /tmp/ui /usr/local/bin/ui
+      - name: Configure git
+        run: |
+          git config user.name "opencode-agent[bot]"
+          git config user.email "opencode-agent@users.noreply.github.com"
 
       - name: Run OpenCode
         id: opencode_run
@@ -535,10 +144,9 @@ jobs:
           INPUT_PROMPT: ${{ github.event.inputs.prompt }}
           INPUT_MODEL: ${{ github.event.inputs.model }}
           INPUT_DIR: ${{ github.event.inputs.working_directory }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}       
-          SCREEN_WIDTH: "1440"
-          SCREEN_HEIGHT: "900"
-
+          INPUT_ENABLE_GUI: ${{ github.event.inputs.enable_gui }}
+          INPUT_GUI_RESOLUTION: ${{ github.event.inputs.gui_resolution }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TARGET_DIR="."
           if [ -n "$INPUT_DIR" ]; then
@@ -547,94 +155,146 @@ jobs:
 
           cd "$TARGET_DIR"
 
-          SYSTEM_PROMPT="You are an autonomous AI agent running in GitHub Actions.
-
-          ROLE:
-          You are a skilled software engineer with expertise in code review, refactoring, bug fixing, feature implementation, and GUI testing.
-
-          ENVIRONMENT:
-          You are running on Linux in GitHub Actions.
-          The virtual desktop is available on DISPLAY=:99.
-          The screen dimentions are ${SCREEN_WIDTH}x${SCREEN_HEIGHT}
-
-          GUI CONTROL:
-          You can interact with GUI applications using these shell commands:
-          - ui screenshot
-          - ui click X Y
-          - ui rightclick X Y
-          - ui doubleclick X Y
-          - ui key KEY
-          - ui type TEXT
-          - ui mousemove X Y
-          - ui window-list
-
-          GUI RULES:
-          1. Always take a screenshot before clicking.
-          2. Use coordinates carefully.
-          3. If you need to launch a GUI app, launch it with DISPLAY=:99.
-          4. Use ui window-list when you need to understand open windows.
-          5. If a captcha appears, do not solve or bypass it. Report that automation is blocked and suggest test or development captcha settings.
-
+          SYSTEM_PROMPT="You are an autonomous AI agent running in GitHub Actions. You have the following characteristics and constraints:
+          ROLE: You are a skilled software engineer with expertise in code review, refactoring, bug fixing, and feature implementation.
           BEHAVIOR RULES:
-          1. Always read and understand existing code before making changes.
-          2. Follow the existing code style and conventions of the project.
-          3. Make incremental, well-tested changes.
-          4. Never break existing functionality.
-          5. Write clear, concise code without unnecessary comments.
-          6. Prefer editing existing files over creating new ones.
-          7. Always verify your changes work before committing.
-
+          1. Always read and understand existing code before making changes
+          2. Follow the existing code style and conventions of the project
+          3. Make incremental, well-tested changes
+          4. Never break existing functionality
+          5. Write clear, concise code without unnecessary comments
+          6. Prefer editing existing files over creating new ones
+          7. Always verify your changes work before committing
           WORKFLOW:
-          1. Explore the codebase to understand structure and conventions.
-          2. Plan your changes mentally before executing.
-          3. Make one logical change at a time.
-          4. After each file edit, commit immediately with a descriptive message.
-          5. Run any available tests or linting after changes.
-          6. If something fails, diagnose and fix before proceeding.
+          1. Explore the codebase to understand structure and conventions
+          2. Plan your changes mentally before executing
+          3. Make one logical change at a time
+          4. After each file edit, commit immediately with a descriptive message
+          5. Run any available tests or linting after changes
+          6. If something fails, diagnose and fix before proceeding
           7. Push before you stop.
 
           COMMIT STANDARDS:
-          - Use conventional commit format when possible: feat:, fix:, refactor:, docs:, chore:.
-          - Keep commits atomic.
-          - Write meaningful commit messages that explain what changed and why.
+          - Use conventional commit format when possible (feat:, fix:, refactor:, docs:, chore:)
+          - Keep commits atomic - one logical change per commit
+          - Write meaningful commit messages that explain WHAT and WHY
           - Git config is already done.
 
           ERROR HANDLING:
-          - If a tool fails, retry once with adjusted parameters.
-          - If stuck, document the issue and move on.
-          - Never leave the codebase in a broken state.
+          - If a tool fails, retry once with adjusted parameters
+          - If stuck, document the issue in a comment and move on
+          - Never leave the codebase in a broken state
 
-          USER REQUEST:
-          ${INPUT_PROMPT}
+          TIME CONSTRAINT: You have 6 hours to complete your task. thats pretty much. check how late it is when you start, i want you to work for at least 2 hours."
 
-          Remember:
-          - After each edit, commit what you have done.
-          - Write instructions for your future self down in a .opencode folder.
-          - Use the GUI tools when needed.
-          - Use screenshots before clicking."
+          if [ "$INPUT_ENABLE_GUI" = "true" ]; then
+            GUI_CAPABILITIES="
+            GUI CAPABILITIES:
+            You have access to a virtual X11 display (DISPLAY=:99) with GUI interaction tools.
+            The gui-controller/ directory contains a Python-based GUI automation framework:
 
-          FULL_PROMPT=${SYSTEM_PROMPT}
+            - DisplayManager: Manages Xvfb virtual display with configurable resolution
+            - InputController: Mouse/keyboard control via xdotool (click, move, drag, type, keys)
+            - ScreenshotManager: Screen capture via mss library with pixel analysis
+            - GUIController: Main orchestrator combining all components
+
+            Usage example:
+            ```python
+            from gui_controller import GUIController, Resolution
+
+            with GUIController(Resolution(1280, 720)) as controller:
+                controller.launch_app('xeyes')
+                controller.click_at(400, 300)
+                controller.screenshot('output.png')
+            ```
+
+            Available tools in the environment:
+            - xdotool: Mouse/keyboard simulation
+            - xvfb: Virtual framebuffer (running on :99)
+            - scrot: Screenshot capture
+            - Python libraries: Pillow, mss, pyautogui
+
+            You can use these to interact with GUI applications, take screenshots,
+            automate testing, or play games like minesweeper."
+          else
+            GUI_CAPABILITIES=""
+          fi
+
+          FULL_PROMPT="${SYSTEM_PROMPT}${GUI_CAPABILITIES}
+          USER REQUEST: ${INPUT_PROMPT}
+          Remember: After each edit, commit what you've done. Write instructions for your future self down in a .opencode folder."
 
           echo "=== Starting OpenCode Run ==="
           echo "Model: $INPUT_MODEL"
           echo "Working directory: $TARGET_DIR"
-          echo "Display: $DISPLAY"
-          echo "Screen: ${SCREEN_WIDTH}x${SCREEN_HEIGHT}"
-          echo "Transport: HTTP only, no WebSockets"
+          echo "GUI enabled: $INPUT_ENABLE_GUI"
+          echo "GUI resolution: $INPUT_GUI_RESOLUTION"
           printf 'User prompt: %s\n' "$INPUT_PROMPT"
           echo "Prompt length: ${#FULL_PROMPT} characters"
           echo ""
 
-          opencode run "$FULL_PROMPT" --model "$INPUT_MODEL" --thinking --dangerously-skip-permissions 2>&1 | tee -a /tmp/opencode-output.log
+          opencode run "$FULL_PROMPT" --model opencode/qwen3.6-plus-free --thinking --dangerously-skip-permissions
 
-      - name: Upload UI logs and screenshots
+      - name: Capture run summary
+        if: always()
+        run: |
+          echo "=== Run Summary ==="
+          echo "Status: ${{ steps.opencode_run.outcome }}"
+          echo "Branch: ${{ github.event.inputs.branch }}"
+          echo "Model: ${{ github.event.inputs.model }}"
+          echo "GUI enabled: ${{ github.event.inputs.enable_gui }}"
+          echo ""
+          echo "=== Git Status ==="
+          git status
+          echo ""
+          echo "=== Recent Commits ==="
+          git log --oneline -10 || true
+          echo ""
+          echo "=== Changes Summary ==="
+          git diff --stat HEAD~1..HEAD 2>/dev/null || echo "No previous commit to compare"
+
+      - name: Capture GUI screenshots
+        if: always() && github.event.inputs.enable_gui == 'true'
+        run: |
+          echo "=== Capturing Final GUI State ==="
+          export DISPLAY=:99
+          if command -v scrot &> /dev/null; then
+            scrot /tmp/final_gui_state.png || true
+            echo "Final GUI screenshot saved"
+          fi
+
+      - name: Commit remaining changes
+        if: always()
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add -A
+
+          git commit -m "opencode: automated changes from workflow run
+
+          Triggered by: ${{ github.actor }}
+          Model: ${{ github.event.inputs.model }}
+          Branch: ${{ github.event.inputs.branch }}
+          GUI enabled: ${{ github.event.inputs.enable_gui }}"
+
+      - name: Push changes
+        if: always()
+        run: |
+          git push origin HEAD:${{ github.event.inputs.branch }}
+
+      - name: Upload run artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ui-debug
+          name: opencode-run-output
           path: |
-            /tmp/*.log
-            /tmp/ui-screenshot.png
-            /tmp/http-screen.jpg
-            /tmp/http-screen.png
-            /tmp/opencode-output.log
+            **/*.md
+            **/*.txt
+            **/*.png
+            **/*.jpg
+            **/screenshots/**
+          retention-days: 30
+          if-no-files-found: ignore
