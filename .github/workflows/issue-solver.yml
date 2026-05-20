@@ -44,8 +44,8 @@ jobs:
 
       - name: Configure git bot
         run: |
-          git config user.name "opencode-agent[bot]"
-          git config user.email "opencode-agent@users.noreply.github.com"
+          git config user.name "Vinkbot"
+          git config user.email "272188895+Vinkbot@users.noreply.github.com"
 
       - name: Read issue body safely
         id: issue
