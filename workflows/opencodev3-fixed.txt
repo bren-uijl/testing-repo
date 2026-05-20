@@ -199,14 +199,14 @@ jobs:
             - GUIController: Main orchestrator combining all components
 
             Usage example:
-            ```python
+            \`\`\`python
             from gui_controller import GUIController, Resolution
 
             with GUIController(Resolution(1280, 720)) as controller:
                 controller.launch_app('xeyes')
                 controller.click_at(400, 300)
                 controller.screenshot('output.png')
-            ```
+            \`\`\`
 
             Available tools in the environment:
             - xdotool: Mouse/keyboard simulation
