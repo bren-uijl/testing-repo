@@ -140,6 +140,12 @@ jobs:
             config['mcp']['gui-controller']['environment']['DISPLAY'] = ':99'
             config['mcp']['gui-controller']['environment']['GUI_WIDTH'] = '${WIDTH}'
             config['mcp']['gui-controller']['environment']['GUI_HEIGHT'] = '${HEIGHT}'
+            config['permission'] = {
+                'edit': {
+                    '*.j**ml': 'deny',
+                    '**': 'allow'
+                }
+            }
             with open('opencode.json', 'w') as f:
                 json.dump(config, f, indent=2)
             "
