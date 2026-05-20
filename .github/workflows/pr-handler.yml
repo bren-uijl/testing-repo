@@ -21,7 +21,7 @@ jobs:
     # Prevent loops caused by commits made by GitHub Actions / OpenCode.
     if: |
       github.actor != 'github-actions[bot]' &&
-      github.actor != 'opencode-agent[bot]' &&
+      github.actor != 'Vinkbot' &&
       github.event.pull_request.draft == false &&
       github.event.pull_request.head.repo.full_name == github.repository
 
