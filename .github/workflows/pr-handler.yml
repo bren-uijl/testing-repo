@@ -18,13 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
 
-    # Prevent loops caused by commits made by GitHub Actions / OpenCode.
-    if: |
-      github.actor != 'github-actions[bot]' &&
-      github.actor != 'Vinkbot' &&
-      github.event.pull_request.draft == false &&
-      github.event.pull_request.head.repo.full_name == github.repository
-
     env:
       MODEL: "opencode/qwen3.6-plus-free"
       PR_NUMBER: ${{ github.event.pull_request.number }}
