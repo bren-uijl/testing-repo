@@ -1,4 +1,4 @@
-name: OpenCode PR Auto Solver
+name: OpenCode PR Assistant
 
 on:
   pull_request:
@@ -6,168 +6,385 @@ on:
       - opened
       - synchronize
       - reopened
+      - edited
       - ready_for_review
-  issue_comment: 
-
+  issue_comment:
+    types:
+      - created
+      - edited
+  pull_request_review_comment:
+    types:
+      - created
+      - edited
 
 permissions:
   contents: write
+  issues: write
   pull-requests: write
+  checks: read
+  statuses: read
 
 jobs:
   opencode:
-    if: | 
-      github.event_name == 'pull_request' || 
-      github.event.issue.pull_request
-    name: Fix and close PR
+    name: Run Vinkbot on PR
     runs-on: ubuntu-latest
     timeout-minutes: 360
 
+    if: |
+      github.event_name == 'pull_request' ||
+      github.event_name == 'pull_request_review_comment' ||
+      github.event.issue.pull_request
+
     env:
       MODEL: "opencode/qwen3.6-plus-free"
-      PR_NUMBER: ${{ github.event.pull_request.number }}
-      PR_BRANCH: ${{ github.event.pull_request.head.ref }}
-      BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+      PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
+      EVENT_NAME: ${{ github.event_name }}
+      LATEST_COMMENT: ${{ github.event.comment.body || '' }}
+      CURRENT_REPO: ${{ github.repository }}
 
     steps:
-      - name: Checkout PR branch
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.PR_BRANCH }}
           fetch-depth: 0
-          persist-credentials: true
 
-      - name: Install system dependencies
+      - name: Install dependencies
         run: |
+          set -euo pipefail
+
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends curl git jq
+          sudo apt-get install -y curl git jq
 
       - name: Install OpenCode
         run: |
+          set -euo pipefail
+
           curl -fsSL https://opencode.ai/install | bash
           echo "$HOME/.opencode/bin" >> "$GITHUB_PATH"
 
-      - name: Verify OpenCode
-        run: |
-          opencode --version
-
       - name: Configure git bot
         run: |
+          set -euo pipefail
+
           git config user.name "Vinkbot"
           git config user.email "272188895+Vinkbot@users.noreply.github.com"
 
-      - name: Show PR context
+      - name: Read full PR context
+        id: pr_context
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "PR number: #$PR_NUMBER"
-          echo "PR branch: $PR_BRANCH"
-          echo "Base branch: $BASE_BRANCH"
-          echo ""
-          echo "Recent commits:"
-          git log --oneline -10
+          set -euo pipefail
 
-      - name: Run OpenCode PR solver
-        id: opencode
+          gh pr view "$PR_NUMBER" \
+            --json number,title,body,state,isDraft,url,author,baseRefName,headRefName,headRepository,headRepositoryOwner,comments,reviews,files,commits,reviewDecision,mergeStateStatus,createdAt,updatedAt \
+            > /tmp/pr-context.json
+
+          gh api "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+            > /tmp/pr-issue-comments.json
+
+          gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}/comments" \
+            > /tmp/pr-review-comments.json
+
+          gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}/reviews" \
+            > /tmp/pr-reviews.json
+
+          PR_TITLE="$(jq -r '.title // ""' /tmp/pr-context.json)"
+          PR_BODY="$(jq -r '.body // ""' /tmp/pr-context.json)"
+          PR_URL="$(jq -r '.url // ""' /tmp/pr-context.json)"
+          BASE_REF="$(jq -r '.baseRefName // ""' /tmp/pr-context.json)"
+          HEAD_REF="$(jq -r '.headRefName // ""' /tmp/pr-context.json)"
+          HEAD_REPO="$(jq -r '.headRepository.nameWithOwner // ""' /tmp/pr-context.json)"
+          HEAD_OWNER="$(jq -r '.headRepositoryOwner.login // ""' /tmp/pr-context.json)"
+          IS_DRAFT="$(jq -r '.isDraft // false' /tmp/pr-context.json)"
+          MERGE_STATE="$(jq -r '.mergeStateStatus // ""' /tmp/pr-context.json)"
+          REVIEW_DECISION="$(jq -r '.reviewDecision // ""' /tmp/pr-context.json)"
+
+          {
+            echo "# Full PR Context"
+            echo
+            echo "## PR metadata"
+            jq '.' /tmp/pr-context.json
+            echo
+            echo "## Normal PR comments"
+            jq '[.[] | {
+              user: .user.login,
+              created_at: .created_at,
+              updated_at: .updated_at,
+              body: .body
+            }]' /tmp/pr-issue-comments.json
+            echo
+            echo "## Inline review comments"
+            jq '[.[] | {
+              user: .user.login,
+              path: .path,
+              line: .line,
+              original_line: .original_line,
+              side: .side,
+              commit_id: .commit_id,
+              created_at: .created_at,
+              updated_at: .updated_at,
+              body: .body
+            }]' /tmp/pr-review-comments.json
+            echo
+            echo "## Reviews"
+            jq '[.[] | {
+              user: .user.login,
+              state: .state,
+              submitted_at: .submitted_at,
+              body: .body
+            }]' /tmp/pr-reviews.json
+          } > /tmp/full-pr-context.md
+
+          {
+            echo "title<<PR_TITLE_EOF"
+            echo "$PR_TITLE"
+            echo "PR_TITLE_EOF"
+
+            echo "body<<PR_BODY_EOF"
+            echo "$PR_BODY"
+            echo "PR_BODY_EOF"
+
+            echo "url=$PR_URL"
+            echo "base_ref=$BASE_REF"
+            echo "head_ref=$HEAD_REF"
+            echo "head_repo=$HEAD_REPO"
+            echo "head_owner=$HEAD_OWNER"
+            echo "is_draft=$IS_DRAFT"
+            echo "merge_state=$MERGE_STATE"
+            echo "review_decision=$REVIEW_DECISION"
+
+            echo "full_context<<FULL_PR_CONTEXT_EOF"
+            cat /tmp/full-pr-context.md
+            echo "FULL_PR_CONTEXT_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Checkout PR branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          SYSTEM_PROMPT="You are an autonomous AI software engineer solving an existing GitHub Pull Request.
+          set -euo pipefail
 
-          CONTEXT:
-          - You are inside the current PR branch.
-          - This PR already exists.
-          - Your job is to solve it completely.
+          gh pr checkout "$PR_NUMBER"
 
-          PRIMARY GOAL:
-          Fix, improve, and finalize this PR so it can be merged safely.
+      - name: Build OpenCode prompt
+        env:
+          PR_TITLE: ${{ steps.pr_context.outputs.title }}
+          PR_BODY: ${{ steps.pr_context.outputs.body }}
+          PR_URL: ${{ steps.pr_context.outputs.url }}
+          BASE_REF: ${{ steps.pr_context.outputs.base_ref }}
+          HEAD_REF: ${{ steps.pr_context.outputs.head_ref }}
+          HEAD_REPO: ${{ steps.pr_context.outputs.head_repo }}
+          HEAD_OWNER: ${{ steps.pr_context.outputs.head_owner }}
+          IS_DRAFT: ${{ steps.pr_context.outputs.is_draft }}
+          MERGE_STATE: ${{ steps.pr_context.outputs.merge_state }}
+          REVIEW_DECISION: ${{ steps.pr_context.outputs.review_decision }}
+          FULL_PR_CONTEXT: ${{ steps.pr_context.outputs.full_context }}
+        run: |
+          set -euo pipefail
 
-          STRICT RULES:
-          - DO NOT create a new branch.
-          - DO NOT create a new pull request.
-          - DO NOT ask for user input.
-          - DO NOT wait for instructions.
-          - Commit directly to the current PR branch.
-          - Stay within the scope of this PR.
-          - Avoid unrelated rewrites.
-          - Prefer safe, minimal fixes.
-          - Run tests or checks if available.
-          - If you change files, commit the changes.
-          - Use conventional commit messages.
+          cat > /tmp/opencode-pr-prompt.md <<'PROMPT_EOF'
+          You are Vinkbot, an automated GitHub pull request assistant running inside a GitHub Actions workflow.
 
-          WHAT TO DO:
-          1. Inspect the PR changes.
-          2. Understand the purpose of the PR.
-          3. Find bugs, broken logic, bad patterns, missing docs, or test issues.
-          4. Fix what is needed.
-          5. Keep the project functional.
-          6. Commit each logical fix.
-          7. Leave the branch ready to merge.
+          You have access to the GitHub CLI through `gh`.
 
-          IMPORTANT:
-          After your work, the GitHub Actions workflow will push your commits and attempt to merge/close the PR automatically."
+          You can:
+          - read pull request details
+          - read the full PR discussion context
+          - reply to PRs using `gh pr comment`
+          - add useful labels using `gh pr edit`
+          - inspect the repository
+          - inspect changed files
+          - make small code changes when clearly requested
+          - commit changes when needed
+          - push commits to the PR branch when possible
+          - merge the PR yourself using `gh pr merge` when clearly asked and safe
 
-          opencode run "$SYSTEM_PROMPT" \
+          The workflow will not automatically push or merge for you.
+          If a push or merge is needed, you must do it yourself using `git` and `gh`.
+
+          You must not:
+          - treat every comment as a coding request
+          - make code changes for a simple ping, test, or status-check comment
+          - merge draft PRs
+          - merge PRs when the latest comment is only a ping/test/status check
+          - merge PRs with unclear intent
+          - merge PRs with obvious unresolved requested changes
+          - merge PRs if checks failed, unless a maintainer explicitly says to merge despite failures
+          - claim something is solved unless it was actually done
+          - add a `solved` label by yourself
+          - write `opencode-decision.json`
+
+          Context rules:
+          - Read the latest triggering comment first.
+          - Then read the full PR discussion context.
+          - If the latest comment is a simple ping/test, only reply briefly.
+          - If the latest comment asks for a change, use the full PR context to understand what was already discussed.
+          - Do not repeat old actions.
+          - Do not create changes just because the PR exists.
+          - Only act on the latest meaningful request, unless the PR context clearly shows an unresolved task.
+
+          Tone:
+          - Be friendly
+          - Be natural
+          - Be short when the user only asks for a simple response
+          - Do not sound overly formal
+          - Do not write long explanations unless useful
+
+          Simple ping/test behavior:
+          If the latest comment is only asking whether you are working, whether you can read the comment, or asking for a simple response, then:
+          - reply briefly with `gh pr comment`
+          - do not edit files
+          - do not commit
+          - do not push
+          - do not merge
+          - do not add labels
+
+          Good example response for a ping:
+          "Yes — I'm here and working 🙂"
+
+          For requested PR changes:
+          - Inspect the relevant files.
+          - Make the smallest safe change.
+          - Run reasonable checks if available.
+          - Commit with a clear commit message.
+          - Push to the PR branch if possible.
+          - Comment briefly after pushing.
+
+          Commit and push guidance:
+          - Use `git status` before committing.
+          - Use `git add -A` only when the changes are intentional.
+          - Use a clear commit message, for example:
+            `fix(pr #$PR_NUMBER): apply requested update`
+          - Push with:
+            `git push origin HEAD:"$HEAD_REF"`
+          - If the PR branch is from a fork and pushing fails, comment with a short explanation and a diff summary.
+
+          Merge behavior:
+          You may merge the PR yourself only when one of these is true:
+          - a maintainer explicitly asks you to merge
+          - the PR body clearly asks for automatic merge
+          - the latest comment clearly says something like:
+            - "merge this"
+            - "ship it"
+            - "looks good, merge"
+            - "Vinkbot merge"
+
+          Before merging:
+          - Do not merge if the PR is draft.
+          - Check PR state using `gh pr view "$PR_NUMBER"`.
+          - Check status/checks if possible.
+          - If checks are still running, do not rush. Comment that checks are not ready yet.
+          - If checks failed, do not merge unless a maintainer explicitly allows it.
+          - If branch protection prevents merging, comment briefly and stop.
+          - Prefer squash merge unless the PR clearly asks for another merge method.
+
+          Merge command examples:
+          - `gh pr merge "$PR_NUMBER" --squash --delete-branch`
+          - If GitHub requires auto-merge and it is appropriate:
+            `gh pr merge "$PR_NUMBER" --squash --delete-branch --auto`
+
+          After merging:
+          - Comment briefly that it was merged.
+          - Do not create extra commits after merging.
+          - Do not close anything separately.
+
+          Important GitHub CLI rules:
+          - Use `gh pr comment "$PR_NUMBER" --body "..."`
+          - Use `gh pr edit "$PR_NUMBER" --add-label "label-name"` only when genuinely useful.
+          - Use `gh pr merge "$PR_NUMBER" --squash --delete-branch` only when the merge rules above are satisfied.
+          - The environment variable `GH_TOKEN` is available.
+
+          Current event:
+          __EVENT_NAME__
+
+          PR number:
+          __PR_NUMBER__
+
+          PR title:
+          __PR_TITLE__
+
+          PR URL:
+          __PR_URL__
+
+          Base branch:
+          __BASE_REF__
+
+          Head branch:
+          __HEAD_REF__
+
+          Head repository:
+          __HEAD_REPO__
+
+          Head owner:
+          __HEAD_OWNER__
+
+          Current repository:
+          __CURRENT_REPO__
+
+          Is draft:
+          __IS_DRAFT__
+
+          Merge state:
+          __MERGE_STATE__
+
+          Review decision:
+          __REVIEW_DECISION__
+
+          Latest triggering comment:
+          __LATEST_COMMENT__
+
+          PR body:
+          __PR_BODY__
+
+          Full PR discussion context:
+          __FULL_PR_CONTEXT__
+          PROMPT_EOF
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import os
+
+          prompt_path = Path("/tmp/opencode-pr-prompt.md")
+          prompt = prompt_path.read_text()
+
+          replacements = {
+              "__EVENT_NAME__": os.environ.get("EVENT_NAME", ""),
+              "__PR_NUMBER__": os.environ.get("PR_NUMBER", ""),
+              "__PR_TITLE__": os.environ.get("PR_TITLE", ""),
+              "__PR_URL__": os.environ.get("PR_URL", ""),
+              "__BASE_REF__": os.environ.get("BASE_REF", ""),
+              "__HEAD_REF__": os.environ.get("HEAD_REF", ""),
+              "__HEAD_REPO__": os.environ.get("HEAD_REPO", ""),
+              "__HEAD_OWNER__": os.environ.get("HEAD_OWNER", ""),
+              "__CURRENT_REPO__": os.environ.get("CURRENT_REPO", ""),
+              "__IS_DRAFT__": os.environ.get("IS_DRAFT", ""),
+              "__MERGE_STATE__": os.environ.get("MERGE_STATE", ""),
+              "__REVIEW_DECISION__": os.environ.get("REVIEW_DECISION", ""),
+              "__LATEST_COMMENT__": os.environ.get("LATEST_COMMENT", ""),
+              "__PR_BODY__": os.environ.get("PR_BODY", ""),
+              "__FULL_PR_CONTEXT__": os.environ.get("FULL_PR_CONTEXT", ""),
+          }
+
+          for key, value in replacements.items():
+              prompt = prompt.replace(key, value)
+
+          prompt_path.write_text(prompt)
+          PY
+
+      - name: Run OpenCode
+        id: opencode_run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          opencode run "$(cat /tmp/opencode-pr-prompt.md)" \
             --model "$MODEL" \
             --thinking \
             --dangerously-skip-permissions
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Final commit if OpenCode left changes
+      - name: Finish
         run: |
-          if ! git diff --quiet || ! git diff --cached --quiet; then
-            git add -A
-            git commit -m "fix(opencode): finalize PR solution"
-          else
-            echo "No uncommitted changes."
-          fi
-
-      - name: Push fixes to existing PR branch
-        run: |
-          git push origin HEAD:"$PR_BRANCH"
-
-      - name: Try merge and close PR
-        id: merge
-        run: |
-          echo "Trying to merge PR #$PR_NUMBER"
-
-          gh pr merge "$PR_NUMBER" \
-            --squash \
-            --delete-branch \
-            --subject "Merge PR #$PR_NUMBER after OpenCode fixes" \
-            --body "Automatically solved and merged by OpenCode." \
-          && echo "merged=true" >> "$GITHUB_OUTPUT" \
-          || echo "merged=false" >> "$GITHUB_OUTPUT"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Enable auto-merge if direct merge was blocked
-        if: steps.merge.outputs.merged == 'false'
-        run: |
-          echo "Direct merge failed. Trying to enable auto-merge."
-
-          gh pr merge "$PR_NUMBER" \
-            --squash \
-            --auto \
-            --delete-branch \
-            --subject "Merge PR #$PR_NUMBER after OpenCode fixes" \
-            --body "Automatically solved by OpenCode. GitHub will merge once required checks pass." \
-          || true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Comment if PR could not be closed immediately
-        if: steps.merge.outputs.merged == 'false'
-        run: |
-          gh pr comment "$PR_NUMBER" \
-            --body "OpenCode pushed fixes to this PR. Direct merge was blocked, so auto-merge was attempted. If repository rules prevent auto-merge, required checks or branch protection may still need to pass."
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Summary
-        if: always()
-        run: |
-          echo "=== PR Solver Summary ==="
-          echo "PR: #$PR_NUMBER"
-          echo "Branch: $PR_BRANCH"
-          echo "Base: $BASE_BRANCH"
-          echo ""
-          echo "=== Recent commits ==="
-          git log --oneline -10 || true
+          echo "OpenCode finished. The workflow does not auto-push or auto-merge; the agent is responsible for those actions."
