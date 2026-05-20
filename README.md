@@ -36,17 +36,31 @@ A Connect IQ app that brings conversational AI to your Garmin vívoactive 5, pow
 - Phone companion app for easy API key configuration
 - Persistent local storage for conversations
 
+### [GUI Controller](gui-controller/)
+
+A Python-based GUI automation framework for Ubuntu with virtual display support.
+
+- Virtual framebuffer (Xvfb) and Openbox window manager integration
+- Screenshot capture and visual verification
+- Input simulation via xdotool
+- Minesweeper grid detection and interaction
+
 ## Workflows
 
 This repository uses GitHub Actions for automation:
 
 | Workflow | Description |
 |----------|-------------|
-| OpenCode v2 | Autonomous AI coding agent |
+| OpenCode v1 | Autonomous AI coding agent |
+| OpenCode v2 | Autonomous AI coding agent (v2) |
+| OpenCode v3 | AI coding agent with GUI interaction capabilities |
 | Issue Solver | Automated issue handling |
 | PR Handler | Pull request automation |
-| macOS / Windows | Cross-platform builds |
+| macOS | Cross-platform macOS builds |
 | Linux (noVNC) | Linux environment with virtual display |
+| Linux (nonoVNC) | Linux environment without virtual display |
+| Test | Automated testing workflow |
+| VNC Clean | VNC cleanup and maintenance |
 
 ## License
 
