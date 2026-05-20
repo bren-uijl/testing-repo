@@ -17,7 +17,7 @@ jobs:
 
     if: |
       github.actor != 'github-actions[bot]' &&
-      github.actor != 'opencode-agent[bot]'
+      github.actor != 'Vinkbot'
 
     env:
       MODEL: "opencode/qwen3.6-plus-free"
