@@ -93,19 +93,19 @@ class ConversationListView extends WatchUi.View {
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 18, Graphics.FONT_SMALL, Rez.Strings.AppName, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 18, Graphics.FONT_MEDIUM, Rez.Strings.AppName, Graphics.TEXT_JUSTIFY_CENTER);
 
         if (!storage.isApiKeySet()) {
             dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, 30, Graphics.FONT_SMALL, Rez.Strings.NoApiKey, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, 30, Graphics.FONT_MEDIUM, Rez.Strings.NoApiKey, Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         if (deleteMode) {
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width - 35, 18, Graphics.FONT_SMALL, "X", Graphics.TEXT_JUSTIFY_RIGHT);
+            dc.drawText(width - 35, 18, Graphics.FONT_MEDIUM, "X", Graphics.TEXT_JUSTIFY_RIGHT);
         } else {
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width - 35, 18, Graphics.FONT_SMALL, "?", Graphics.TEXT_JUSTIFY_RIGHT);
+            dc.drawText(width - 35, 18, Graphics.FONT_MEDIUM, "?", Graphics.TEXT_JUSTIFY_RIGHT);
         }
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
@@ -120,7 +120,7 @@ class ConversationListView extends WatchUi.View {
         dc.fillRectangle(btnX, newBtnY, btnWidth, btnHeight);
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, newBtnY + 12, Graphics.FONT_SMALL, Rez.Strings.NewConversation, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, newBtnY + 12, Graphics.FONT_MEDIUM, Rez.Strings.NewConversation, Graphics.TEXT_JUSTIFY_CENTER);
 
         if (showQuickPrompts) {
             var promptY = newBtnY + btnHeight + 8;
@@ -138,19 +138,19 @@ class ConversationListView extends WatchUi.View {
                 dc.fillRoundedRectangle(px, py, promptBtnWidth, promptBtnHeight, 6);
 
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(px + promptBtnWidth / 2, py + 11, Graphics.FONT_SMALL, prompt.get(:label), Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(px + promptBtnWidth / 2, py + 11, Graphics.FONT_MEDIUM, prompt.get(:label), Graphics.TEXT_JUSTIFY_CENTER);
             }
         }
 
         if (conversations.size() == 0 && !showQuickPrompts) {
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, height / 2, Graphics.FONT_SMALL, Rez.Strings.NoConversations, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, height / 2, Graphics.FONT_MEDIUM, Rez.Strings.NoConversations, Graphics.TEXT_JUSTIFY_CENTER);
             return;
         }
 
         if (deleteMode) {
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, newBtnY + 12, Graphics.FONT_SMALL, "Delete Mode", Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, newBtnY + 12, Graphics.FONT_MEDIUM, "Delete Mode", Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         var listTop;
@@ -182,17 +182,17 @@ class ConversationListView extends WatchUi.View {
 
             var titleColor = deleteMode && i == deleteTargetIdx ? Graphics.COLOR_WHITE : Graphics.COLOR_WHITE;
             dc.setColor(titleColor, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(15, y + 8, Graphics.FONT_SMALL, conv.title, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(15, y + 8, Graphics.FONT_MEDIUM, conv.title, Graphics.TEXT_JUSTIFY_LEFT);
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width - 15, y + 8, Graphics.FONT_SMALL, conv.getDisplayTime(), Graphics.TEXT_JUSTIFY_RIGHT);
+            dc.drawText(width - 15, y + 8, Graphics.FONT_MEDIUM, conv.getDisplayTime(), Graphics.TEXT_JUSTIFY_RIGHT);
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(15, y + 26, Graphics.FONT_SMALL, conv.getPreview(), Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(15, y + 26, Graphics.FONT_MEDIUM, conv.getPreview(), Graphics.TEXT_JUSTIFY_LEFT);
 
             if (deleteMode) {
                 dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(width - 25, y + 24, Graphics.FONT_SMALL, "X", Graphics.TEXT_JUSTIFY_RIGHT);
+                dc.drawText(width - 25, y + 24, Graphics.FONT_MEDIUM, "X", Graphics.TEXT_JUSTIFY_RIGHT);
             }
 
             if (i < conversations.size() - 1) {

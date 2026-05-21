@@ -54,7 +54,7 @@ class PhoneSettingsView extends WatchUi.View {
         var y = 80;
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(20, y, Graphics.FONT_SMALL, "NVIDIA API Key:", Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(20, y, Graphics.FONT_MEDIUM, "NVIDIA API Key:", Graphics.TEXT_JUSTIFY_LEFT);
 
         y += 30;
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
@@ -70,15 +70,15 @@ class PhoneSettingsView extends WatchUi.View {
         } else {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         }
-        dc.drawText(25, y + 20, Graphics.FONT_SMALL, displayKey, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(25, y + 20, Graphics.FONT_MEDIUM, displayKey, Graphics.TEXT_JUSTIFY_LEFT);
 
         y += 60;
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(20, y, Graphics.FONT_SMALL, "Model:", Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(20, y, Graphics.FONT_MEDIUM, "Model:", Graphics.TEXT_JUSTIFY_LEFT);
 
         y += 30;
         dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(20, y, Graphics.FONT_SMALL, models.get(modelSelected), Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(20, y, Graphics.FONT_MEDIUM, models.get(modelSelected), Graphics.TEXT_JUSTIFY_LEFT);
 
         y += 50;
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
@@ -86,7 +86,7 @@ class PhoneSettingsView extends WatchUi.View {
 
         y += 20;
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, y, Graphics.FONT_SMALL, "Swipe left/right to change model", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, y, Graphics.FONT_MEDIUM, "Swipe left/right to change model", Graphics.TEXT_JUSTIFY_CENTER);
 
         var keyLen = apiKeyInput.length();
         var statusColor = keyLen == 70 ? Graphics.COLOR_GREEN : (keyLen > 0 ? Graphics.COLOR_YELLOW : Graphics.COLOR_RED);
@@ -94,12 +94,12 @@ class PhoneSettingsView extends WatchUi.View {
 
         y += 40;
         dc.setColor(statusColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, y, Graphics.FONT_SMALL, statusText, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, y, Graphics.FONT_MEDIUM, statusText, Graphics.TEXT_JUSTIFY_CENTER);
 
         if (statusMessage.length() > 0) {
             y += 30;
             dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, y, Graphics.FONT_SMALL, statusMessage, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, y, Graphics.FONT_MEDIUM, statusMessage, Graphics.TEXT_JUSTIFY_CENTER);
         }
     }
 
