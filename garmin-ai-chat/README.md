@@ -11,6 +11,12 @@ A Connect IQ app that brings conversational AI to your wrist, powered by NVIDIA'
 - **Phone Companion**: Easy API key configuration via phone app
 - **Smart API Key Input**: 10-segment input for the 70-character API key
 
+## Screenshots
+
+| Conversation List | Active Chat | Settings |
+|---|---|---|
+| ![Conversation List](screenshots/garmin-conversation-list.png) | ![Conversation View](screenshots/garmin-conversation-view.png) | ![Settings](screenshots/garmin-settings.png) |
+
 ## Requirements
 
 - Garmin vívoactive 5
