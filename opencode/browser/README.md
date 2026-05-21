@@ -2,6 +2,17 @@
 
 A next-generation Chromium-based browser with full Chrome Web Store extension support, built on Electron.
 
+## Screenshots
+
+### Home Page
+![Nexus Browser Home Page](screenshots/browser-homepage.png)
+
+### Loaded Page
+![Nexus Browser Loading example.com](screenshots/browser-loaded-page.png)
+
+### Settings
+![Nexus Browser Settings](screenshots/browser-settings.png)
+
 ## Features
 
 - **Chrome Web Store Support**: Install extensions directly from the Chrome Web Store
