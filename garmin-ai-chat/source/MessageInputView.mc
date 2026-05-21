@@ -40,7 +40,7 @@ class MessageInputView extends WatchUi.View {
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 20, Graphics.FONT_TINY, Rez.Strings.TypeMessage, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 20, Graphics.FONT_SMALL, Rez.Strings.TypeMessage, Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(10, 35, width - 10, 35);
@@ -58,12 +58,12 @@ class MessageInputView extends WatchUi.View {
 
         if (currentText.length() > 0) {
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width - 15, inputY + 35, Graphics.FONT_TINY, currentText.length().toString() + "/500", Graphics.TEXT_JUSTIFY_RIGHT);
+            dc.drawText(width - 15, inputY + 35, Graphics.FONT_SMALL, currentText.length().toString() + "/500", Graphics.TEXT_JUSTIFY_RIGHT);
         }
 
         if (errorMessage != null) {
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, inputY + 100, Graphics.FONT_TINY, errorMessage, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, inputY + 100, Graphics.FONT_SMALL, errorMessage, Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         if (isLoading) {
