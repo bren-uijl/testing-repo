@@ -28,7 +28,7 @@ jobs:
       github.event.issue.pull_request == null
 
     env:
-      MODEL: "opencode/qwen3.6-plus-free"
+      MODEL: "opencode/deepseek-v4-flash-free"
       ISSUE_NUMBER: ${{ github.event.issue.number }}
       ISSUE_TITLE: ${{ github.event.issue.title }}
       BASE_BRANCH: "main"
@@ -217,7 +217,8 @@ jobs:
           opencode run "$(cat /tmp/opencode-prompt.md)" \
             --model "$MODEL" \
             --thinking \
-            --dangerously-skip-permissions
+            --dangerously-skip-permissions \
+            --variant max
 
       - name: Check for repository changes
         id: changes
