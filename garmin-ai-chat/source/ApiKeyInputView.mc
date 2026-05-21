@@ -53,7 +53,7 @@ class ApiKeyInputView extends WatchUi.View {
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 18, Graphics.FONT_TINY, Rez.Strings.ApiKey, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 18, Graphics.FONT_SMALL, Rez.Strings.ApiKey, Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(0, 35, width, 35);
@@ -63,7 +63,7 @@ class ApiKeyInputView extends WatchUi.View {
         var statusColor = keyLen == 70 ? Graphics.COLOR_GREEN : Graphics.COLOR_LT_GRAY;
         dc.setColor(statusColor, Graphics.COLOR_TRANSPARENT);
         var statusText = keyLen.toString() + "/70";
-        dc.drawText(width / 2, 42, Graphics.FONT_TINY, statusText, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 42, Graphics.FONT_SMALL, statusText, Graphics.TEXT_JUSTIFY_CENTER);
 
         var listTop = headerHeight + 10;
         var availableHeight = height - listTop - 50;
@@ -84,7 +84,7 @@ class ApiKeyInputView extends WatchUi.View {
             }
 
             dc.setColor(i == selectedPart ? Graphics.COLOR_WHITE : Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(10, y + 8, Graphics.FONT_TINY, "Part " + (i + 1) + "/10", Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(10, y + 8, Graphics.FONT_SMALL, "Part " + (i + 1) + "/10", Graphics.TEXT_JUSTIFY_LEFT);
 
             var partValue = keyParts.get(i);
             var displayValue = partValue;

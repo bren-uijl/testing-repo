@@ -77,11 +77,11 @@ class ConversationView extends WatchUi.View {
         if (title.length() > 20) {
             title = title.substring(0, 17) + "...";
         }
-        dc.drawText(width / 2, 18, Graphics.FONT_TINY, title, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 18, Graphics.FONT_SMALL, title, Graphics.TEXT_JUSTIFY_CENTER);
 
         var msgCount = conversation.getMessageCount();
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 28, Graphics.FONT_TINY, msgCount.toString() + " msgs", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 28, Graphics.FONT_SMALL, msgCount.toString() + " msgs", Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(0, 30, width, 30);
@@ -140,7 +140,7 @@ class ConversationView extends WatchUi.View {
                 dc.drawText(15, y + 12, Graphics.FONT_SMALL, msg.content, Graphics.TEXT_JUSTIFY_LEFT);
             } else {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(width / 2, y + 12, Graphics.FONT_TINY, msg.content, Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(width / 2, y + 12, Graphics.FONT_SMALL, msg.content, Graphics.TEXT_JUSTIFY_CENTER);
             }
         }
 
@@ -180,7 +180,7 @@ class ConversationView extends WatchUi.View {
 
         if (errorMessage != null) {
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, height - 12, Graphics.FONT_TINY, errorMessage, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, height - 12, Graphics.FONT_SMALL, errorMessage, Graphics.TEXT_JUSTIFY_CENTER);
 
             var retryBtnWidth = 50;
             var retryBtnHeight = 20;
@@ -191,7 +191,7 @@ class ConversationView extends WatchUi.View {
             dc.fillRoundedRectangle(retryBtnX, retryBtnY, retryBtnWidth, retryBtnHeight, 6);
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, retryBtnY + 10, Graphics.FONT_TINY, "Retry", Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, retryBtnY + 10, Graphics.FONT_SMALL, "Retry", Graphics.TEXT_JUSTIFY_CENTER);
         }
     }
 
