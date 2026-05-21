@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.5
+Name=Connect IQ Simulator
+Icon=connectiq-icon
+Exec=simulator
+Terminal=false
+Categories=Development
+Keywords=Garmin
+SingleMainWindow=true
+X-AppImage-Version=8.4.1+159
