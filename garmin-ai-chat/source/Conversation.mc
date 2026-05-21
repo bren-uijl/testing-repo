@@ -114,15 +114,15 @@ class Conversation {
     function save() {
         var storage = Application.getApp().getPropertyStore();
         var convData = {
-            :id => id,
-            :title => title,
-            :createdAt => createdAt,
-            :updatedAt => updatedAt,
-            :messages => []
+            "id" => id,
+            "title" => title,
+            "createdAt" => createdAt,
+            "updatedAt" => updatedAt,
+            "messages" => []
         };
 
         for (var i = 0; i < messages.size(); i++) {
-            convData.get(:messages).add(messages.get(i).toDictionary());
+            convData.get("messages").add(messages.get(i).toDictionary());
         }
 
         storage.setConversation(id, convData);
@@ -144,14 +144,14 @@ class Conversation {
         if (convData == null) {
             return new Conversation(convId, "Unknown");
         }
-        var title = convData.get(:title);
+        var title = convData.get("title");
         var conv = new Conversation(convId, title != null ? title : "Unknown");
-        var created = convData.get(:createdAt);
-        var updated = convData.get(:updatedAt);
+        var created = convData.get("createdAt");
+        var updated = convData.get("updatedAt");
         conv.createdAt = created != null ? created : System.getTimer();
         conv.updatedAt = updated != null ? updated : System.getTimer();
 
-        var msgList = convData.get(:messages);
+        var msgList = convData.get("messages");
         if (msgList != null) {
             for (var i = 0; i < msgList.size(); i++) {
                 var msgData = msgList.get(i);
