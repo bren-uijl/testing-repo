@@ -161,6 +161,11 @@ jobs:
           - Use `gh issue edit "$ISSUE_NUMBER" --add-label "label-name"` when useful.
           - The environment variable `GH_TOKEN` is available.
 
+
+          SUPERIMPORTANT: 
+          - CREATE AFTER EDITING FILES ALWAYS AN PR IF THE USER ASKED FOR CHANGES. 
+          - DONT RESPOND NORMALLY, RESPOND BY RESPONDING ON THE ISSUE.
+
           Current event:
           __EVENT_NAME__
 
