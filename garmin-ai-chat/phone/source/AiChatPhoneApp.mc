@@ -47,26 +47,26 @@ class PhonePropertyStore {
         store = Application.getApp().getProperty("AiChatPhoneStore");
         if (store == null) {
             store = {};
-            store.put(:apiKey, "");
-            store.put(:model, "nvidia/nemotron-nano-9b-v2");
+            store.put("apiKey", "");
+            store.put("model", "nvidia/nemotron-nano-9b-v2");
         }
     }
 
     function getApiKey() {
-        return store.get(:apiKey);
+        return store.get("apiKey");
     }
 
     function setApiKey(key) {
-        store.put(:apiKey, key);
+        store.put("apiKey", key);
         save();
     }
 
     function getModel() {
-        return store.get(:model);
+        return store.get("model");
     }
 
     function setModel(model) {
-        store.put(:model, model);
+        store.put("model", model);
         save();
     }
 

@@ -14,38 +14,38 @@ class PropertyStore {
         store = Application.getApp().getProperty("AiChatStore");
         if (store == null) {
             store = {};
-            store.put(:conversations, []);
-            store.put(:apiKey, "");
-            store.put(:apiKeyParts, []);
-            store.put(:model, "nvidia/nemotron-nano-9b-v2");
-            store.put(:lastConversationId, null);
-            store.put(:systemPrompt, "You are a helpful assistant on a Garmin watch. Keep responses concise and under 200 characters.");
+            store.put("conversations", []);
+            store.put("apiKey", "");
+            store.put("apiKeyParts", []);
+            store.put("model", "nvidia/nemotron-nano-9b-v2");
+            store.put("lastConversationId", null);
+            store.put("systemPrompt", "You are a helpful assistant on a Garmin watch. Keep responses concise and under 200 characters.");
         }
     }
 
     function getApiKey() {
-        return store.get(:apiKey);
+        return store.get("apiKey");
     }
 
     function setApiKey(key) {
-        store.put(:apiKey, key);
+        store.put("apiKey", key);
         save();
     }
 
     function getApiKeyParts() {
-        var parts = store.get(:apiKeyParts);
+        var parts = store.get("apiKeyParts");
         if (parts == null || parts.size() == 0) {
             parts = [];
             for (var i = 0; i < API_KEY_SEGMENT_COUNT; i++) {
                 parts.add("");
             }
-            store.put(:apiKeyParts, parts);
+            store.put("apiKeyParts", parts);
         }
         return parts;
     }
 
     function setApiKeyParts(parts) {
-        store.put(:apiKeyParts, parts);
+        store.put("apiKeyParts", parts);
         rebuildApiKey(parts);
         save();
     }
@@ -57,7 +57,7 @@ class PropertyStore {
         }
         var parts = getApiKeyParts();
         parts[index] = value;
-        store.put(:apiKeyParts, parts);
+        store.put("apiKeyParts", parts);
         rebuildApiKey(parts);
         save();
     }
@@ -67,7 +67,7 @@ class PropertyStore {
         for (var i = 0; i < parts.size(); i++) {
             key = key + parts.get(i);
         }
-        store.put(:apiKey, key);
+        store.put("apiKey", key);
     }
 
     function isApiKeySet() {
@@ -76,7 +76,7 @@ class PropertyStore {
     }
 
     function getModel() {
-        var model = store.get(:model);
+        var model = store.get("model");
         if (model == null || model.length() == 0) {
             return "nvidia/nemotron-nano-9b-v2";
         }
@@ -84,12 +84,12 @@ class PropertyStore {
     }
 
     function setModel(model) {
-        store.put(:model, model);
+        store.put("model", model);
         save();
     }
 
     function getConversationIds() {
-        var ids = store.get(:conversations);
+        var ids = store.get("conversations");
         if (ids == null) {
             return [];
         }
@@ -119,7 +119,7 @@ class PropertyStore {
             }
             ids.add(id);
         }
-        store.put(:conversations, ids);
+        store.put("conversations", ids);
         save();
     }
 
@@ -135,7 +135,7 @@ class PropertyStore {
             var convId = ids.get(i);
             var data = getConversation(convId);
             if (data != null) {
-                var updatedAt = data.get(:updatedAt);
+                var updatedAt = data.get("updatedAt");
                 if (updatedAt != null && updatedAt < oldestTime) {
                     oldestTime = updatedAt;
                     oldestId = convId;
@@ -156,7 +156,7 @@ class PropertyStore {
                 newIds.add(ids.get(i));
             }
         }
-        store.put(:conversations, newIds);
+        store.put("conversations", newIds);
     }
 
     function deleteConversation(id) {
@@ -170,7 +170,7 @@ class PropertyStore {
                 newIds.add(ids.get(i));
             }
         }
-        store.put(:conversations, newIds);
+        store.put("conversations", newIds);
         save();
     }
 
@@ -180,17 +180,17 @@ class PropertyStore {
             var key = "conv_" + ids.get(i);
             store.put(key, null);
         }
-        store.put(:conversations, []);
-        store.put(:lastConversationId, null);
+        store.put("conversations", []);
+        store.put("lastConversationId", null);
         save();
     }
 
     function getLastConversationId() {
-        return store.get(:lastConversationId);
+        return store.get("lastConversationId");
     }
 
     function setLastConversationId(id) {
-        store.put(:lastConversationId, id);
+        store.put("lastConversationId", id);
         save();
     }
 
@@ -199,7 +199,7 @@ class PropertyStore {
     }
 
     function getSystemPrompt() {
-        var prompt = store.get(:systemPrompt);
+        var prompt = store.get("systemPrompt");
         if (prompt == null || prompt.length() == 0) {
             return "You are a helpful assistant.";
         }
@@ -207,7 +207,7 @@ class PropertyStore {
     }
 
     function setSystemPrompt(prompt) {
-        store.put(:systemPrompt, prompt);
+        store.put("systemPrompt", prompt);
         save();
     }
 
