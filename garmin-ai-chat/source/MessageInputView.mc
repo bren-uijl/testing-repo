@@ -40,7 +40,7 @@ class MessageInputView extends WatchUi.View {
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 20, Graphics.FONT_SMALL, Rez.Strings.TypeMessage, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 20, Graphics.FONT_MEDIUM, Rez.Strings.TypeMessage, Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(10, 35, width - 10, 35);
@@ -54,21 +54,21 @@ class MessageInputView extends WatchUi.View {
         if (currentText.length() < 100) {
             displayText = displayText + "|";
         }
-        dc.drawText(20, inputY + 35, Graphics.FONT_SMALL, displayText, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(20, inputY + 35, Graphics.FONT_MEDIUM, displayText, Graphics.TEXT_JUSTIFY_LEFT);
 
         if (currentText.length() > 0) {
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width - 15, inputY + 35, Graphics.FONT_SMALL, currentText.length().toString() + "/500", Graphics.TEXT_JUSTIFY_RIGHT);
+            dc.drawText(width - 15, inputY + 35, Graphics.FONT_MEDIUM, currentText.length().toString() + "/500", Graphics.TEXT_JUSTIFY_RIGHT);
         }
 
         if (errorMessage != null) {
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, inputY + 100, Graphics.FONT_SMALL, errorMessage, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, inputY + 100, Graphics.FONT_MEDIUM, errorMessage, Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         if (isLoading) {
             dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, height - 60, Graphics.FONT_SMALL, Rez.Strings.Loading, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, height - 60, Graphics.FONT_MEDIUM, Rez.Strings.Loading, Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         var sendBtnY = height - 45;
@@ -81,13 +81,13 @@ class MessageInputView extends WatchUi.View {
             dc.fillRoundedRectangle(sendBtnX, sendBtnY, sendBtnWidth, sendBtnHeight, 8);
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, sendBtnY + 15, Graphics.FONT_SMALL, Rez.Strings.Send, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, sendBtnY + 15, Graphics.FONT_MEDIUM, Rez.Strings.Send, Graphics.TEXT_JUSTIFY_CENTER);
         } else {
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
             dc.fillRoundedRectangle(sendBtnX, sendBtnY, sendBtnWidth, sendBtnHeight, 8);
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, sendBtnY + 15, Graphics.FONT_SMALL, Rez.Strings.Send, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, sendBtnY + 15, Graphics.FONT_MEDIUM, Rez.Strings.Send, Graphics.TEXT_JUSTIFY_CENTER);
         }
     }
 

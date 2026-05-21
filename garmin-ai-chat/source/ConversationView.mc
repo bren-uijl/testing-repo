@@ -68,7 +68,7 @@ class ConversationView extends WatchUi.View {
 
         if (conversation == null) {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, height / 2, Graphics.FONT_SMALL, "Conversation not found", Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, height / 2, Graphics.FONT_MEDIUM, "Conversation not found", Graphics.TEXT_JUSTIFY_CENTER);
             return;
         }
 
@@ -77,11 +77,11 @@ class ConversationView extends WatchUi.View {
         if (title.length() > 20) {
             title = title.substring(0, 17) + "...";
         }
-        dc.drawText(width / 2, 18, Graphics.FONT_SMALL, title, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 18, Graphics.FONT_MEDIUM, title, Graphics.TEXT_JUSTIFY_CENTER);
 
         var msgCount = conversation.getMessageCount();
         dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 28, Graphics.FONT_SMALL, msgCount.toString() + " msgs", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 28, Graphics.FONT_MEDIUM, msgCount.toString() + " msgs", Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(0, 30, width, 30);
@@ -93,7 +93,7 @@ class ConversationView extends WatchUi.View {
         var messages = conversation.getMessages();
         if (messages.size() == 0) {
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, height / 2, Graphics.FONT_SMALL, "No messages", Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, height / 2, Graphics.FONT_MEDIUM, "No messages", Graphics.TEXT_JUSTIFY_CENTER);
             return;
         }
 
@@ -117,7 +117,7 @@ class ConversationView extends WatchUi.View {
 
             if (msg.isUser()) {
                 dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLUE);
-                var textWidth = dc.getTextWidthInPixels(msg.content, Graphics.FONT_SMALL);
+                var textWidth = dc.getTextWidthInPixels(msg.content, Graphics.FONT_MEDIUM);
                 var bubbleWidth = textWidth + 20;
                 if (bubbleWidth > width - 40) {
                     bubbleWidth = width - 40;
@@ -126,10 +126,10 @@ class ConversationView extends WatchUi.View {
                 dc.fillRoundedRectangle(bubbleX, y, bubbleWidth, lineHeight, 8);
 
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(width - 15, y + 12, Graphics.FONT_SMALL, msg.content, Graphics.TEXT_JUSTIFY_RIGHT);
+                dc.drawText(width - 15, y + 12, Graphics.FONT_MEDIUM, msg.content, Graphics.TEXT_JUSTIFY_RIGHT);
             } else if (msg.isAssistant()) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
-                var textWidth = dc.getTextWidthInPixels(msg.content, Graphics.FONT_SMALL);
+                var textWidth = dc.getTextWidthInPixels(msg.content, Graphics.FONT_MEDIUM);
                 var bubbleWidth = textWidth + 20;
                 if (bubbleWidth > width - 40) {
                     bubbleWidth = width - 40;
@@ -137,10 +137,10 @@ class ConversationView extends WatchUi.View {
                 dc.fillRoundedRectangle(10, y, bubbleWidth, lineHeight, 8);
 
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(15, y + 12, Graphics.FONT_SMALL, msg.content, Graphics.TEXT_JUSTIFY_LEFT);
+                dc.drawText(15, y + 12, Graphics.FONT_MEDIUM, msg.content, Graphics.TEXT_JUSTIFY_LEFT);
             } else {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(width / 2, y + 12, Graphics.FONT_SMALL, msg.content, Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(width / 2, y + 12, Graphics.FONT_MEDIUM, msg.content, Graphics.TEXT_JUSTIFY_CENTER);
             }
         }
 
@@ -159,13 +159,13 @@ class ConversationView extends WatchUi.View {
             dc.fillRoundedRectangle(replyBtnX, replyBtnY, replyBtnWidth, replyBtnHeight, 8);
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, replyBtnY + 14, Graphics.FONT_SMALL, "Reply", Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, replyBtnY + 14, Graphics.FONT_MEDIUM, "Reply", Graphics.TEXT_JUSTIFY_CENTER);
         } else {
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
             dc.fillRoundedRectangle(replyBtnX, replyBtnY, replyBtnWidth, replyBtnHeight, 8);
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, replyBtnY + 14, Graphics.FONT_SMALL, Rez.Strings.Loading + loadingDots, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, replyBtnY + 14, Graphics.FONT_MEDIUM, Rez.Strings.Loading + loadingDots, Graphics.TEXT_JUSTIFY_CENTER);
 
             var cancelBtnWidth = 60;
             var cancelBtnX = replyBtnX + replyBtnWidth + 10;
@@ -174,13 +174,13 @@ class ConversationView extends WatchUi.View {
                 dc.fillRoundedRectangle(cancelBtnX, replyBtnY, cancelBtnWidth, replyBtnHeight, 8);
 
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(cancelBtnX + cancelBtnWidth / 2, replyBtnY + 14, Graphics.FONT_SMALL, "Cancel", Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(cancelBtnX + cancelBtnWidth / 2, replyBtnY + 14, Graphics.FONT_MEDIUM, "Cancel", Graphics.TEXT_JUSTIFY_CENTER);
             }
         }
 
         if (errorMessage != null) {
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, height - 12, Graphics.FONT_SMALL, errorMessage, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, height - 12, Graphics.FONT_MEDIUM, errorMessage, Graphics.TEXT_JUSTIFY_CENTER);
 
             var retryBtnWidth = 50;
             var retryBtnHeight = 20;
@@ -191,13 +191,13 @@ class ConversationView extends WatchUi.View {
             dc.fillRoundedRectangle(retryBtnX, retryBtnY, retryBtnWidth, retryBtnHeight, 6);
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, retryBtnY + 10, Graphics.FONT_SMALL, "Retry", Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, retryBtnY + 10, Graphics.FONT_MEDIUM, "Retry", Graphics.TEXT_JUSTIFY_CENTER);
         }
     }
 
     function estimateLineHeight(text, dc) {
         var width = dc.getWidth() - 60;
-        var textWidth = dc.getTextWidthInPixels(text, Graphics.FONT_SMALL);
+        var textWidth = dc.getTextWidthInPixels(text, Graphics.FONT_MEDIUM);
         var lines = (textWidth / width).toFloat().ceil().toNumber();
         if (lines < 1) {
             lines = 1;

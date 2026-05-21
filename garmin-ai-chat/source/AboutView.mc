@@ -39,7 +39,7 @@ class AboutView extends WatchUi.View {
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 18, Graphics.FONT_SMALL, "About AI Chat", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 18, Graphics.FONT_MEDIUM, "About AI Chat", Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(0, 35, width, 35);
@@ -59,12 +59,12 @@ class AboutView extends WatchUi.View {
             var y = listTop + (i - scrollOffset) * itemHeight;
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(15, y + 14, Graphics.FONT_SMALL, item.get(:label), Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(15, y + 14, Graphics.FONT_MEDIUM, item.get(:label), Graphics.TEXT_JUSTIFY_LEFT);
 
             var value = item.get(:value);
             if (value != null) {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(width - 15, y + 14, Graphics.FONT_SMALL, value, Graphics.TEXT_JUSTIFY_RIGHT);
+                dc.drawText(width - 15, y + 14, Graphics.FONT_MEDIUM, value, Graphics.TEXT_JUSTIFY_RIGHT);
             }
 
             if (i < items.size() - 1) {
