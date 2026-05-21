@@ -104,7 +104,7 @@ class PhoneSettingsView extends WatchUi.View {
     }
 
     function onTap(evt) {
-        var y = evt.getY();
+        var y = evt.getCoordinates()[1];
 
         if (y >= 110 && y <= 150) {
             if (WatchUi has :TextPicker) {

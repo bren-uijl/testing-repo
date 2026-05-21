@@ -132,8 +132,9 @@ class SettingsView extends WatchUi.View {
     }
 
     function onTap(evt) {
-        var x = evt.getX();
-        var y = evt.getY();
+        var coords = evt.getCoordinates();
+        var x = coords[0];
+        var y = coords[1];
 
         var listTop = headerHeight;
         if (y >= listTop) {
