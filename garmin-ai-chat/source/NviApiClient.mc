@@ -48,19 +48,19 @@ class NviApiClient {
         }
 
         var requestBody = {
-            :model => model,
-            :messages => messages,
-            :max_tokens => 1024,
-            :temperature => 0.7,
-            :stream => false
+            "model" => model,
+            "messages" => messages,
+            "max_tokens" => 1024,
+            "temperature" => 0.7,
+            "stream" => false
         };
 
         var options = {
-            :method => Communications.HTTP_REQUEST_METHOD_POST,
-            :headers => {
+            "method" => Communications.HTTP_REQUEST_METHOD_POST,
+            "headers" => {
                 "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
             },
-            :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            "responseType" => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
         };
 
         try {
@@ -80,13 +80,17 @@ class NviApiClient {
         if (responseCode == 200 && data != null) {
             try {
                 if (data instanceof Dictionary) {
-                    var choices = data[:choices];
+                    var choices = data["choices"];
                     if (choices != null && choices.size() > 0) {
-                        var choice = choices[0];
-                        if (choice != null) {
-                            var message = choice[:message];
+                        var firstChoice = null;
+                        for (var c : choices) {
+                            firstChoice = c;
+                            break;
+                        }
+                        if (firstChoice != null) {
+                            var message = firstChoice["message"];
                             if (message != null) {
-                                var content = message[:content];
+                                var content = message["content"];
                                 if (content != null && content.length() > 0) {
                                     callback.onComplete(content, null);
                                     return;
@@ -125,9 +129,9 @@ class NviApiClient {
         if (data != null) {
             try {
                 if (data instanceof Dictionary) {
-                    var error = data[:error];
+                    var error = data["error"];
                     if (error != null) {
-                        var message = error[:message];
+                        var message = error["message"];
                         if (message != null && message.length() > 0) {
                             if (message.length() > 50) {
                                 message = message.substring(0, 47) + "...";
