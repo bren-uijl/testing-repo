@@ -2,6 +2,16 @@ using Toybox.WatchUi;
 using Toybox.Graphics;
 using Toybox.Lang;
 
+class AboutItem {
+    var label;
+    var value;
+
+    function initialize(label, value) {
+        self.label = label;
+        self.value = value;
+    }
+}
+
 class AboutView extends WatchUi.View {
 
     var items;
@@ -18,12 +28,12 @@ class AboutView extends WatchUi.View {
         itemHeight = 45;
         headerHeight = 45;
 
-        items.add({ :label => "Version", :value => "1.2.0" });
-        items.add({ :label => "Device", :value => "vívoactive 5" });
-        items.add({ :label => "API", :value => "NVIDIA Chat" });
-        items.add({ :label => "Models", :value => "8 available" });
-        items.add({ :label => "Built with", :value => "Monkey C" });
-        items.add({ :label => "License", :value => "MIT" });
+        items.add(new AboutItem("Version", "1.2.0"));
+        items.add(new AboutItem("Device", "vívoactive 5"));
+        items.add(new AboutItem("API", "NVIDIA Chat"));
+        items.add(new AboutItem("Models", "8 available"));
+        items.add(new AboutItem("Built with", "Monkey C"));
+        items.add(new AboutItem("License", "MIT"));
     }
 
     function onLayout(dc) {
@@ -59,9 +69,9 @@ class AboutView extends WatchUi.View {
             var y = listTop + (i - scrollOffset) * itemHeight;
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(15, y + 14, Graphics.FONT_MEDIUM, item[:label], Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(15, y + 14, Graphics.FONT_MEDIUM, item.label, Graphics.TEXT_JUSTIFY_LEFT);
 
-            var value = item[:value];
+            var value = item.value;
             if (value != null) {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
                 dc.drawText(width - 15, y + 14, Graphics.FONT_MEDIUM, value, Graphics.TEXT_JUSTIFY_RIGHT);
