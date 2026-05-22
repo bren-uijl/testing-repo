@@ -230,7 +230,7 @@ class ConversationView extends WatchUi.View {
         var count = 0;
         for (var mi = 0; mi < msgList.size(); mi++) {
             var m = msgList[mi];
-            if (count == idx) return m;
+            if (count == idx) { return m; }
             count++;
         }
         return null;

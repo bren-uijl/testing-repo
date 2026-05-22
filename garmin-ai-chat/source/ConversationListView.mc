@@ -194,7 +194,7 @@ class ConversationListView extends WatchUi.View {
         for (var ci = 0; ci < conversations.size(); ci++) {
             var conv = conversations[ci];
             if (ci < scrollOffset) { continue; }
-            if (ci >= scrollOffset + maxVisible + 1) break;
+            if (ci >= scrollOffset + maxVisible + 1) { break; }
 
             var y = listTop + (ci - scrollOffset) * itemHeight;
 

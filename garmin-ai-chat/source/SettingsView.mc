@@ -99,7 +99,7 @@ class SettingsView extends WatchUi.View {
         for (var ci = 0; ci < items.size(); ci++) {
             var item = items[ci];
             if (ci < scrollOffset) { continue; }
-            if (ci >= scrollOffset + maxVisible + 1) break;
+            if (ci >= scrollOffset + maxVisible + 1) { break; }
 
             var y = listTop + (ci - scrollOffset) * itemHeight;
 
