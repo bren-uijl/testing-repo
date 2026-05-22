@@ -171,7 +171,7 @@ class ConversationView extends WatchUi.View {
 
             var cancelBtnWidth = 60;
             var cancelBtnX = replyBtnX + replyBtnWidth + 10;
-            if (cancelBtnX + cancelBtnWidth < width - 10) {
+            if (cancelBtnX + cancelBtnWidth <= width - 10) {
                 dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_RED);
                 dc.fillRoundedRectangle(cancelBtnX, replyBtnY, cancelBtnWidth, replyBtnHeight, 8);
 
