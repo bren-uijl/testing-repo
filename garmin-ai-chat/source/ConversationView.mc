@@ -167,7 +167,7 @@ class ConversationView extends WatchUi.View {
             dc.fillRoundedRectangle(replyBtnX, replyBtnY, replyBtnWidth, replyBtnHeight, 8);
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, replyBtnY + 14, Graphics.FONT_MEDIUM, Rez.Strings.Loading + loadingDots, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, replyBtnY + 14, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.Loading) + loadingDots, Graphics.TEXT_JUSTIFY_CENTER);
 
             var cancelBtnWidth = 60;
             var cancelBtnX = replyBtnX + replyBtnWidth + 10;
@@ -221,8 +221,13 @@ class ConversationView extends WatchUi.View {
 
     function onTap(evt) {
         var coords = evt.getCoordinates();
-        var x = coords[0];
-        var y = coords[1];
+        var x = 0;
+        var y = 0;
+        var isFirst = true;
+        for (var c : coords) {
+            if (isFirst) { x = c; isFirst = false; }
+            else { y = c; }
+        }
         var width = viewWidth;
         var height = viewHeight;
 

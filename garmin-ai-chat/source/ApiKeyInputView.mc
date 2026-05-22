@@ -53,7 +53,7 @@ class ApiKeyInputView extends WatchUi.View {
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 18, Graphics.FONT_MEDIUM, Rez.Strings.ApiKey, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 18, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.ApiKey), Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(0, 35, width, 35);
@@ -71,35 +71,35 @@ class ApiKeyInputView extends WatchUi.View {
 
         dc.setClip(0, listTop, width, availableHeight);
 
-        for (var i = scrollOffset; i < segmentCount; i++) {
-            if (i >= scrollOffset + maxVisible + 1) {
-                break;
-            }
+        var ci = 0;
+        for (var partValue : keyParts) {
+            if (ci < scrollOffset) { ci++; continue; }
+            if (ci >= scrollOffset + maxVisible + 1) break;
 
-            var y = listTop + (i - scrollOffset) * segmentHeight;
+            var y = listTop + (ci - scrollOffset) * segmentHeight;
 
-            if (i == selectedPart) {
+            if (ci == selectedPart) {
                 dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLUE);
                 dc.fillRectangle(5, y, width - 10, segmentHeight - 4);
             }
 
-            dc.setColor(i == selectedPart ? Graphics.COLOR_WHITE : Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(10, y + 8, Graphics.FONT_MEDIUM, "Part " + (i + 1) + "/10", Graphics.TEXT_JUSTIFY_LEFT);
+            dc.setColor(ci == selectedPart ? Graphics.COLOR_WHITE : Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(10, y + 8, Graphics.FONT_MEDIUM, "Part " + (ci + 1) + "/10", Graphics.TEXT_JUSTIFY_LEFT);
 
-            var partValue = keyParts[i];
             var displayValue = partValue;
             if (displayValue.length() == 0) {
                 displayValue = "Tap to enter";
-                dc.setColor(i == selectedPart ? Graphics.COLOR_LT_GRAY : Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
+                dc.setColor(ci == selectedPart ? Graphics.COLOR_LT_GRAY : Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
             }
 
-            dc.setColor(i == selectedPart ? Graphics.COLOR_WHITE : Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+            dc.setColor(ci == selectedPart ? Graphics.COLOR_WHITE : Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             dc.drawText(width / 2, y + 24, Graphics.FONT_MEDIUM, displayValue, Graphics.TEXT_JUSTIFY_CENTER);
 
-            if (i < segmentCount - 1) {
+            if (ci < segmentCount - 1) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
                 dc.drawLine(10, y + segmentHeight - 4, width - 10, y + segmentHeight - 4);
             }
+            ci++;
         }
 
         dc.clearClip();
@@ -120,16 +120,21 @@ class ApiKeyInputView extends WatchUi.View {
 
     function getFullKey() {
         var key = "";
-        for (var i = 0; i < keyParts.size(); i++) {
-            key = key + keyParts[i];
+        for (var p : keyParts) {
+            key = key + p;
         }
         return key;
     }
 
     function onTap(evt) {
         var coords = evt.getCoordinates();
-        var x = coords[0];
-        var y = coords[1];
+        var x = 0;
+        var y = 0;
+        var isFirst = true;
+        for (var c : coords) {
+            if (isFirst) { x = c; isFirst = false; }
+            else { y = c; }
+        }
         var width = viewWidth;
         var height = viewHeight;
 
@@ -156,13 +161,25 @@ class ApiKeyInputView extends WatchUi.View {
 
     function openSegmentInput(idx) {
         if (WatchUi has :TextPicker) {
-            WatchUi.pushView(new WatchUi.TextPicker(keyParts[idx]), new ApiKeyTextInputDelegate(self, idx), WatchUi.SLIDE_DOWN);
+            var currentValue = "";
+            var ci = 0;
+            for (var p : keyParts) {
+                if (ci == idx) { currentValue = p; break; }
+                ci++;
+            }
+            WatchUi.pushView(new WatchUi.TextPicker(currentValue), new ApiKeyTextInputDelegate(self, idx), WatchUi.SLIDE_DOWN);
         }
     }
 
     function onSegmentSubmitted(idx, text) {
         if (text != null) {
-            keyParts[idx] = text;
+            var newParts = [];
+            var pi = 0;
+            for (var p : keyParts) {
+                newParts.add(pi == idx ? text : p);
+                pi++;
+            }
+            keyParts = newParts;
             storage.setApiKeyPart(idx, text);
         }
         WatchUi.requestUpdate();

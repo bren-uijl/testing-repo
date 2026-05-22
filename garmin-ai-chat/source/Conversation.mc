@@ -55,7 +55,11 @@ class Conversation {
 
     function getLastMessage() {
         if (messages.size() > 0) {
-            return messages[messages.size() - 1];
+            var last = null;
+            for (var msg : messages) {
+                last = msg;
+            }
+            return last;
         }
         return null;
     }

@@ -109,11 +109,11 @@ class ConversationListView extends WatchUi.View {
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 18, Graphics.FONT_MEDIUM, Rez.Strings.AppName, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 18, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.AppName), Graphics.TEXT_JUSTIFY_CENTER);
 
         if (!storage.isApiKeySet()) {
             dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, 30, Graphics.FONT_MEDIUM, Rez.Strings.NoApiKey, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, 30, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.NoApiKey), Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         if (deleteMode) {
@@ -136,7 +136,7 @@ class ConversationListView extends WatchUi.View {
         dc.fillRectangle(btnX, newBtnY, btnWidth, btnHeight);
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, newBtnY + 12, Graphics.FONT_MEDIUM, Rez.Strings.NewConversation, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, newBtnY + 12, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.NewConversation), Graphics.TEXT_JUSTIFY_CENTER);
 
         if (showQuickPrompts) {
             var promptY = newBtnY + btnHeight + 8;
@@ -161,7 +161,7 @@ class ConversationListView extends WatchUi.View {
 
         if (conversations.size() == 0 && !showQuickPrompts) {
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, height / 2, Graphics.FONT_MEDIUM, Rez.Strings.NoConversations, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, height / 2, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.NoConversations), Graphics.TEXT_JUSTIFY_CENTER);
             return;
         }
 
@@ -223,8 +223,13 @@ class ConversationListView extends WatchUi.View {
 
     function onTap(evt) {
         var coords = evt.getCoordinates();
-        var x = coords[0];
-        var y = coords[1];
+        var x = 0;
+        var y = 0;
+        var isFirst = true;
+        for (var c : coords) {
+            if (isFirst) { x = c; isFirst = false; }
+            else { y = c; }
+        }
         var width = viewWidth;
 
         var newBtnY = 42;
