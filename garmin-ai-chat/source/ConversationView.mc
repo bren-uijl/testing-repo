@@ -154,24 +154,33 @@ class ConversationView extends WatchUi.View {
         var replyBtnY = height - footerHeight + 10;
         var replyBtnWidth = 100;
         var replyBtnHeight = 28;
-        var replyBtnX = (width - replyBtnWidth) / 2;
+        var cancelBtnWidth = 60;
+
+        var replyBtnX;
+        var cancelBtnX;
+        if (isLoading) {
+            var pairWidth = replyBtnWidth + 10 + cancelBtnWidth;
+            replyBtnX = (width - pairWidth) / 2;
+            cancelBtnX = replyBtnX + replyBtnWidth + 10;
+        } else {
+            replyBtnX = (width - replyBtnWidth) / 2;
+            cancelBtnX = 0;
+        }
 
         if (!isLoading) {
             dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLUE);
             dc.fillRoundedRectangle(replyBtnX, replyBtnY, replyBtnWidth, replyBtnHeight, 8);
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, replyBtnY + 14, Graphics.FONT_MEDIUM, "Reply", Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(replyBtnX + replyBtnWidth / 2, replyBtnY + 14, Graphics.FONT_MEDIUM, "Reply", Graphics.TEXT_JUSTIFY_CENTER);
         } else {
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
             dc.fillRoundedRectangle(replyBtnX, replyBtnY, replyBtnWidth, replyBtnHeight, 8);
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, replyBtnY + 14, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.Loading) + loadingDots, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(replyBtnX + replyBtnWidth / 2, replyBtnY + 14, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.Loading) + loadingDots, Graphics.TEXT_JUSTIFY_CENTER);
 
-            var cancelBtnWidth = 60;
-            var cancelBtnX = replyBtnX + replyBtnWidth + 10;
-            if (cancelBtnX + cancelBtnWidth <= width - 10) {
+            if (cancelBtnX + cancelBtnWidth <= width) {
                 dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_RED);
                 dc.fillRoundedRectangle(cancelBtnX, replyBtnY, cancelBtnWidth, replyBtnHeight, 8);
 
@@ -245,7 +254,18 @@ class ConversationView extends WatchUi.View {
         var replyBtnY = height - footerHeight + 10;
         var replyBtnWidth = 100;
         var replyBtnHeight = 28;
-        var replyBtnX = (width - replyBtnWidth) / 2;
+        var cancelBtnWidth = 60;
+
+        var replyBtnX;
+        var cancelBtnX;
+        if (isLoading) {
+            var pairWidth = replyBtnWidth + 10 + cancelBtnWidth;
+            replyBtnX = (width - pairWidth) / 2;
+            cancelBtnX = replyBtnX + replyBtnWidth + 10;
+        } else {
+            replyBtnX = (width - replyBtnWidth) / 2;
+            cancelBtnX = 0;
+        }
 
         if (x >= replyBtnX && x <= replyBtnX + replyBtnWidth && y >= replyBtnY && y <= replyBtnY + replyBtnHeight) {
             if (!isLoading) {
@@ -255,8 +275,6 @@ class ConversationView extends WatchUi.View {
         }
 
         if (isLoading) {
-            var cancelBtnWidth = 60;
-            var cancelBtnX = replyBtnX + replyBtnWidth + 10;
             if (x >= cancelBtnX && x <= cancelBtnX + cancelBtnWidth && y >= replyBtnY && y <= replyBtnY + replyBtnHeight) {
                 onCancelRequest();
                 return;
