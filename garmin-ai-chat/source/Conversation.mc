@@ -55,7 +55,7 @@ class Conversation {
 
     function getLastMessage() {
         if (messages.size() > 0) {
-            return messages[messages.size(] - 1);
+            return messages[messages.size() - 1];
         }
         return null;
     }
@@ -94,19 +94,20 @@ class Conversation {
 
         if (systemPrompt != null && systemPrompt.length() > 0) {
             apiMsgs.add({
-                :role => "system",
-                :content => systemPrompt
+                "role" => "system",
+                "content" => systemPrompt
             });
         }
 
-        for (var i = 0; i < messages.size(); i++) {
-            var msg = messages[i];
-            if (msg.role != "system" || i == 0) {
+        var isFirst = true;
+        for (var msg : messages) {
+            if (msg.role != "system" || isFirst) {
                 apiMsgs.add({
-                    :role => msg.role,
-                    :content => msg.content
+                    "role" => msg.role,
+                    "content" => msg.content
                 });
             }
+            isFirst = false;
         }
         return apiMsgs;
     }
@@ -121,8 +122,8 @@ class Conversation {
             "messages" => []
         };
 
-        for (var i = 0; i < messages.size(); i++) {
-            convData["messages"].add(messages[i].toDictionary());
+        for (var msg : messages) {
+            convData["messages"].add(msg.toDictionary());
         }
 
         storage.setConversation(id, convData);
@@ -153,8 +154,7 @@ class Conversation {
 
         var msgList = convData["messages"];
         if (msgList != null) {
-            for (var i = 0; i < msgList.size(); i++) {
-                var msgData = msgList[i];
+            for (var msgData : msgList) {
                 if (msgData != null) {
                     conv.messages.add(Message.fromDictionary(msgData));
                 }

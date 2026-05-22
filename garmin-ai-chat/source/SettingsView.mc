@@ -42,15 +42,15 @@ class SettingsView extends WatchUi.View {
             keyStatus = masked;
         }
         items.add({
-            :label => "API Key",
-            :value => keyStatus,
-            :action => "apiKey"
+            "label" => "API Key",
+            "value" => keyStatus,
+            "action" => "apiKey"
         });
 
         items.add({
-            :label => "Model",
-            :value => getModelDisplayName(storage.getModel()),
-            :action => "model"
+            "label" => "Model",
+            "value" => getModelDisplayName(storage.getModel()),
+            "action" => "model"
         });
 
         var prompt = storage.getSystemPrompt();
@@ -59,21 +59,21 @@ class SettingsView extends WatchUi.View {
             promptPreview = promptPreview.substring(0, 22) + "...";
         }
         items.add({
-            :label => "System Prompt",
-            :value => promptPreview != null ? promptPreview : "Default",
-            :action => "systemPrompt"
+            "label" => "System Prompt",
+            "value" => promptPreview != null ? promptPreview : "Default",
+            "action" => "systemPrompt"
         });
 
         items.add({
-            :label => "Clear All Chats",
-            :value => "",
-            :action => "clear"
+            "label" => "Clear All Chats",
+            "value" => "",
+            "action" => "clear"
         });
 
         items.add({
-            :label => "About",
-            :value => "v1.2.0",
-            :action => "about"
+            "label" => "About",
+            "value" => "v1.2.0",
+            "action" => "about"
         });
     }
 
@@ -96,23 +96,23 @@ class SettingsView extends WatchUi.View {
 
         dc.setClip(0, listTop, width, availableHeight);
 
-        for (var i = scrollOffset; i < items.size(); i++) {
-            if (i >= scrollOffset + maxVisible + 1) {
-                break;
-            }
+        var idx = 0;
+        var drawn = 0;
+        for (var item : items) {
+            if (idx < scrollOffset) { idx++; continue; }
+            if (drawn > maxVisible) break;
 
-            var item = items[i];
-            var y = listTop + (i - scrollOffset) * itemHeight;
+            var y = listTop + drawn * itemHeight;
 
-            if (i == selectedIdx) {
+            if (idx == selectedIdx) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
                 dc.fillRectangle(5, y, width - 10, itemHeight - 4);
             }
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(15, y + 12, Graphics.FONT_MEDIUM, item[:label], Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(15, y + 12, Graphics.FONT_MEDIUM, item["label"], Graphics.TEXT_JUSTIFY_LEFT);
 
-            var value = item[:value];
+            var value = item["value"];
             if (value != null && value.length() > 0) {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
                 var displayValue = value;
@@ -122,10 +122,13 @@ class SettingsView extends WatchUi.View {
                 dc.drawText(width - 15, y + 12, Graphics.FONT_MEDIUM, displayValue, Graphics.TEXT_JUSTIFY_RIGHT);
             }
 
-            if (i < items.size() - 1) {
+            if (drawn > 0) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
-                dc.drawLine(10, y + itemHeight - 4, width - 10, y + itemHeight - 4);
+                dc.drawLine(10, y - 4, width - 10, y - 4);
             }
+
+            idx++;
+            drawn++;
         }
 
         dc.clearClip();
@@ -146,8 +149,15 @@ class SettingsView extends WatchUi.View {
     }
 
     function handleItemSelect(idx) {
-        var item = items[idx];
-        var action = item[:action];
+        var action = "";
+        var ci = 0;
+        for (var item : items) {
+            if (ci == idx) {
+                action = item["action"];
+                break;
+            }
+            ci++;
+        }
 
         if (action == "apiKey") {
             Application.getApp().showApiKeyInput();
