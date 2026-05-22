@@ -1,7 +1,7 @@
 ---
 description: Haves the capability to view images
 mode: subagent
-model: nvidia/mistralai/mistral-medium-3.5-128b
+model: nvidia/mistralai/mistral-small-4-119b-2603
 temperature: 0.1
 permission:
   edit: deny
