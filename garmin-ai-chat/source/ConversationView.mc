@@ -105,8 +105,9 @@ class ConversationView extends WatchUi.View {
             startIdx = scrollOffset;
         }
 
-        for (var i = startIdx; i >= 0; i--) {
-            var msg = messages[i];
+        var msgIdx = startIdx;
+        while (msgIdx >= 0) {
+            var msg = getMessageAt(messages, msgIdx);
             var lineHeight = estimateLineHeight(msg.content, dc);
 
             if (y - lineHeight < headerHeight) {
@@ -142,6 +143,7 @@ class ConversationView extends WatchUi.View {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
                 dc.drawText(width / 2, y + 12, Graphics.FONT_MEDIUM, msg.content, Graphics.TEXT_JUSTIFY_CENTER);
             }
+            msgIdx--;
         }
 
         dc.clearClip();
@@ -193,6 +195,15 @@ class ConversationView extends WatchUi.View {
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             dc.drawText(width / 2, retryBtnY + 10, Graphics.FONT_MEDIUM, "Retry", Graphics.TEXT_JUSTIFY_CENTER);
         }
+    }
+
+    function getMessageAt(msgList, idx) {
+        var count = 0;
+        for (var m : msgList) {
+            if (count == idx) return m;
+            count++;
+        }
+        return null;
     }
 
     function estimateLineHeight(text, dc) {

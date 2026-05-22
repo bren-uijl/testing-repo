@@ -4,6 +4,16 @@ using Toybox.Application;
 using Toybox.Lang;
 using Toybox.System;
 
+class QuickPrompt {
+    var label;
+    var prompt;
+
+    function initialize(label, prompt) {
+        self.label = label;
+        self.prompt = prompt;
+    }
+}
+
 class ConversationListView extends WatchUi.View {
 
     var conversations;
@@ -31,12 +41,12 @@ class ConversationListView extends WatchUi.View {
         deleteTargetIdx = -1;
         showQuickPrompts = false;
         quickPrompts = [
-            { :label => "Translate", :prompt => "Translate to English: " },
-            { :label => "Summarize", :prompt => "Summarize: " },
-            { :label => "Explain", :prompt => "Explain simply: " },
-            { :label => "Weather", :prompt => "What's the weather like?" },
-            { :label => "Joke", :prompt => "Tell me a short joke" },
-            { :label => "Timer", :prompt => "Set a reminder for " }
+            new QuickPrompt("Translate", "Translate to English: "),
+            new QuickPrompt("Summarize", "Summarize: "),
+            new QuickPrompt("Explain", "Explain simply: "),
+            new QuickPrompt("Weather", "What's the weather like?"),
+            new QuickPrompt("Joke", "Tell me a short joke"),
+            new QuickPrompt("Timer", "Set a reminder for ")
         ];
     }
 
@@ -138,7 +148,7 @@ class ConversationListView extends WatchUi.View {
                 dc.fillRoundedRectangle(px, py, promptBtnWidth, promptBtnHeight, 6);
 
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(px + promptBtnWidth / 2, py + 11, Graphics.FONT_MEDIUM, prompt[:label], Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(px + promptBtnWidth / 2, py + 11, Graphics.FONT_MEDIUM, prompt.label, Graphics.TEXT_JUSTIFY_CENTER);
             }
         }
 
@@ -238,7 +248,7 @@ class ConversationListView extends WatchUi.View {
                 var py = promptY + row * (promptBtnHeight + 6);
 
                 if (x >= px && x <= px + promptBtnWidth && y >= py && y <= py + promptBtnHeight) {
-                    startQuickConversation(prompt[:prompt]);
+                    startQuickConversation(prompt.prompt);
                     return;
                 }
             }

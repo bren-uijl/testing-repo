@@ -4,6 +4,18 @@ using Toybox.Application;
 using Toybox.Lang;
 using Toybox.System;
 
+class SettingsItem {
+    var label;
+    var value;
+    var action;
+
+    function initialize(label, value, action) {
+        self.label = label;
+        self.value = value;
+        self.action = action;
+    }
+}
+
 class SettingsView extends WatchUi.View {
 
     var storage;
@@ -41,40 +53,20 @@ class SettingsView extends WatchUi.View {
             var masked = apiKey.substring(0, 4) + "..." + apiKey.substring(apiKey.length() - 4);
             keyStatus = masked;
         }
-        items.add({
-            :label => "API Key",
-            :value => keyStatus,
-            :action => "apiKey"
-        });
+        items.add(new SettingsItem("API Key", keyStatus, "apiKey"));
 
-        items.add({
-            :label => "Model",
-            :value => getModelDisplayName(storage.getModel()),
-            :action => "model"
-        });
+        items.add(new SettingsItem("Model", getModelDisplayName(storage.getModel()), "model"));
 
         var prompt = storage.getSystemPrompt();
         var promptPreview = prompt;
         if (promptPreview != null && promptPreview.length() > 25) {
             promptPreview = promptPreview.substring(0, 22) + "...";
         }
-        items.add({
-            :label => "System Prompt",
-            :value => promptPreview != null ? promptPreview : "Default",
-            :action => "systemPrompt"
-        });
+        items.add(new SettingsItem("System Prompt", promptPreview != null ? promptPreview : "Default", "systemPrompt"));
 
-        items.add({
-            :label => "Clear All Chats",
-            :value => "",
-            :action => "clear"
-        });
+        items.add(new SettingsItem("Clear All Chats", "", "clear"));
 
-        items.add({
-            :label => "About",
-            :value => "v1.2.0",
-            :action => "about"
-        });
+        items.add(new SettingsItem("About", "v1.2.0", "about"));
     }
 
     function onUpdate(dc) {
@@ -110,9 +102,9 @@ class SettingsView extends WatchUi.View {
             }
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(15, y + 12, Graphics.FONT_MEDIUM, item[:label], Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(15, y + 12, Graphics.FONT_MEDIUM, item.label, Graphics.TEXT_JUSTIFY_LEFT);
 
-            var value = item[:value];
+            var value = item.value;
             if (value != null && value.length() > 0) {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
                 var displayValue = value;
@@ -147,7 +139,7 @@ class SettingsView extends WatchUi.View {
 
     function handleItemSelect(idx) {
         var item = items[idx];
-        var action = item[:action];
+        var action = item.action;
 
         if (action == "apiKey") {
             Application.getApp().showApiKeyInput();
