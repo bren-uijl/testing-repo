@@ -55,7 +55,7 @@ class Conversation {
 
     function getLastMessage() {
         if (messages.size() > 0) {
-            return messages.get(messages.size() - 1);
+            return messages[messages.size(] - 1);
         }
         return null;
     }
@@ -100,7 +100,7 @@ class Conversation {
         }
 
         for (var i = 0; i < messages.size(); i++) {
-            var msg = messages.get(i);
+            var msg = messages[i];
             if (msg.role != "system" || i == 0) {
                 apiMsgs.add({
                     :role => msg.role,
@@ -122,7 +122,7 @@ class Conversation {
         };
 
         for (var i = 0; i < messages.size(); i++) {
-            convData.get("messages").add(messages.get(i).toDictionary());
+            convData["messages"].add(messages[i].toDictionary());
         }
 
         storage.setConversation(id, convData);
@@ -144,17 +144,17 @@ class Conversation {
         if (convData == null) {
             return new Conversation(convId, "Unknown");
         }
-        var title = convData.get("title");
+        var title = convData["title"];
         var conv = new Conversation(convId, title != null ? title : "Unknown");
-        var created = convData.get("createdAt");
-        var updated = convData.get("updatedAt");
+        var created = convData["createdAt"];
+        var updated = convData["updatedAt"];
         conv.createdAt = created != null ? created : System.getTimer();
         conv.updatedAt = updated != null ? updated : System.getTimer();
 
-        var msgList = convData.get("messages");
+        var msgList = convData["messages"];
         if (msgList != null) {
             for (var i = 0; i < msgList.size(); i++) {
-                var msgData = msgList.get(i);
+                var msgData = msgList[i];
                 if (msgData != null) {
                     conv.messages.add(Message.fromDictionary(msgData));
                 }

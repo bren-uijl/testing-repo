@@ -101,7 +101,7 @@ class SettingsView extends WatchUi.View {
                 break;
             }
 
-            var item = items.get(i);
+            var item = items[i];
             var y = listTop + (i - scrollOffset) * itemHeight;
 
             if (i == selectedIdx) {
@@ -110,9 +110,9 @@ class SettingsView extends WatchUi.View {
             }
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(15, y + 12, Graphics.FONT_MEDIUM, item.get(:label), Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(15, y + 12, Graphics.FONT_MEDIUM, item[:label], Graphics.TEXT_JUSTIFY_LEFT);
 
-            var value = item.get(:value);
+            var value = item[:value];
             if (value != null && value.length() > 0) {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
                 var displayValue = value;
@@ -146,8 +146,8 @@ class SettingsView extends WatchUi.View {
     }
 
     function handleItemSelect(idx) {
-        var item = items.get(idx);
-        var action = item.get(:action);
+        var item = items[idx];
+        var action = item[:action];
 
         if (action == "apiKey") {
             Application.getApp().showApiKeyInput();

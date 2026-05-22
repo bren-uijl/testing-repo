@@ -52,7 +52,7 @@ class ConversationListView extends WatchUi.View {
         var ids = storage.getConversationIds();
 
         for (var i = 0; i < ids.size(); i++) {
-            var id = ids.get(i);
+            var id = ids[i];
             if (id == null) {
                 continue;
             }
@@ -75,8 +75,8 @@ class ConversationListView extends WatchUi.View {
     function sortConversations() {
         for (var i = 0; i < conversations.size() - 1; i++) {
             for (var j = i + 1; j < conversations.size(); j++) {
-                var a = conversations.get(i);
-                var b = conversations.get(j);
+                var a = conversations[i];
+                var b = conversations[j];
                 if (b.updatedAt > a.updatedAt) {
                     conversations[i] = b;
                     conversations[j] = a;
@@ -128,7 +128,7 @@ class ConversationListView extends WatchUi.View {
             var promptBtnHeight = 22;
 
             for (var p = 0; p < quickPrompts.size(); p++) {
-                var prompt = quickPrompts.get(p);
+                var prompt = quickPrompts[p];
                 var col = p % 2;
                 var row = p / 2;
                 var px = 10 + col * (promptBtnWidth + 10);
@@ -138,7 +138,7 @@ class ConversationListView extends WatchUi.View {
                 dc.fillRoundedRectangle(px, py, promptBtnWidth, promptBtnHeight, 6);
 
                 dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(px + promptBtnWidth / 2, py + 11, Graphics.FONT_MEDIUM, prompt.get(:label), Graphics.TEXT_JUSTIFY_CENTER);
+                dc.drawText(px + promptBtnWidth / 2, py + 11, Graphics.FONT_MEDIUM, prompt[:label], Graphics.TEXT_JUSTIFY_CENTER);
             }
         }
 
@@ -169,7 +169,7 @@ class ConversationListView extends WatchUi.View {
                 break;
             }
 
-            var conv = conversations.get(i);
+            var conv = conversations[i];
             var y = listTop + (i - scrollOffset) * itemHeight;
 
             if (deleteMode && i == deleteTargetIdx) {
@@ -231,14 +231,14 @@ class ConversationListView extends WatchUi.View {
             var promptBtnHeight = 22;
 
             for (var p = 0; p < quickPrompts.size(); p++) {
-                var prompt = quickPrompts.get(p);
+                var prompt = quickPrompts[p];
                 var col = p % 2;
                 var row = p / 2;
                 var px = 10 + col * (promptBtnWidth + 10);
                 var py = promptY + row * (promptBtnHeight + 6);
 
                 if (x >= px && x <= px + promptBtnWidth && y >= py && y <= py + promptBtnHeight) {
-                    startQuickConversation(prompt.get(:prompt));
+                    startQuickConversation(prompt[:prompt]);
                     return;
                 }
             }
@@ -263,7 +263,7 @@ class ConversationListView extends WatchUi.View {
                     deleteTargetIdx = idx;
                     WatchUi.requestUpdate();
                 } else {
-                    var conv = conversations.get(idx);
+                    var conv = conversations[idx];
                     Application.getApp().showConversation(conv.id);
                 }
             }
@@ -300,7 +300,7 @@ class ConversationListView extends WatchUi.View {
 
     function deleteSelectedConversation() {
         if (deleteTargetIdx >= 0 && deleteTargetIdx < conversations.size()) {
-            var conv = conversations.get(deleteTargetIdx);
+            var conv = conversations[deleteTargetIdx];
             conv.delete();
             conversations.remove(deleteTargetIdx);
             deleteTargetIdx = -1;
