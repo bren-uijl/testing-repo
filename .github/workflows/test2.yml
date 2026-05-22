@@ -25,7 +25,4 @@ jobs:
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
         run: |
-          opencode providers list
-          opencode run "test, respond as quick as possible" --model nvidia/openai/gpt-oss-120b
-          echo "-----------"
-          opencode run "test the image subagent" --model nvidia/openai/gpt-oss-120b
+          opencode run "test the image subagent using the task tool" --model nvidia/openai/gpt-oss-120b
