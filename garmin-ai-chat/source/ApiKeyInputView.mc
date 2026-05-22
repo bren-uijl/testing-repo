@@ -86,7 +86,7 @@ class ApiKeyInputView extends WatchUi.View {
             dc.setColor(i == selectedPart ? Graphics.COLOR_WHITE : Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
             dc.drawText(10, y + 8, Graphics.FONT_MEDIUM, "Part " + (i + 1) + "/10", Graphics.TEXT_JUSTIFY_LEFT);
 
-            var partValue = keyParts.get(i);
+            var partValue = keyParts[i];
             var displayValue = partValue;
             if (displayValue.length() == 0) {
                 displayValue = "Tap to enter";
@@ -121,7 +121,7 @@ class ApiKeyInputView extends WatchUi.View {
     function getFullKey() {
         var key = "";
         for (var i = 0; i < keyParts.size(); i++) {
-            key = key + keyParts.get(i);
+            key = key + keyParts[i];
         }
         return key;
     }

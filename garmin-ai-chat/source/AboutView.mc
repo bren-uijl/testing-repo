@@ -55,13 +55,13 @@ class AboutView extends WatchUi.View {
                 break;
             }
 
-            var item = items.get(i);
+            var item = items[i];
             var y = listTop + (i - scrollOffset) * itemHeight;
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(15, y + 14, Graphics.FONT_MEDIUM, item.get(:label), Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(15, y + 14, Graphics.FONT_MEDIUM, item[:label], Graphics.TEXT_JUSTIFY_LEFT);
 
-            var value = item.get(:value);
+            var value = item[:value];
             if (value != null) {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
                 dc.drawText(width - 15, y + 14, Graphics.FONT_MEDIUM, value, Graphics.TEXT_JUSTIFY_RIGHT);

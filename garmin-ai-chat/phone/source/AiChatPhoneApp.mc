@@ -53,7 +53,7 @@ class PhonePropertyStore {
     }
 
     function getApiKey() {
-        return store.get("apiKey");
+        return store["apiKey"];
     }
 
     function setApiKey(key) {
@@ -62,7 +62,7 @@ class PhonePropertyStore {
     }
 
     function getModel() {
-        return store.get("model");
+        return store["model"];
     }
 
     function setModel(model) {

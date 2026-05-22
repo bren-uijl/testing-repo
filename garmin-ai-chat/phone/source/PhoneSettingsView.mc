@@ -34,7 +34,7 @@ class PhoneSettingsView extends WatchUi.View {
         apiKeyInput = storage.getApiKey();
         var currentModel = storage.getModel();
         for (var i = 0; i < models.size(); i++) {
-            if (models.get(i) == currentModel) {
+            if (models[i] == currentModel) {
                 modelSelected = i;
                 break;
             }
@@ -78,7 +78,7 @@ class PhoneSettingsView extends WatchUi.View {
 
         y += 30;
         dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(20, y, Graphics.FONT_MEDIUM, models.get(modelSelected), Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(20, y, Graphics.FONT_MEDIUM, models[modelSelected], Graphics.TEXT_JUSTIFY_LEFT);
 
         y += 50;
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
@@ -126,11 +126,11 @@ class PhoneSettingsView extends WatchUi.View {
 
         if (direction == WatchUi.SWIPE_LEFT) {
             modelSelected = (modelSelected + 1) % models.size();
-            storage.setModel(models.get(modelSelected));
+            storage.setModel(models[modelSelected]);
             WatchUi.requestUpdate();
         } else if (direction == WatchUi.SWIPE_RIGHT) {
             modelSelected = (modelSelected - 1 + models.size()) % models.size();
-            storage.setModel(models.get(modelSelected));
+            storage.setModel(models[modelSelected]);
             WatchUi.requestUpdate();
         }
     }

@@ -24,7 +24,7 @@ class PropertyStore {
     }
 
     function getApiKey() {
-        return store.get("apiKey");
+        return store["apiKey"];
     }
 
     function setApiKey(key) {
@@ -33,7 +33,7 @@ class PropertyStore {
     }
 
     function getApiKeyParts() {
-        var parts = store.get("apiKeyParts");
+        var parts = store["apiKeyParts"];
         if (parts == null || parts.size() == 0) {
             parts = [];
             for (var i = 0; i < API_KEY_SEGMENT_COUNT; i++) {
@@ -65,7 +65,7 @@ class PropertyStore {
     function rebuildApiKey(parts) {
         var key = "";
         for (var i = 0; i < parts.size(); i++) {
-            key = key + parts.get(i);
+            key = key + parts[i];
         }
         store.put("apiKey", key);
     }
@@ -76,7 +76,7 @@ class PropertyStore {
     }
 
     function getModel() {
-        var model = store.get("model");
+        var model = store["model"];
         if (model == null || model.length() == 0) {
             return "nvidia/nemotron-nano-9b-v2";
         }
@@ -89,7 +89,7 @@ class PropertyStore {
     }
 
     function getConversationIds() {
-        var ids = store.get("conversations");
+        var ids = store["conversations"];
         if (ids == null) {
             return [];
         }
@@ -98,7 +98,7 @@ class PropertyStore {
 
     function getConversation(id) {
         var key = "conv_" + id;
-        return store.get(key);
+        return store[key];
     }
 
     function setConversation(id, data) {
@@ -108,7 +108,7 @@ class PropertyStore {
         var ids = getConversationIds();
         var found = false;
         for (var i = 0; i < ids.size(); i++) {
-            if (ids.get(i) == id) {
+            if (ids[i] == id) {
                 found = true;
                 break;
             }
@@ -132,10 +132,10 @@ class PropertyStore {
         var oldestTime = System.getTimer();
 
         for (var i = 0; i < ids.size(); i++) {
-            var convId = ids.get(i);
+            var convId = ids[i];
             var data = getConversation(convId);
             if (data != null) {
-                var updatedAt = data.get("updatedAt");
+                var updatedAt = data["updatedAt"];
                 if (updatedAt != null && updatedAt < oldestTime) {
                     oldestTime = updatedAt;
                     oldestId = convId;
@@ -144,7 +144,7 @@ class PropertyStore {
         }
 
         if (oldestId == null) {
-            oldestId = ids.get(0);
+            oldestId = ids[0];
         }
 
         var key = "conv_" + oldestId;
@@ -152,8 +152,8 @@ class PropertyStore {
 
         var newIds = [];
         for (var i = 0; i < ids.size(); i++) {
-            if (ids.get(i) != oldestId) {
-                newIds.add(ids.get(i));
+            if (ids[i] != oldestId) {
+                newIds.add(ids[i]);
             }
         }
         store.put("conversations", newIds);
@@ -166,8 +166,8 @@ class PropertyStore {
         var ids = getConversationIds();
         var newIds = [];
         for (var i = 0; i < ids.size(); i++) {
-            if (ids.get(i) != id) {
-                newIds.add(ids.get(i));
+            if (ids[i] != id) {
+                newIds.add(ids[i]);
             }
         }
         store.put("conversations", newIds);
@@ -177,7 +177,7 @@ class PropertyStore {
     function clearAllConversations() {
         var ids = getConversationIds();
         for (var i = 0; i < ids.size(); i++) {
-            var key = "conv_" + ids.get(i);
+            var key = "conv_" + ids[i];
             store.put(key, null);
         }
         store.put("conversations", []);
@@ -186,7 +186,7 @@ class PropertyStore {
     }
 
     function getLastConversationId() {
-        return store.get("lastConversationId");
+        return store["lastConversationId"];
     }
 
     function setLastConversationId(id) {
@@ -199,7 +199,7 @@ class PropertyStore {
     }
 
     function getSystemPrompt() {
-        var prompt = store.get("systemPrompt");
+        var prompt = store["systemPrompt"];
         if (prompt == null || prompt.length() == 0) {
             return "You are a helpful assistant.";
         }

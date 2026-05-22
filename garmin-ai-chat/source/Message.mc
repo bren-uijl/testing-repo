@@ -55,15 +55,15 @@ class Message {
         if (dict == null) {
             return new Message("unknown", "system", "Corrupted message");
         }
-        var msgId = dict.get("id");
-        var msgRole = dict.get("role");
-        var msgContent = dict.get("content");
+        var msgId = dict["id"];
+        var msgRole = dict["role"];
+        var msgContent = dict["content"];
         var msg = new Message(
             msgId != null ? msgId : "unknown",
             msgRole != null ? msgRole : "system",
             msgContent != null ? msgContent : ""
         );
-        var ts = dict.get("timestamp");
+        var ts = dict["timestamp"];
         if (ts != null) {
             msg.timestamp = ts;
         }

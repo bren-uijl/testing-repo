@@ -106,7 +106,7 @@ class ConversationView extends WatchUi.View {
         }
 
         for (var i = startIdx; i >= 0; i--) {
-            var msg = messages.get(i);
+            var msg = messages[i];
             var lineHeight = estimateLineHeight(msg.content, dc);
 
             if (y - lineHeight < headerHeight) {
