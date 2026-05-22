@@ -278,7 +278,12 @@ class ConversationListView extends WatchUi.View {
             return;
         }
 
-        var listTop = headerHeight + 30;
+        var listTop;
+        if (showQuickPrompts) {
+            listTop = newBtnY + btnHeight + 8 + 3 * (22 + 6) + 10;
+        } else {
+            listTop = headerHeight + 30;
+        }
         if (y >= listTop) {
             var tappedIdx = scrollOffset + (y - listTop) / itemHeight;
             var ci = 0;
