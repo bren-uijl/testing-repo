@@ -70,7 +70,8 @@ class ConversationListView extends WatchUi.View {
         conversations = [];
         var ids = storage.getConversationIds();
 
-        for (var id : ids) {
+        for (var idi = 0; idi < ids.size(); idi++) {
+            var id = ids[idi];
             if (id == null) {
                 continue;
             }
@@ -92,10 +93,12 @@ class ConversationListView extends WatchUi.View {
 
     function sortConversations() {
         var sorted = [];
-        for (var conv : conversations) {
+        for (var ci = 0; ci < conversations.size(); ci++) {
+            var conv = conversations[ci];
             var added = false;
             var tmp = [];
-            for (var r : sorted) {
+            for (var ri = 0; ri < sorted.size(); ri++) {
+                var r = sorted[ri];
                 if (!added && conv.updatedAt > r.updatedAt) {
                     tmp.add(conv);
                     added = true;
@@ -151,21 +154,19 @@ class ConversationListView extends WatchUi.View {
             var promptY = newBtnY + btnHeight + 8;
             var promptBtnWidth = (width - 30) / 2;
             var promptBtnHeight = 22;
-            var pi = 0;
+        for (var pi = 0; pi < quickPrompts.size(); pi++) {
+            var prompt = quickPrompts[pi];
+            var col = pi % 2;
+            var row = pi / 2;
+            var px = 10 + col * (promptBtnWidth + 10);
+            var py = promptY + row * (promptBtnHeight + 6);
 
-            for (var prompt : quickPrompts) {
-                var col = pi % 2;
-                var row = pi / 2;
-                var px = 10 + col * (promptBtnWidth + 10);
-                var py = promptY + row * (promptBtnHeight + 6);
+            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
+            dc.fillRoundedRectangle(px, py, promptBtnWidth, promptBtnHeight, 6);
 
-                dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
-                dc.fillRoundedRectangle(px, py, promptBtnWidth, promptBtnHeight, 6);
-
-                dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(px + promptBtnWidth / 2, py + 11, Graphics.FONT_MEDIUM, prompt.label, Graphics.TEXT_JUSTIFY_CENTER);
-                pi++;
-            }
+            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(px + promptBtnWidth / 2, py + 11, Graphics.FONT_MEDIUM, prompt.label, Graphics.TEXT_JUSTIFY_CENTER);
+        }
         }
 
         if (conversations.size() == 0 && !showQuickPrompts) {
@@ -190,9 +191,9 @@ class ConversationListView extends WatchUi.View {
 
         dc.setClip(0, listTop, width, availableHeight);
 
-        var ci = 0;
-        for (var conv : conversations) {
-            if (ci < scrollOffset) { ci++; continue; }
+        for (var ci = 0; ci < conversations.size(); ci++) {
+            var conv = conversations[ci];
+            if (ci < scrollOffset) { continue; }
             if (ci >= scrollOffset + maxVisible + 1) break;
 
             var y = listTop + (ci - scrollOffset) * itemHeight;
@@ -224,7 +225,6 @@ class ConversationListView extends WatchUi.View {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
                 dc.drawLine(10, y + itemHeight - 4, width - 10, y + itemHeight - 4);
             }
-            ci++;
         }
 
         dc.clearClip();
@@ -235,7 +235,8 @@ class ConversationListView extends WatchUi.View {
         var x = 0;
         var y = 0;
         var isFirst = true;
-        for (var c : coords) {
+        for (var ci = 0; ci < coords.size(); ci++) {
+            var c = coords[ci];
             if (isFirst) { x = c; isFirst = false; }
             else { y = c; }
         }
@@ -261,8 +262,8 @@ class ConversationListView extends WatchUi.View {
             var promptBtnWidth = (width - 30) / 2;
             var promptBtnHeight = 22;
 
-            var pi = 0;
-            for (var prompt : quickPrompts) {
+            for (var pi = 0; pi < quickPrompts.size(); pi++) {
+                var prompt = quickPrompts[pi];
                 var col = pi % 2;
                 var row = pi / 2;
                 var px = 10 + col * (promptBtnWidth + 10);
@@ -272,7 +273,6 @@ class ConversationListView extends WatchUi.View {
                     startQuickConversation(prompt.prompt);
                     return;
                 }
-                pi++;
             }
         }
 
@@ -295,8 +295,8 @@ class ConversationListView extends WatchUi.View {
         }
         if (y >= listTop) {
             var tappedIdx = scrollOffset + (y - listTop) / itemHeight;
-            var ci = 0;
-            for (var conv : conversations) {
+            for (var ci = 0; ci < conversations.size(); ci++) {
+                var conv = conversations[ci];
                 if (ci == tappedIdx) {
                     if (deleteMode) {
                         deleteTargetIdx = ci;
@@ -306,7 +306,6 @@ class ConversationListView extends WatchUi.View {
                     }
                     break;
                 }
-                ci++;
             }
         }
     }
@@ -341,14 +340,13 @@ class ConversationListView extends WatchUi.View {
 
     function deleteSelectedConversation() {
         if (deleteTargetIdx >= 0) {
-            var ci = 0;
-            for (var conv : conversations) {
+            for (var ci = 0; ci < conversations.size(); ci++) {
+                var conv = conversations[ci];
                 if (ci == deleteTargetIdx) {
                     conv.delete();
                     conversations.remove(ci);
                     break;
                 }
-                ci++;
             }
             deleteTargetIdx = -1;
             if (scrollOffset >= conversations.size()) {

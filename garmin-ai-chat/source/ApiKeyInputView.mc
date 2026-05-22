@@ -80,7 +80,8 @@ class ApiKeyInputView extends WatchUi.View {
         dc.setClip(0, listTop, width, availableHeight);
 
         var ci = 0;
-        for (var partValue : keyParts) {
+        for (var pi = 0; pi < keyParts.size(); pi++) {
+            var partValue = keyParts[pi];
             if (ci < scrollOffset) { ci++; continue; }
             if (ci >= scrollOffset + maxVisible + 1) break;
 
@@ -128,8 +129,8 @@ class ApiKeyInputView extends WatchUi.View {
 
     function getFullKey() {
         var key = "";
-        for (var p : keyParts) {
-            key = key + p;
+        for (var pi = 0; pi < keyParts.size(); pi++) {
+            key = key + keyParts[pi];
         }
         return key;
     }
@@ -139,7 +140,8 @@ class ApiKeyInputView extends WatchUi.View {
         var x = 0;
         var y = 0;
         var isFirst = true;
-        for (var c : coords) {
+        for (var ci = 0; ci < coords.size(); ci++) {
+            var c = coords[ci];
             if (isFirst) { x = c; isFirst = false; }
             else { y = c; }
         }
@@ -171,9 +173,9 @@ class ApiKeyInputView extends WatchUi.View {
         if (WatchUi has :TextPicker) {
             var currentValue = "";
             var ci = 0;
-            for (var p : keyParts) {
-                if (ci == idx) { currentValue = p; break; }
-                ci++;
+            for (var pi = 0; pi < keyParts.size(); pi++) {
+                var p = keyParts[pi];
+                if (pi == idx) { currentValue = p; break; }
             }
             WatchUi.pushView(new WatchUi.TextPicker(currentValue), new ApiKeyTextInputDelegate(self, idx), WatchUi.SLIDE_DOWN);
         }
@@ -183,9 +185,9 @@ class ApiKeyInputView extends WatchUi.View {
         if (text != null) {
             var newParts = [];
             var pi = 0;
-            for (var p : keyParts) {
-                newParts.add(pi == idx ? text : p);
-                pi++;
+            for (var pi2 = 0; pi2 < keyParts.size(); pi2++) {
+                var p = keyParts[pi2];
+                newParts.add(pi2 == idx ? text : p);
             }
             keyParts = newParts;
             storage.setApiKeyPart(idx, text);

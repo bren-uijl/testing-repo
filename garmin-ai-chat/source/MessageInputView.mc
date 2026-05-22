@@ -96,7 +96,8 @@ class MessageInputView extends WatchUi.View {
         var x = 0;
         var y = 0;
         var isFirst = true;
-        for (var c : coords) {
+        for (var ci = 0; ci < coords.size(); ci++) {
+            var c = coords[ci];
             if (isFirst) { x = c; isFirst = false; }
             else { y = c; }
         }

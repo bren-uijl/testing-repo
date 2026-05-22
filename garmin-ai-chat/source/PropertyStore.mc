@@ -56,10 +56,9 @@ class PropertyStore {
             return;
         }
         var parts = [];
-        var pi = 0;
-        for (var ep : getApiKeyParts()) {
-            parts.add(pi == index ? value : ep);
-            pi++;
+        var keyPartsArray = getApiKeyParts();
+        for (var pi = 0; pi < keyPartsArray.size(); pi++) {
+            parts.add(pi == index ? value : keyPartsArray[pi]);
         }
         store.put("apiKeyParts", parts);
         rebuildApiKey(parts);
@@ -68,8 +67,8 @@ class PropertyStore {
 
     function rebuildApiKey(parts) {
         var key = "";
-        for (var p : parts) {
-            key = key + p;
+        for (var pi = 0; pi < parts.size(); pi++) {
+            key = key + parts[pi];
         }
         store.put("apiKey", key);
     }
@@ -111,7 +110,8 @@ class PropertyStore {
 
         var ids = getConversationIds();
         var found = false;
-        for (var existingId : ids) {
+        for (var ei = 0; ei < ids.size(); ei++) {
+            var existingId = ids[ei];
             if (existingId == id) {
                 found = true;
                 break;
@@ -135,7 +135,8 @@ class PropertyStore {
         var oldestId = null;
         var oldestTime = System.getTimer();
 
-        for (var convId : ids) {
+        for (var ci = 0; ci < ids.size(); ci++) {
+            var convId = ids[ci];
             var data = getConversation(convId);
             if (data != null) {
                 var updatedAt = data["updatedAt"];
@@ -147,9 +148,8 @@ class PropertyStore {
         }
 
         if (oldestId == null) {
-            for (var firstId : ids) {
-                oldestId = firstId;
-                break;
+            if (ids.size() > 0) {
+                oldestId = ids[0];
             }
         }
 
@@ -157,7 +157,8 @@ class PropertyStore {
         store.put(key, null);
 
         var newIds = [];
-        for (var convId : ids) {
+        for (var ci = 0; ci < ids.size(); ci++) {
+            var convId = ids[ci];
             if (convId != oldestId) {
                 newIds.add(convId);
             }
@@ -171,7 +172,8 @@ class PropertyStore {
 
         var ids = getConversationIds();
         var newIds = [];
-        for (var existingId : ids) {
+        for (var ei = 0; ei < ids.size(); ei++) {
+            var existingId = ids[ei];
             if (existingId != id) {
                 newIds.add(existingId);
             }
@@ -182,7 +184,8 @@ class PropertyStore {
 
     function clearAllConversations() {
         var ids = getConversationIds();
-        for (var convId : ids) {
+        for (var ci = 0; ci < ids.size(); ci++) {
+            var convId = ids[ci];
             var key = "conv_" + convId;
             store.put(key, null);
         }

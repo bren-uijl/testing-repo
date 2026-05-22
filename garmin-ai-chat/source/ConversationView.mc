@@ -228,7 +228,8 @@ class ConversationView extends WatchUi.View {
 
     function getMessageAt(msgList, idx) {
         var count = 0;
-        for (var m : msgList) {
+        for (var mi = 0; mi < msgList.size(); mi++) {
+            var m = msgList[mi];
             if (count == idx) return m;
             count++;
         }
@@ -253,7 +254,8 @@ class ConversationView extends WatchUi.View {
         var x = 0;
         var y = 0;
         var isFirst = true;
-        for (var c : coords) {
+        for (var ci = 0; ci < coords.size(); ci++) {
+            var c = coords[ci];
             if (isFirst) { x = c; isFirst = false; }
             else { y = c; }
         }

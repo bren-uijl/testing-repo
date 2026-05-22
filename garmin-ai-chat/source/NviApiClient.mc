@@ -1,6 +1,6 @@
-import Toybox.Communications;
-import Toybox.System;
-import Toybox.Lang;
+using Toybox.Communications;
+using Toybox.System;
+using Toybox.Lang;
 
 class NviApiClient {
 
@@ -89,7 +89,8 @@ class NviApiClient {
                     var choices = data["choices"];
                     if (choices != null && choices.size() > 0) {
                         var firstChoice = null;
-                        for (var c : choices) {
+                        for (var ci = 0; ci < choices.size(); ci++) {
+                            var c = choices[ci];
                             firstChoice = c;
                             break;
                         }
