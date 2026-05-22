@@ -44,6 +44,14 @@ class SettingsView extends WatchUi.View {
         viewHeight = dc.getHeight();
     }
 
+    function onShow() {
+        if (storage == null) {
+            storage = Application.getApp().getPropertyStore();
+        }
+        buildItems();
+        WatchUi.requestUpdate();
+    }
+
     function buildItems() {
         items = [];
 
