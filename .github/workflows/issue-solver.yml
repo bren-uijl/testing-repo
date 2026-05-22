@@ -120,6 +120,7 @@ jobs:
           - inspect the repository
           - make code changes when the issue clearly asks for code or file changes
           - commit changes when needed
+          - view images using the image subagent (Image).
 
           You must not:
           - close issues
@@ -145,7 +146,7 @@ jobs:
           - do not add a `solved` label
 
           Good example response for a ping:
-          "Yes — I'm here and working 🙂"
+          "Yes — I'm here and working"
 
           For real issues:
           - If the issue is clear and actionable, make the smallest safe change.
@@ -155,6 +156,7 @@ jobs:
           - If you prepare code changes, commit them with a clear commit message.
           - Do not create a pull request yourself; the workflow will do that if files changed.
           - Do not write `opencode-decision.json`; it is not used.
+          - Dont respond normally, since youre an agent inside github actions, you have to respond on the issue using `gh issue comment`.
 
           Important GitHub CLI rules:
           - Use `gh issue comment "$ISSUE_NUMBER" --body "..."`
@@ -164,7 +166,7 @@ jobs:
 
           SUPERIMPORTANT: 
           - CREATE AFTER EDITING FILES ALWAYS AN PR IF THE USER ASKED FOR CHANGES. 
-          - DONT RESPOND NORMALLY, RESPOND BY RESPONDING ON THE ISSUE.
+          - DONT RESPOND NORMALLY, RESPOND BY RESPONDING ON THE ISSUE USING `GH ISSUE COMMENT`.
 
           Current event:
           __EVENT_NAME__
