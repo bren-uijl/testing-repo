@@ -2,6 +2,16 @@ using Toybox.WatchUi;
 using Toybox.Graphics;
 using Toybox.Lang;
 
+class AboutItem {
+    var label;
+    var value;
+
+    function initialize(label, value) {
+        self.label = label;
+        self.value = value;
+    }
+}
+
 class AboutView extends WatchUi.View {
 
     var items;
@@ -18,12 +28,12 @@ class AboutView extends WatchUi.View {
         itemHeight = 45;
         headerHeight = 45;
 
-        items.add({ "label" => "Version", "value" => "1.2.0" });
-        items.add({ "label" => "Device", "value" => "vívoactive 5" });
-        items.add({ "label" => "API", "value" => "NVIDIA Chat" });
-        items.add({ "label" => "Models", "value" => "8 available" });
-        items.add({ "label" => "Built with", "value" => "Monkey C" });
-        items.add({ "label" => "License", "value" => "MIT" });
+        items.add(new AboutItem("Version", "1.2.0"));
+        items.add(new AboutItem("Device", "vívoactive 5"));
+        items.add(new AboutItem("API", "NVIDIA Chat"));
+        items.add(new AboutItem("Models", "8 available"));
+        items.add(new AboutItem("Built with", "Monkey C"));
+        items.add(new AboutItem("License", "MIT"));
     }
 
     function onLayout(dc) {
@@ -50,30 +60,27 @@ class AboutView extends WatchUi.View {
 
         dc.setClip(0, listTop, width, availableHeight);
 
-        var idx = 0;
-        var drawn = 0;
-        for (var item : items) {
-            if (idx < scrollOffset) { idx++; continue; }
-            if (drawn > maxVisible) break;
+        for (var i = scrollOffset; i < items.size(); i++) {
+            if (i >= scrollOffset + maxVisible + 1) {
+                break;
+            }
 
-            var y = listTop + drawn * itemHeight;
+            var item = items[i];
+            var y = listTop + (i - scrollOffset) * itemHeight;
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(15, y + 14, Graphics.FONT_MEDIUM, item["label"], Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(15, y + 14, Graphics.FONT_MEDIUM, item.label, Graphics.TEXT_JUSTIFY_LEFT);
 
-            var value = item["value"];
+            var value = item.value;
             if (value != null) {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
                 dc.drawText(width - 15, y + 14, Graphics.FONT_MEDIUM, value, Graphics.TEXT_JUSTIFY_RIGHT);
             }
 
-            if (drawn > 0) {
+            if (i < items.size() - 1) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
-                dc.drawLine(10, y - 4, width - 10, y - 4);
+                dc.drawLine(10, y + itemHeight - 4, width - 10, y + itemHeight - 4);
             }
-
-            idx++;
-            drawn++;
         }
 
         dc.clearClip();

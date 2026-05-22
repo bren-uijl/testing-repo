@@ -4,6 +4,18 @@ using Toybox.Application;
 using Toybox.Lang;
 using Toybox.System;
 
+class SettingsItem {
+    var label;
+    var value;
+    var action;
+
+    function initialize(label, value, action) {
+        self.label = label;
+        self.value = value;
+        self.action = action;
+    }
+}
+
 class SettingsView extends WatchUi.View {
 
     var storage;
@@ -41,40 +53,20 @@ class SettingsView extends WatchUi.View {
             var masked = apiKey.substring(0, 4) + "..." + apiKey.substring(apiKey.length() - 4);
             keyStatus = masked;
         }
-        items.add({
-            "label" => "API Key",
-            "value" => keyStatus,
-            "action" => "apiKey"
-        });
+        items.add(new SettingsItem("API Key", keyStatus, "apiKey"));
 
-        items.add({
-            "label" => "Model",
-            "value" => getModelDisplayName(storage.getModel()),
-            "action" => "model"
-        });
+        items.add(new SettingsItem("Model", getModelDisplayName(storage.getModel()), "model"));
 
         var prompt = storage.getSystemPrompt();
         var promptPreview = prompt;
         if (promptPreview != null && promptPreview.length() > 25) {
             promptPreview = promptPreview.substring(0, 22) + "...";
         }
-        items.add({
-            "label" => "System Prompt",
-            "value" => promptPreview != null ? promptPreview : "Default",
-            "action" => "systemPrompt"
-        });
+        items.add(new SettingsItem("System Prompt", promptPreview != null ? promptPreview : "Default", "systemPrompt"));
 
-        items.add({
-            "label" => "Clear All Chats",
-            "value" => "",
-            "action" => "clear"
-        });
+        items.add(new SettingsItem("Clear All Chats", "", "clear"));
 
-        items.add({
-            "label" => "About",
-            "value" => "v1.2.0",
-            "action" => "about"
-        });
+        items.add(new SettingsItem("About", "v1.2.0", "about"));
     }
 
     function onUpdate(dc) {
@@ -96,23 +88,23 @@ class SettingsView extends WatchUi.View {
 
         dc.setClip(0, listTop, width, availableHeight);
 
-        var idx = 0;
-        var drawn = 0;
-        for (var item : items) {
-            if (idx < scrollOffset) { idx++; continue; }
-            if (drawn > maxVisible) break;
+        for (var i = scrollOffset; i < items.size(); i++) {
+            if (i >= scrollOffset + maxVisible + 1) {
+                break;
+            }
 
-            var y = listTop + drawn * itemHeight;
+            var item = items[i];
+            var y = listTop + (i - scrollOffset) * itemHeight;
 
-            if (idx == selectedIdx) {
+            if (i == selectedIdx) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
                 dc.fillRectangle(5, y, width - 10, itemHeight - 4);
             }
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(15, y + 12, Graphics.FONT_MEDIUM, item["label"], Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(15, y + 12, Graphics.FONT_MEDIUM, item.label, Graphics.TEXT_JUSTIFY_LEFT);
 
-            var value = item["value"];
+            var value = item.value;
             if (value != null && value.length() > 0) {
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
                 var displayValue = value;
@@ -122,13 +114,10 @@ class SettingsView extends WatchUi.View {
                 dc.drawText(width - 15, y + 12, Graphics.FONT_MEDIUM, displayValue, Graphics.TEXT_JUSTIFY_RIGHT);
             }
 
-            if (drawn > 0) {
+            if (i < items.size() - 1) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
-                dc.drawLine(10, y - 4, width - 10, y - 4);
+                dc.drawLine(10, y + itemHeight - 4, width - 10, y + itemHeight - 4);
             }
-
-            idx++;
-            drawn++;
         }
 
         dc.clearClip();
@@ -149,15 +138,8 @@ class SettingsView extends WatchUi.View {
     }
 
     function handleItemSelect(idx) {
-        var action = "";
-        var ci = 0;
-        for (var item : items) {
-            if (ci == idx) {
-                action = item["action"];
-                break;
-            }
-            ci++;
-        }
+        var item = items[idx];
+        var action = item.action;
 
         if (action == "apiKey") {
             Application.getApp().showApiKeyInput();
