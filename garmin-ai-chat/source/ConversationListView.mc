@@ -62,6 +62,8 @@ class ConversationListView extends WatchUi.View {
             storage = Application.getApp().getPropertyStore();
         }
         loadConversations();
+        scrollOffset = 0;
+        WatchUi.requestUpdate();
     }
 
     function loadConversations() {

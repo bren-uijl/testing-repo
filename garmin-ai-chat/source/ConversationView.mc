@@ -67,6 +67,9 @@ class ConversationView extends WatchUi.View {
                 }
             }
         }
+        scrollOffset = 0;
+        errorMessage = null;
+        WatchUi.requestUpdate();
     }
 
     function onExit() {
