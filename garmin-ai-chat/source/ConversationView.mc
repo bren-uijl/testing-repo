@@ -52,6 +52,23 @@ class ConversationView extends WatchUi.View {
         viewHeight = dc.getHeight();
     }
 
+    function onShow() {
+        if (storage == null) {
+            storage = Application.getApp().getPropertyStore();
+        }
+        if (conversation != null) {
+            var convId = conversation.id;
+            var data = storage.getConversation(convId);
+            if (data != null) {
+                try {
+                    conversation = Conversation.load(convId, data);
+                } catch (e) {
+                    System.println("Failed to reload conversation: " + e.toString());
+                }
+            }
+        }
+    }
+
     function onExit() {
     }
 

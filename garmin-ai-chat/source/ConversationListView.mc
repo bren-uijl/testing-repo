@@ -57,6 +57,13 @@ class ConversationListView extends WatchUi.View {
         viewHeight = dc.getHeight();
     }
 
+    function onShow() {
+        if (storage == null) {
+            storage = Application.getApp().getPropertyStore();
+        }
+        loadConversations();
+    }
+
     function loadConversations() {
         conversations = [];
         var ids = storage.getConversationIds();
@@ -342,6 +349,12 @@ class ConversationListView extends WatchUi.View {
                 ci++;
             }
             deleteTargetIdx = -1;
+            if (scrollOffset >= conversations.size()) {
+                scrollOffset = conversations.size() - 1;
+                if (scrollOffset < 0) {
+                    scrollOffset = 0;
+                }
+            }
             WatchUi.requestUpdate();
         }
     }
