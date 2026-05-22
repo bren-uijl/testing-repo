@@ -33,11 +33,13 @@ class PhoneSettingsView extends WatchUi.View {
         storage = Application.getApp().getPropertyStore();
         apiKeyInput = storage.getApiKey();
         var currentModel = storage.getModel();
-        for (var i = 0; i < models.size(); i++) {
-            if (models[i] == currentModel) {
-                modelSelected = i;
+        var mi = 0;
+        for (var m : models) {
+            if (m == currentModel) {
+                modelSelected = mi;
                 break;
             }
+            mi++;
         }
     }
 
@@ -78,7 +80,13 @@ class PhoneSettingsView extends WatchUi.View {
 
         y += 30;
         dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(20, y, Graphics.FONT_MEDIUM, models[modelSelected], Graphics.TEXT_JUSTIFY_LEFT);
+        var selectedModel = "";
+        var smi = 0;
+        for (var m : models) {
+            if (smi == modelSelected) { selectedModel = m; break; }
+            smi++;
+        }
+        dc.drawText(20, y, Graphics.FONT_MEDIUM, selectedModel, Graphics.TEXT_JUSTIFY_LEFT);
 
         y += 50;
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
@@ -104,7 +112,13 @@ class PhoneSettingsView extends WatchUi.View {
     }
 
     function onTap(evt) {
-        var y = evt.getCoordinates()[1];
+        var coords = evt.getCoordinates();
+        var y = 0;
+        var isFirst = true;
+        for (var c : coords) {
+            if (!isFirst) { y = c; break; }
+            isFirst = false;
+        }
 
         if (y >= 110 && y <= 150) {
             if (WatchUi has :TextPicker) {
@@ -126,11 +140,23 @@ class PhoneSettingsView extends WatchUi.View {
 
         if (direction == WatchUi.SWIPE_LEFT) {
             modelSelected = (modelSelected + 1) % models.size();
-            storage.setModel(models[modelSelected]);
+            var nextModel = "";
+            var nmi = 0;
+            for (var m : models) {
+                if (nmi == modelSelected) { nextModel = m; break; }
+                nmi++;
+            }
+            storage.setModel(nextModel);
             WatchUi.requestUpdate();
         } else if (direction == WatchUi.SWIPE_RIGHT) {
             modelSelected = (modelSelected - 1 + models.size()) % models.size();
-            storage.setModel(models[modelSelected]);
+            var nextModel = "";
+            var nmi = 0;
+            for (var m : models) {
+                if (nmi == modelSelected) { nextModel = m; break; }
+                nmi++;
+            }
+            storage.setModel(nextModel);
             WatchUi.requestUpdate();
         }
     }

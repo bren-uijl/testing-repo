@@ -40,7 +40,7 @@ class MessageInputView extends WatchUi.View {
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 20, Graphics.FONT_MEDIUM, Rez.Strings.TypeMessage, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 20, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.TypeMessage), Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(10, 35, width - 10, 35);
@@ -68,7 +68,7 @@ class MessageInputView extends WatchUi.View {
 
         if (isLoading) {
             dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, height - 60, Graphics.FONT_MEDIUM, Rez.Strings.Loading, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, height - 60, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.Loading), Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         var sendBtnY = height - 45;
@@ -81,20 +81,25 @@ class MessageInputView extends WatchUi.View {
             dc.fillRoundedRectangle(sendBtnX, sendBtnY, sendBtnWidth, sendBtnHeight, 8);
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, sendBtnY + 15, Graphics.FONT_MEDIUM, Rez.Strings.Send, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, sendBtnY + 15, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.Send), Graphics.TEXT_JUSTIFY_CENTER);
         } else {
             dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
             dc.fillRoundedRectangle(sendBtnX, sendBtnY, sendBtnWidth, sendBtnHeight, 8);
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, sendBtnY + 15, Graphics.FONT_MEDIUM, Rez.Strings.Send, Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, sendBtnY + 15, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.Send), Graphics.TEXT_JUSTIFY_CENTER);
         }
     }
 
     function onTap(evt) {
         var coords = evt.getCoordinates();
-        var x = coords[0];
-        var y = coords[1];
+        var x = 0;
+        var y = 0;
+        var isFirst = true;
+        for (var c : coords) {
+            if (isFirst) { x = c; isFirst = false; }
+            else { y = c; }
+        }
         var width = viewWidth;
         var height = viewHeight;
 
@@ -136,7 +141,7 @@ class MessageInputView extends WatchUi.View {
         }
 
         if (!storage.isApiKeySet()) {
-            errorMessage = Rez.Strings.NoApiKey;
+            errorMessage = WatchUi.loadResource(Rez.Strings.NoApiKey);
             WatchUi.requestUpdate();
             return;
         }
@@ -152,7 +157,7 @@ class MessageInputView extends WatchUi.View {
         var userMsg = Message.userMessage(currentText);
         conversation.addMessage(userMsg);
 
-        var loadingMsg = Message.systemMessage(Rez.Strings.Loading);
+        var loadingMsg = Message.systemMessage(WatchUi.loadResource(Rez.Strings.Loading));
         conversation.addMessage(loadingMsg);
 
         var messages = conversation.getApiMessages();

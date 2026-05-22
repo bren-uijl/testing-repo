@@ -77,7 +77,7 @@ class SettingsView extends WatchUi.View {
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 18, Graphics.FONT_MEDIUM, Rez.Strings.Settings, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, 18, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.Settings), Graphics.TEXT_JUSTIFY_CENTER);
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
         dc.drawLine(0, 35, width, 35);
@@ -88,15 +88,14 @@ class SettingsView extends WatchUi.View {
 
         dc.setClip(0, listTop, width, availableHeight);
 
-        for (var i = scrollOffset; i < items.size(); i++) {
-            if (i >= scrollOffset + maxVisible + 1) {
-                break;
-            }
+        var ci = 0;
+        for (var item : items) {
+            if (ci < scrollOffset) { ci++; continue; }
+            if (ci >= scrollOffset + maxVisible + 1) break;
 
-            var item = items[i];
-            var y = listTop + (i - scrollOffset) * itemHeight;
+            var y = listTop + (ci - scrollOffset) * itemHeight;
 
-            if (i == selectedIdx) {
+            if (ci == selectedIdx) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
                 dc.fillRectangle(5, y, width - 10, itemHeight - 4);
             }
@@ -114,10 +113,11 @@ class SettingsView extends WatchUi.View {
                 dc.drawText(width - 15, y + 12, Graphics.FONT_MEDIUM, displayValue, Graphics.TEXT_JUSTIFY_RIGHT);
             }
 
-            if (i < items.size() - 1) {
+            if (ci < items.size() - 1) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
                 dc.drawLine(10, y + itemHeight - 4, width - 10, y + itemHeight - 4);
             }
+            ci++;
         }
 
         dc.clearClip();
@@ -125,8 +125,13 @@ class SettingsView extends WatchUi.View {
 
     function onTap(evt) {
         var coords = evt.getCoordinates();
-        var x = coords[0];
-        var y = coords[1];
+        var x = 0;
+        var y = 0;
+        var isFirst = true;
+        for (var c : coords) {
+            if (isFirst) { x = c; isFirst = false; }
+            else { y = c; }
+        }
 
         var listTop = headerHeight;
         if (y >= listTop) {
@@ -138,8 +143,15 @@ class SettingsView extends WatchUi.View {
     }
 
     function handleItemSelect(idx) {
-        var item = items[idx];
-        var action = item.action;
+        var action = "";
+        var ci = 0;
+        for (var item : items) {
+            if (ci == idx) {
+                action = item.action;
+                break;
+            }
+            ci++;
+        }
 
         if (action == "apiKey") {
             Application.getApp().showApiKeyInput();
@@ -174,14 +186,22 @@ class SettingsView extends WatchUi.View {
 
         var current = storage.getModel();
         var nextIdx = 0;
-        for (var i = 0; i < models.size(); i++) {
-            if (models[i] == current) {
-                nextIdx = (i + 1) % models.size();
+        var mi = 0;
+        for (var m : models) {
+            if (m == current) {
+                nextIdx = (mi + 1) % models.size();
                 break;
             }
+            mi++;
         }
 
-        storage.setModel(models[nextIdx]);
+        var nextModel = "";
+        var nmi = 0;
+        for (var m : models) {
+            if (nmi == nextIdx) { nextModel = m; break; }
+            nmi++;
+        }
+        storage.setModel(nextModel);
         buildItems();
         WatchUi.requestUpdate();
     }
