@@ -31,7 +31,9 @@ class NviApiClient {
     }
 
     function sendMessage(messages, cb) {
-        callback = cb;
+        if (cb != null) {
+            callback = cb;
+        }
 
         if (apiKey == null || apiKey.length() == 0) {
             if (callback != null) {
@@ -55,12 +57,16 @@ class NviApiClient {
             "stream" => false
         };
 
+        var headers = {
+            "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
+        };
+        if (apiKey != null && apiKey.length() > 0) {
+            headers.put("Authorization", "Bearer " + apiKey);
+        }
         var options = {
-            "method" => Communications.HTTP_REQUEST_METHOD_POST,
-            "headers" => {
-                "Content-Type" => Communications.REQUEST_CONTENT_TYPE_JSON
-            },
-            "responseType" => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
+            :method => Communications.HTTP_REQUEST_METHOD_POST,
+            :headers => headers,
+            :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
         };
 
         try {

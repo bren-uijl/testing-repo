@@ -36,6 +36,14 @@ class ApiKeyInputView extends WatchUi.View {
         viewHeight = dc.getHeight();
     }
 
+    function onShow() {
+        if (storage == null) {
+            storage = Application.getApp().getPropertyStore();
+        }
+        loadKeyParts();
+        WatchUi.requestUpdate();
+    }
+
     function loadKeyParts() {
         keyParts = storage.getApiKeyParts();
         if (keyParts.size() == 0) {

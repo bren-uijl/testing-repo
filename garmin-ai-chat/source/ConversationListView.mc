@@ -57,6 +57,15 @@ class ConversationListView extends WatchUi.View {
         viewHeight = dc.getHeight();
     }
 
+    function onShow() {
+        if (storage == null) {
+            storage = Application.getApp().getPropertyStore();
+        }
+        loadConversations();
+        scrollOffset = 0;
+        WatchUi.requestUpdate();
+    }
+
     function loadConversations() {
         conversations = [];
         var ids = storage.getConversationIds();
@@ -278,7 +287,12 @@ class ConversationListView extends WatchUi.View {
             return;
         }
 
-        var listTop = headerHeight + 30;
+        var listTop;
+        if (showQuickPrompts) {
+            listTop = newBtnY + btnHeight + 8 + 3 * (22 + 6) + 10;
+        } else {
+            listTop = headerHeight + 30;
+        }
         if (y >= listTop) {
             var tappedIdx = scrollOffset + (y - listTop) / itemHeight;
             var ci = 0;
@@ -337,6 +351,12 @@ class ConversationListView extends WatchUi.View {
                 ci++;
             }
             deleteTargetIdx = -1;
+            if (scrollOffset >= conversations.size()) {
+                scrollOffset = conversations.size() - 1;
+                if (scrollOffset < 0) {
+                    scrollOffset = 0;
+                }
+            }
             WatchUi.requestUpdate();
         }
     }
