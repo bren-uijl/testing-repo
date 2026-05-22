@@ -83,7 +83,7 @@ class ApiKeyInputView extends WatchUi.View {
         for (var pi = 0; pi < keyParts.size(); pi++) {
             var partValue = keyParts[pi];
             if (ci < scrollOffset) { ci++; continue; }
-            if (ci >= scrollOffset + maxVisible + 1) break;
+            if (ci >= scrollOffset + maxVisible + 1) { break; }
 
             var y = listTop + (ci - scrollOffset) * segmentHeight;
 

@@ -63,7 +63,7 @@ class AboutView extends WatchUi.View {
         for (var ii = 0; ii < items.size(); ii++) {
             var item = items[ii];
             if (ii < scrollOffset) { continue; }
-            if (ii >= scrollOffset + maxVisible + 1) break;
+            if (ii >= scrollOffset + maxVisible + 1) { break; }
 
             var y = listTop + (ii - scrollOffset) * itemHeight;
 
