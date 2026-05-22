@@ -1,0 +1,31 @@
+name: test
+
+on:
+  workflow_dispatch: 
+
+
+jobs:
+  run-opencode:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Install OpenCode CLI
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+          echo "/usr/local/bin" >> $GITHUB_PATH
+
+      - name: Verify OpenCode Installation
+        run: opencode --version
+
+      - name: Run OpenCode Prompt
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: |
+          opencode providers list
+          opencode run "test, respond as quick as possible" --model nvidia/openai/gpt-oss-120b
+          echo "-----------"
+          opencode run "test the image subagent" --model nvidia/openai/gpt-oss-120b
