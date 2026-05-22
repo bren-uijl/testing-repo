@@ -56,7 +56,8 @@ class Conversation {
     function getLastMessage() {
         if (messages.size() > 0) {
             var last = null;
-            for (var msg : messages) {
+            for (var mi = 0; mi < messages.size(); mi++) {
+                var msg = messages[mi];
                 last = msg;
             }
             return last;
@@ -104,7 +105,8 @@ class Conversation {
         }
 
         var isFirst = true;
-        for (var msg : messages) {
+        for (var mi = 0; mi < messages.size(); mi++) {
+            var msg = messages[mi];
             if (msg.role != "system" || isFirst) {
                 apiMsgs.add({
                     "role" => msg.role,
@@ -126,7 +128,8 @@ class Conversation {
             "messages" => []
         };
 
-        for (var msg : messages) {
+        for (var mi = 0; mi < messages.size(); mi++) {
+            var msg = messages[mi];
             convData["messages"].add(msg.toDictionary());
         }
 
@@ -158,7 +161,8 @@ class Conversation {
 
         var msgList = convData["messages"];
         if (msgList != null) {
-            for (var msgData : msgList) {
+            for (var mdi = 0; mdi < msgList.size(); mdi++) {
+                var msgData = msgList[mdi];
                 if (msgData != null) {
                     conv.messages.add(Message.fromDictionary(msgData));
                 }

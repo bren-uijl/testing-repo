@@ -96,9 +96,9 @@ class SettingsView extends WatchUi.View {
 
         dc.setClip(0, listTop, width, availableHeight);
 
-        var ci = 0;
-        for (var item : items) {
-            if (ci < scrollOffset) { ci++; continue; }
+        for (var ci = 0; ci < items.size(); ci++) {
+            var item = items[ci];
+            if (ci < scrollOffset) { continue; }
             if (ci >= scrollOffset + maxVisible + 1) break;
 
             var y = listTop + (ci - scrollOffset) * itemHeight;
@@ -125,7 +125,6 @@ class SettingsView extends WatchUi.View {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
                 dc.drawLine(10, y + itemHeight - 4, width - 10, y + itemHeight - 4);
             }
-            ci++;
         }
 
         dc.clearClip();
@@ -136,7 +135,8 @@ class SettingsView extends WatchUi.View {
         var x = 0;
         var y = 0;
         var isFirst = true;
-        for (var c : coords) {
+        for (var ci = 0; ci < coords.size(); ci++) {
+            var c = coords[ci];
             if (isFirst) { x = c; isFirst = false; }
             else { y = c; }
         }
@@ -152,13 +152,12 @@ class SettingsView extends WatchUi.View {
 
     function handleItemSelect(idx) {
         var action = "";
-        var ci = 0;
-        for (var item : items) {
+        for (var ci = 0; ci < items.size(); ci++) {
+            var item = items[ci];
             if (ci == idx) {
                 action = item.action;
                 break;
             }
-            ci++;
         }
 
         if (action == "apiKey") {
@@ -194,20 +193,18 @@ class SettingsView extends WatchUi.View {
 
         var current = storage.getModel();
         var nextIdx = 0;
-        var mi = 0;
-        for (var m : models) {
+        for (var mi = 0; mi < models.size(); mi++) {
+            var m = models[mi];
             if (m == current) {
                 nextIdx = (mi + 1) % models.size();
                 break;
             }
-            mi++;
         }
 
         var nextModel = "";
-        var nmi = 0;
-        for (var m : models) {
+        for (var nmi = 0; nmi < models.size(); nmi++) {
+            var m = models[nmi];
             if (nmi == nextIdx) { nextModel = m; break; }
-            nmi++;
         }
         storage.setModel(nextModel);
         buildItems();

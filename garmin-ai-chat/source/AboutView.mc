@@ -60,12 +60,12 @@ class AboutView extends WatchUi.View {
 
         dc.setClip(0, listTop, width, availableHeight);
 
-        var ci = 0;
-        for (var item : items) {
-            if (ci < scrollOffset) { ci++; continue; }
-            if (ci >= scrollOffset + maxVisible + 1) break;
+        for (var ii = 0; ii < items.size(); ii++) {
+            var item = items[ii];
+            if (ii < scrollOffset) { continue; }
+            if (ii >= scrollOffset + maxVisible + 1) break;
 
-            var y = listTop + (ci - scrollOffset) * itemHeight;
+            var y = listTop + (ii - scrollOffset) * itemHeight;
 
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
             dc.drawText(15, y + 14, Graphics.FONT_MEDIUM, item.label, Graphics.TEXT_JUSTIFY_LEFT);
@@ -76,11 +76,10 @@ class AboutView extends WatchUi.View {
                 dc.drawText(width - 15, y + 14, Graphics.FONT_MEDIUM, value, Graphics.TEXT_JUSTIFY_RIGHT);
             }
 
-            if (ci < items.size() - 1) {
+            if (ii < items.size() - 1) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
                 dc.drawLine(10, y + itemHeight - 4, width - 10, y + itemHeight - 4);
             }
-            ci++;
         }
 
         dc.clearClip();

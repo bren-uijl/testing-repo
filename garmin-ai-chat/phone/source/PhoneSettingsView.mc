@@ -33,13 +33,12 @@ class PhoneSettingsView extends WatchUi.View {
         storage = Application.getApp().getPropertyStore();
         apiKeyInput = storage.getApiKey();
         var currentModel = storage.getModel();
-        var mi = 0;
-        for (var m : models) {
+        for (var mi = 0; mi < models.size(); mi++) {
+            var m = models[mi];
             if (m == currentModel) {
                 modelSelected = mi;
                 break;
             }
-            mi++;
         }
     }
 
@@ -81,10 +80,9 @@ class PhoneSettingsView extends WatchUi.View {
         y += 30;
         dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_TRANSPARENT);
         var selectedModel = "";
-        var smi = 0;
-        for (var m : models) {
+        for (var smi = 0; smi < models.size(); smi++) {
+            var m = models[smi];
             if (smi == modelSelected) { selectedModel = m; break; }
-            smi++;
         }
         dc.drawText(20, y, Graphics.FONT_MEDIUM, selectedModel, Graphics.TEXT_JUSTIFY_LEFT);
 
@@ -115,7 +113,8 @@ class PhoneSettingsView extends WatchUi.View {
         var coords = evt.getCoordinates();
         var y = 0;
         var isFirst = true;
-        for (var c : coords) {
+        for (var ci = 0; ci < coords.size(); ci++) {
+            var c = coords[ci];
             if (!isFirst) { y = c; break; }
             isFirst = false;
         }
@@ -141,20 +140,18 @@ class PhoneSettingsView extends WatchUi.View {
         if (direction == WatchUi.SWIPE_LEFT) {
             modelSelected = (modelSelected + 1) % models.size();
             var nextModel = "";
-            var nmi = 0;
-            for (var m : models) {
+            for (var nmi = 0; nmi < models.size(); nmi++) {
+                var m = models[nmi];
                 if (nmi == modelSelected) { nextModel = m; break; }
-                nmi++;
             }
             storage.setModel(nextModel);
             WatchUi.requestUpdate();
         } else if (direction == WatchUi.SWIPE_RIGHT) {
             modelSelected = (modelSelected - 1 + models.size()) % models.size();
             var nextModel = "";
-            var nmi = 0;
-            for (var m : models) {
+            for (var nmi = 0; nmi < models.size(); nmi++) {
+                var m = models[nmi];
                 if (nmi == modelSelected) { nextModel = m; break; }
-                nmi++;
             }
             storage.setModel(nextModel);
             WatchUi.requestUpdate();
