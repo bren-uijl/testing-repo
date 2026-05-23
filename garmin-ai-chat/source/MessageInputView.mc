@@ -14,6 +14,8 @@ class MessageInputView extends WatchUi.View {
     var storage;
     var viewWidth;
     var viewHeight;
+    var isActive;
+    var isNewConversation;
 
     function initialize(existingConv) {
         View.initialize();
@@ -22,6 +24,8 @@ class MessageInputView extends WatchUi.View {
         errorMessage = null;
         conversation = existingConv;
         storage = Application.getApp().getPropertyStore();
+        isActive = true;
+        isNewConversation = (existingConv == null);
     }
 
     function onLayout(dc) {
@@ -30,6 +34,7 @@ class MessageInputView extends WatchUi.View {
     }
 
     function onExit() {
+        isActive = false;
     }
 
     function onUpdate(dc) {
@@ -195,14 +200,20 @@ class MessageInputView extends WatchUi.View {
         if (error != null) {
             errorMessage = error;
             conversation.removeLastMessage();
+            WatchUi.requestUpdate();
         } else if (response != null) {
             conversation.removeLastMessage();
             var assistantMsg = Message.assistantMessage(response);
             conversation.addMessage(assistantMsg);
             storage.setLastConversationId(conversation.id);
-        }
 
-        WatchUi.requestUpdate();
+            if (isActive) {
+                WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+                if (isNewConversation) {
+                    Application.getApp().showConversation(conversation.id);
+                }
+            }
+        }
     }
 }
 
