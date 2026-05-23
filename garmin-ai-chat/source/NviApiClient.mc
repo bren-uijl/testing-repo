@@ -87,17 +87,21 @@ class NviApiClient {
             try {
                 if (data instanceof Dictionary) {
                     var choices = data["choices"];
-                    if (choices != null && choices.size() > 0) {
-                        var firstChoice = null;
-                        for (var ci = 0; ci < choices.size(); ci++) {
-                            var c = choices[ci];
-                            firstChoice = c;
-                            break;
-                        }
+                    if (choices == null) {
+                        choices = safeDictGet(data, "choices");
+                    }
+                    if (choices != null && choices instanceof Array && choices.size() > 0) {
+                        var firstChoice = safeArrayGet(choices, 0);
                         if (firstChoice != null) {
                             var message = firstChoice["message"];
+                            if (message == null) {
+                                message = safeDictGet(firstChoice, "message");
+                            }
                             if (message != null) {
                                 var content = message["content"];
+                                if (content == null) {
+                                    content = safeDictGet(message, "content");
+                                }
                                 if (content != null && content.length() > 0) {
                                     callback.onComplete(content, null);
                                     return;
@@ -116,6 +120,39 @@ class NviApiClient {
             var errorMsg = getErrorMessage(responseCode, data);
             callback.onComplete(null, errorMsg);
         }
+    }
+
+    function safeDictGet(dict, key) {
+        if (dict == null || !(dict instanceof Dictionary)) {
+            return null;
+        }
+        try {
+            var keys = dict.keys();
+            for (var ki = 0; ki < keys.size(); ki++) {
+                try {
+                    var k = keys[ki];
+                    if (k.toString().equals(key.toString())) {
+                        return dict[k];
+                    }
+                } catch (e) {
+                }
+            }
+        } catch (e) {
+        }
+        return null;
+    }
+
+    function safeArrayGet(arr, index) {
+        if (arr == null || !(arr instanceof Array)) {
+            return null;
+        }
+        try {
+            if (index >= 0 && index < arr.size()) {
+                return arr[index];
+            }
+        } catch (e) {
+        }
+        return null;
     }
 
     function getErrorMessage(responseCode, data) {
@@ -137,8 +174,14 @@ class NviApiClient {
             try {
                 if (data instanceof Dictionary) {
                     var error = data["error"];
+                    if (error == null) {
+                        error = safeDictGet(data, "error");
+                    }
                     if (error != null) {
                         var message = error["message"];
+                        if (message == null) {
+                            message = safeDictGet(error, "message");
+                        }
                         if (message != null && message.length() > 0) {
                             if (message.length() > 50) {
                                 message = message.substring(0, 47) + "...";
