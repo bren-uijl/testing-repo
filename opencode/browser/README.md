@@ -2,6 +2,14 @@
 
 A next-generation Chromium-based browser with full Chrome Web Store extension support, built on Electron.
 
+## Screenshots
+
+_Screenshots coming soon. Run the app with `npm start` and capture:_
+
+1. **Home Page** — Search bar, quick links, and recent tabs
+2. **Loaded Page** — A rendered webpage with the navigation bar
+3. **Privacy Shield** — The privacy panel showing tracker blocking stats
+
 ## Features
 
 - **Chrome Web Store Support**: Install extensions directly from the Chrome Web Store
