@@ -79,7 +79,7 @@ class NviApiClient {
         }
     }
 
-    function onResponse(responseCode as Number, data as Null or Dictionary or String or Iterator) as Void {
+    function onResponse(responseCode, data) {
         if (callback == null) {
             return;
         }
@@ -156,7 +156,7 @@ class NviApiClient {
         return null;
     }
 
-    function getErrorMessage(responseCode as Number, data as Null or Dictionary or String or Iterator) as String {
+    function getErrorMessage(responseCode, data) {
         var baseMsg = "HTTP " + responseCode.toString();
 
         if (responseCode == 401) {
