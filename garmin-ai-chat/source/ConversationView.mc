@@ -138,7 +138,7 @@ class ConversationView extends WatchUi.View {
 
             if (msg.isUser()) {
                 dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLUE);
-                var textWidth = dc.getTextWidthInPixels(msg.content, Graphics.FONT_MEDIUM);
+                var textWidth = dc.getTextDimensions(msg.content, Graphics.FONT_MEDIUM)[0];
                 var bubbleWidth = textWidth + 20;
                 if (bubbleWidth > width - 40) {
                     bubbleWidth = width - 40;
@@ -150,7 +150,7 @@ class ConversationView extends WatchUi.View {
                 dc.drawText(width - 15, y + 12, Graphics.FONT_MEDIUM, msg.content, Graphics.TEXT_JUSTIFY_RIGHT);
             } else if (msg.isAssistant()) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
-                var textWidth = dc.getTextWidthInPixels(msg.content, Graphics.FONT_MEDIUM);
+                var textWidth = dc.getTextDimensions(msg.content, Graphics.FONT_MEDIUM)[0];
                 var bubbleWidth = textWidth + 20;
                 if (bubbleWidth > width - 40) {
                     bubbleWidth = width - 40;
@@ -238,7 +238,7 @@ class ConversationView extends WatchUi.View {
 
     function estimateLineHeight(text, dc) {
         var width = dc.getWidth() - 60;
-        var textWidth = dc.getTextWidthInPixels(text, Graphics.FONT_MEDIUM);
+        var textWidth = dc.getTextDimensions(text, Graphics.FONT_MEDIUM)[0];
         var lines = (textWidth / width).toFloat().ceil().toNumber();
         if (lines < 1) {
             lines = 1;
@@ -388,6 +388,10 @@ class ConversationView extends WatchUi.View {
 
     function onSwipe(evt) {
         var direction = evt.getDirection();
+
+        if (conversation == null) {
+            return;
+        }
         var messages = conversation.getMessages();
 
         if (direction == WatchUi.SWIPE_UP) {

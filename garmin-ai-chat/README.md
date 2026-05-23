@@ -2,6 +2,14 @@
 
 A Connect IQ app that brings conversational AI to your wrist, powered by NVIDIA's API.
 
+## Screenshots
+
+_Screenshots coming soon. Capture them from the Connect IQ Simulator:_
+
+1. **Conversation List** — Shows the main screen with quick prompts and saved conversations
+2. **Active Conversation** — A chat in progress with message bubbles
+3. **Settings** — API key configuration, model selection, and options
+
 ## Features
 
 - **Past Conversations**: View and continue previous conversations
