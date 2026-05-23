@@ -1,6 +1,7 @@
 using Toybox.Communications;
 using Toybox.System;
 using Toybox.Lang;
+using Toybox.PersistedContent;
 
 class NviApiClient {
 
@@ -78,7 +79,7 @@ class NviApiClient {
         }
     }
 
-    function onResponse(responseCode, data) {
+    function onResponse(responseCode as Number, data as Null or Dictionary or String or Iterator) as Void {
         if (callback == null) {
             return;
         }
@@ -118,7 +119,7 @@ class NviApiClient {
         }
     }
 
-    function getErrorMessage(responseCode, data) {
+    function getErrorMessage(responseCode as Number, data as Null or Dictionary or String or Iterator) as String {
         var baseMsg = "HTTP " + responseCode.toString();
 
         if (responseCode == 401) {
