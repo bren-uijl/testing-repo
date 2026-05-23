@@ -44,7 +44,6 @@ class PhoneSettingsView extends WatchUi.View {
 
     function onUpdate(dc) {
         var width = dc.getWidth();
-        var height = dc.getHeight();
 
         dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
         dc.clear();

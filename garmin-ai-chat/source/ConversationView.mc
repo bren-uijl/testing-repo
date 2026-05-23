@@ -339,7 +339,6 @@ class ConversationView extends WatchUi.View {
             return;
         }
 
-        var title = conversation.title;
         conversation.messages = [];
         conversation.updatedAt = System.getTimer();
         conversation.save();
