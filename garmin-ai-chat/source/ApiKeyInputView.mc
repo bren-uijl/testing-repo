@@ -172,7 +172,6 @@ class ApiKeyInputView extends WatchUi.View {
     function openSegmentInput(idx) {
         if (WatchUi has :TextPicker) {
             var currentValue = "";
-            var ci = 0;
             for (var pi = 0; pi < keyParts.size(); pi++) {
                 var p = keyParts[pi];
                 if (pi == idx) { currentValue = p; break; }
@@ -184,7 +183,6 @@ class ApiKeyInputView extends WatchUi.View {
     function onSegmentSubmitted(idx, text) {
         if (text != null) {
             var newParts = [];
-            var pi = 0;
             for (var pi2 = 0; pi2 < keyParts.size(); pi2++) {
                 var p = keyParts[pi2];
                 newParts.add(pi2 == idx ? text : p);

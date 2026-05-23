@@ -58,8 +58,11 @@ class SettingsView extends WatchUi.View {
         var apiKey = storage.getApiKey();
         var keyStatus = "Not set";
         if (apiKey != null && apiKey.length() > 0) {
-            var masked = apiKey.substring(0, 4) + "..." + apiKey.substring(apiKey.length() - 4);
-            keyStatus = masked;
+            if (apiKey.length() >= 8) {
+                keyStatus = apiKey.substring(0, 4) + "..." + apiKey.substring(apiKey.length() - 4);
+            } else {
+                keyStatus = apiKey;
+            }
         }
         items.add(new SettingsItem("API Key", keyStatus, "apiKey"));
 
@@ -132,12 +135,11 @@ class SettingsView extends WatchUi.View {
 
     function onTap(evt) {
         var coords = evt.getCoordinates();
-        var x = 0;
         var y = 0;
         var isFirst = true;
         for (var ci = 0; ci < coords.size(); ci++) {
             var c = coords[ci];
-            if (isFirst) { x = c; isFirst = false; }
+            if (isFirst) { isFirst = false; }
             else { y = c; }
         }
 
