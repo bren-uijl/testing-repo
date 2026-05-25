@@ -79,7 +79,7 @@ class NviApiClient {
         }
     }
 
-    function onResponse(responseCode, data) {
+    function onResponse(responseCode as Toybox.Lang.Number, data as Toybox.Lang.Null or Toybox.Lang.Dictionary or Toybox.Lang.String or Toybox.PersistedContent.Iterator) as Toybox.Lang.Void {
         if (callback == null) {
             return;
         }
