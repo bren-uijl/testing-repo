@@ -411,11 +411,11 @@ class ConversationView extends WatchUi.View {
         isLoading = false;
         loadingDots = "";
 
+        conversation.removeLastMessage();
+
         if (error != null) {
             errorMessage = error;
         } else if (response != null) {
-            conversation.removeLastMessage();
-
             var assistantMsg = Message.assistantMessage(response);
             conversation.addMessage(assistantMsg);
 

@@ -44,7 +44,7 @@ class PhonePropertyStore {
     var store;
 
     function initialize() {
-        store = Application.getApp().getProperty("AiChatPhoneStore");
+        store = Application.getApp().getPropertyValue("AiChatPhoneStore");
         if (store == null) {
             store = {};
             store.put("apiKey", "");
@@ -71,6 +71,6 @@ class PhonePropertyStore {
     }
 
     function save() {
-        Application.getApp().setProperty("AiChatPhoneStore", store);
+        Application.getApp().setPropertyValue("AiChatPhoneStore", store);
     }
 }
