@@ -11,7 +11,7 @@ class PropertyStore {
     static const API_KEY_SEGMENT_COUNT = 10;
 
     function initialize() {
-        store = Application.getApp().getPropertyValue("AiChatStore");
+        store = Application.Storage.getValue("AiChatStore");
         if (store == null) {
             store = {};
             store.put("conversations", []);
@@ -221,6 +221,6 @@ class PropertyStore {
     }
 
     function save() {
-        Application.getApp().setPropertyValue("AiChatStore", store);
+        Application.Storage.setValue("AiChatStore", store);
     }
 }
