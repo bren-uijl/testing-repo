@@ -79,7 +79,7 @@ class NviApiClient {
         }
     }
 
-    function onResponse(responseCode, data) {
+    function onResponse(responseCode, data) as Void {
         if (callback == null) {
             return;
         }
