@@ -55,5 +55,4 @@ jobs:
             exit 1
           fi
           caveman --provider nvidia --model "moonshotai/kimi-k2.6" \
-            --caveman-mode lite \
             -p "${{ github.event.inputs.prompt }}"
