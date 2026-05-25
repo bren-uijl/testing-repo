@@ -1,0 +1,52 @@
+name: Caveman Code + NVIDIA (Kimi K2.6)
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: "Prompt for caveman-code"
+        required: true
+        default: "list files in the current directory"
+
+jobs:
+  caveman:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install caveman-code
+        run: npm install -g @juliusbrussee/caveman-code
+
+      - name: Configure NVIDIA provider
+        run: |
+          mkdir -p ~/.cave/agent
+          cat > ~/.cave/agent/models.json << 'EOF'
+          {
+            "providers": {
+              "nvidia": {
+                "baseUrl": "https://integrate.api.nvidia.com/v1",
+                "api": "openai-completions",
+                "apiKey": "NVIDIA_API_KEY",
+                "models": [
+                  { "id": "moonshotai/kimi-k2.6" }
+                ]
+              }
+            }
+          }
+          EOF
+
+      - name: Run caveman-code
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+        run: |
+          if [ -z "$NVIDIA_API_KEY" ]; then
+            echo "Set NVIDIA_API_KEY secret to run caveman-code"
+            exit 1
+          fi
+          caveman --provider nvidia --model "moonshotai/kimi-k2.6" -p "${{ github.event.inputs.prompt }}"
