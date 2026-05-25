@@ -4,7 +4,7 @@ A next-generation Chromium-based browser with full Chrome Web Store extension su
 
 ## Screenshots
 
-_Screenshots coming soon. Run the app with `npm start` and capture:_
+Screenshots can be taken by running the app with `npm start` and capturing the window. Key screens to capture:
 
 1. **Home Page** — Search bar, quick links, and recent tabs
 2. **Loaded Page** — A rendered webpage with the navigation bar

@@ -169,9 +169,11 @@ class ConversationListView extends WatchUi.View {
         }
         }
 
-        if (conversations.size() == 0 && !showQuickPrompts) {
-            dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, height / 2, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.NoConversations), Graphics.TEXT_JUSTIFY_CENTER);
+        if (conversations.size() == 0) {
+            if (!showQuickPrompts) {
+                showQuickPrompts = true;
+                WatchUi.requestUpdate();
+            }
             return;
         }
 
@@ -251,8 +253,7 @@ class ConversationListView extends WatchUi.View {
             if (deleteMode) {
                 deleteSelectedConversation();
             } else {
-                showQuickPrompts = !showQuickPrompts;
-                WatchUi.requestUpdate();
+                Application.getApp().showNewConversation();
             }
             return;
         }

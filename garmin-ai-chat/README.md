@@ -22,7 +22,7 @@ _Screenshots coming soon. Capture them from the Connect IQ Simulator:_
 ## Requirements
 
 - Garmin vívoactive 5
-- Connect IQ SDK 4.x (for building)
+- Connect IQ SDK 5.x+ (tested with 9.1.0)
 - NVIDIA API key (get one at https://build.nvidia.com/)
 
 ## Installation
@@ -36,15 +36,12 @@ _Screenshots coming soon. Capture them from the Connect IQ Simulator:_
 ### Build from Source
 ```bash
 # Install Connect IQ SDK from https://developer.garmin.com/connect-iq/sdk/
-export CONNECTIQ_SDK_DIR=/path/to/connectiq-sdk
 
 # Build watch app
-monkeyc -w -y developer_key.der -m manifest.xml -z resources/ -o AIChat.prg source/*.mc
+monkeyc -f monkey.jungle -d vivoactive5 -o AIChat.iq
 
-# Build with phone app
-monkeyc -w -y developer_key.der -m manifest.xml -m phone/manifest.xml \
-  -z resources/ -z phone/resources/ -o AIChat.prg \
-  source/*.mc phone/source/*.mc
+# Build for testing (adds unit tests)
+monkeyc -f monkey.jungle -d vivoactive5 -o bin/test_vivoactive5_garminaichat.prg --unit-test
 ```
 
 ## Setup
