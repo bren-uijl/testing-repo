@@ -215,8 +215,8 @@ jobs:
       - name: Run OpenCode
         id: opencode_run
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.VINKBOT }}
+          GITHUB_TOKEN: ${{ secrets.VINKBOT }}
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
         run: |
           set -euo pipefail
@@ -271,7 +271,7 @@ jobs:
         id: pr
         if: steps.changes.outputs.has_changes == 'true' && steps.push.outputs.push_failed != 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.VINKBOT }}
         run: |
           set -euo pipefail
 
@@ -295,14 +295,14 @@ jobs:
       - name: Add ready-for-review label
         if: steps.pr.outputs.pr_url != ''
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.VINKBOT }}
         run: |
           gh issue edit "$ISSUE_NUMBER" --add-label "ready-for-review" || true
 
       - name: Comment pull request link
         if: steps.pr.outputs.pr_url != ''
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.VINKBOT }}
         run: |
           gh issue comment "$ISSUE_NUMBER" \
             --body "$(cat <<EOF
@@ -315,7 +315,7 @@ jobs:
       - name: Fallback if push failed
         if: steps.changes.outputs.has_changes == 'true' && steps.push.outputs.push_failed == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.VINKBOT }}
         run: |
           set -euo pipefail
 
