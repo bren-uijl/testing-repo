@@ -6,7 +6,7 @@ on:
       prompt:
         description: "Prompt for caveman-code"
         required: true
-        default: "list files in the current directory"
+        default: "explain what this repo does and suggest 3 improvements"
 
 jobs:
   caveman:
@@ -19,6 +19,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+
+      - name: Set git identity (for cave checkpoints)
+        run: |
+          git config --global user.email "runner@github.com"
+          git config --global user.name "GitHub Runner"
 
       - name: Install caveman-code
         run: npm install -g @juliusbrussee/caveman-code
@@ -49,4 +54,6 @@ jobs:
             echo "Set NVIDIA_API_KEY secret to run caveman-code"
             exit 1
           fi
-          caveman --provider nvidia --model "moonshotai/kimi-k2.6" -p "${{ github.event.inputs.prompt }}"
+          caveman --provider nvidia --model "moonshotai/kimi-k2.6" \
+            --caveman-mode lite \
+            -p "${{ github.event.inputs.prompt }}"
