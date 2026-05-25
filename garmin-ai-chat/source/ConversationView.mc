@@ -94,6 +94,9 @@ class ConversationView extends WatchUi.View {
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         var title = conversation.title;
+        if (title == null) {
+            title = "Unknown";
+        }
         if (title.length() > 20) {
             title = title.substring(0, 17) + "...";
         }
@@ -238,6 +241,12 @@ class ConversationView extends WatchUi.View {
 
     function estimateLineHeight(text, dc) {
         var width = dc.getWidth() - 60;
+        if (width <= 0) {
+            width = 1;
+        }
+        if (text == null) {
+            text = "";
+        }
         var textWidth = dc.getTextDimensions(text, Graphics.FONT_MEDIUM)[0];
         var lines = (textWidth / width).toFloat().ceil().toNumber();
         if (lines < 1) {
@@ -251,6 +260,9 @@ class ConversationView extends WatchUi.View {
 
     function onTap(evt) {
         var coords = evt.getCoordinates();
+        if (coords == null) {
+            return;
+        }
         var x = 0;
         var y = 0;
         var isFirst = true;
@@ -411,11 +423,13 @@ class ConversationView extends WatchUi.View {
         isLoading = false;
         loadingDots = "";
 
-        conversation.removeLastMessage();
+        if (conversation != null) {
+            conversation.removeLastMessage();
+        }
 
         if (error != null) {
             errorMessage = error;
-        } else if (response != null) {
+        } else if (response != null && conversation != null) {
             var assistantMsg = Message.assistantMessage(response);
             conversation.addMessage(assistantMsg);
 

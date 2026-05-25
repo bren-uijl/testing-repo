@@ -135,6 +135,9 @@ class SettingsView extends WatchUi.View {
 
     function onTap(evt) {
         var coords = evt.getCoordinates();
+        if (coords == null) {
+            return;
+        }
         var y = 0;
         var isFirst = true;
         for (var ci = 0; ci < coords.size(); ci++) {

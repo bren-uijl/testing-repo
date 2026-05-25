@@ -137,6 +137,9 @@ class ApiKeyInputView extends WatchUi.View {
 
     function onTap(evt) {
         var coords = evt.getCoordinates();
+        if (coords == null) {
+            return;
+        }
         var x = 0;
         var y = 0;
         var isFirst = true;

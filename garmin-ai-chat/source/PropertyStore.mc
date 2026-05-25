@@ -12,7 +12,7 @@ class PropertyStore {
 
     function initialize() {
         store = Application.Storage.getValue("AiChatStore");
-        if (store == null) {
+        if (store == null || !(store instanceof Dictionary)) {
             store = {};
             store.put("conversations", []);
             store.put("apiKey", "");

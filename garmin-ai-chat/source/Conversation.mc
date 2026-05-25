@@ -18,6 +18,10 @@ class Conversation {
     }
 
     function addMessage(msg) {
+        if (msg == null) {
+            return;
+        }
+
         var storage = Application.getApp().getPropertyStore();
         var maxMessages = storage.getMaxMessagesPerConversation();
 
@@ -30,6 +34,9 @@ class Conversation {
 
         if (messages.size() == 1 && msg.isUser()) {
             var preview = msg.content;
+            if (preview == null) {
+                preview = "";
+            }
             if (preview.length() > 40) {
                 preview = preview.substring(0, 37) + "...";
             }
