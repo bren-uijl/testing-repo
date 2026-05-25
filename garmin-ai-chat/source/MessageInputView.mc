@@ -152,10 +152,6 @@ class MessageInputView extends WatchUi.View {
             return;
         }
 
-        isLoading = true;
-        errorMessage = null;
-        WatchUi.requestUpdate();
-
         if (conversation == null) {
             conversation = Conversation.create(currentText);
         }
@@ -163,15 +159,19 @@ class MessageInputView extends WatchUi.View {
         var userMsg = Message.userMessage(currentText);
         conversation.addMessage(userMsg);
 
+        var messages = conversation.getApiMessages();
+
         var loadingMsg = Message.systemMessage(WatchUi.loadResource(Rez.Strings.Loading));
         conversation.addMessage(loadingMsg);
 
-        var messages = conversation.getApiMessages();
+        isLoading = true;
+        errorMessage = null;
+        WatchUi.requestUpdate();
 
         var client = new NviApiClient();
         client.setApiKey(storage.getApiKey());
         client.setModel(storage.getModel());
-        client.setCallback(new SendCallback(self, conversation, loadingMsg));
+        client.setCallback(new SendCallback(self, conversation));
 
         client.sendMessage(messages, null);
 
@@ -221,12 +221,10 @@ class SendCallback {
 
     var view;
     var conv;
-    var loadingMsg;
 
-    function initialize(msgView, conversation, loadMsg) {
+    function initialize(msgView, conversation) {
         view = msgView;
         conv = conversation;
-        loadingMsg = loadMsg;
     }
 
     function onComplete(response, error) {
