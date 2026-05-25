@@ -14,7 +14,7 @@
 
 ## What's Here
 
-A bunch of experimental projects and GitHub Actions workflows where I test out AI coding agents like OpenCode.
+A sandbox with experimental projects and GitHub Actions workflows. AI coding agents (like OpenCode and Cave) test their skills here.
 
 ## Projects
 
