@@ -154,19 +154,19 @@ class ConversationListView extends WatchUi.View {
             var promptY = newBtnY + btnHeight + 8;
             var promptBtnWidth = (width - 30) / 2;
             var promptBtnHeight = 22;
-        for (var pi = 0; pi < quickPrompts.size(); pi++) {
-            var prompt = quickPrompts[pi];
-            var col = pi % 2;
-            var row = pi / 2;
-            var px = 10 + col * (promptBtnWidth + 10);
-            var py = promptY + row * (promptBtnHeight + 6);
+            for (var pi = 0; pi < quickPrompts.size(); pi++) {
+                var prompt = quickPrompts[pi];
+                var col = pi % 2;
+                var row = pi / 2;
+                var px = 10 + col * (promptBtnWidth + 10);
+                var py = promptY + row * (promptBtnHeight + 6);
 
-            dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
-            dc.fillRoundedRectangle(px, py, promptBtnWidth, promptBtnHeight, 6);
+                dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
+                dc.fillRoundedRectangle(px, py, promptBtnWidth, promptBtnHeight, 6);
 
-            dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(px + promptBtnWidth / 2, py + 11, Graphics.FONT_MEDIUM, prompt.label, Graphics.TEXT_JUSTIFY_CENTER);
-        }
+                dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+                dc.drawText(px + promptBtnWidth / 2, py + 11, Graphics.FONT_MEDIUM, prompt.label, Graphics.TEXT_JUSTIFY_CENTER);
+            }
         }
 
         if (conversations.size() == 0) {
