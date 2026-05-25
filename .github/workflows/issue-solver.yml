@@ -119,7 +119,7 @@ jobs:
           - inspect the repository
           - make code changes when the issue clearly asks for code or file changes
           - commit changes when needed
-          - view images using `opencode run "[PROMPT TO DESCRIBE IMAGE, OR ASK AN QUESTION]" --model "mistralai/mistral-small-4-119b-2603" --file "path/to/image.png"`
+          - view images using the image subagent (defined in `.opencode/agents/image.md`)
 
           You must not:
           - close issues
