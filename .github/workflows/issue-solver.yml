@@ -105,6 +105,9 @@ jobs:
           FULL_ISSUE_CONTEXT: ${{ steps.issue.outputs.full_context }}
           ISSUE_URL: ${{ steps.issue.outputs.url }}
         run: |
+
+          echo "$FULL_ISSUE_CONTEXT" > /tmp/context.json
+          
           set -euo pipefail
 
           cat > /tmp/opencode-prompt.md <<'PROMPT_EOF'
@@ -183,7 +186,7 @@ jobs:
           __LATEST_COMMENT__
 
           Issue body:
-          __ISSUE_BODY__
+          inserted to /tmp/context.json
 
           Full issue context as JSON:
           __FULL_ISSUE_CONTEXT__
@@ -203,7 +206,6 @@ jobs:
               "__ISSUE_URL__": os.environ.get("ISSUE_URL", ""),
               "__LATEST_COMMENT__": os.environ.get("LATEST_COMMENT", ""),
               "__ISSUE_BODY__": os.environ.get("ISSUE_BODY", ""),
-              "__FULL_ISSUE_CONTEXT__": os.environ.get("FULL_ISSUE_CONTEXT", ""),
           }
 
           for key, value in replacements.items():
