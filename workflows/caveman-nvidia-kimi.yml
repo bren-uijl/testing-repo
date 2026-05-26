@@ -1,15 +1,16 @@
-name: Caveman Code + NVIDIA (Kimi K2.6)
+name: Vinkbot - Caveman Code + NVIDIA (Kimi K2.6)
 
 on:
   workflow_dispatch:
     inputs:
       prompt:
-        description: "Prompt for caveman-code"
+        description: "Task for Vinkbot"
         required: true
         default: "explain what this repo does and suggest 3 improvements"
 
 jobs:
-  caveman:
+  vinkbot:
+    name: Run Vinkbot
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -20,10 +21,10 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Set git identity (for cave checkpoints)
+      - name: Set git identity (Vinkbot)
         run: |
-          git config --global user.email "runner@github.com"
-          git config --global user.name "GitHub Runner"
+          git config --global user.email "272188895+Vinkbot@users.noreply.github.com"
+          git config --global user.name "Vinkbot"
 
       - name: Install caveman-code
         run: npm install -g @juliusbrussee/caveman-code
@@ -46,14 +47,61 @@ jobs:
           }
           EOF
 
-      - name: Run caveman-code
+      - name: Run Vinkbot (caveman-code)
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
         run: |
           if [ -z "$NVIDIA_API_KEY" ]; then
-            echo "Set NVIDIA_API_KEY secret to run caveman-code"
+            echo "Set NVIDIA_API_KEY secret to run Vinkbot"
             exit 1
           fi
+
           caveman --provider nvidia --model "moonshotai/kimi-k2.6" \
             --caveman-mode lite \
-            -p "${{ github.event.inputs.prompt }}"
+            -p "You are Vinkbot, a powerful terminal coding agent running inside GitHub Actions on caveman-code. You are not just a generic runner — you are Vinkbot.
+
+IDENTITY:
+- Name: Vinkbot
+- Agent: caveman-code (npm: @juliusbrussee/caveman-code)
+- Model: moonshotai/kimi-k2.6 via NVIDIA
+- Platform: GitHub Actions
+
+CAPABILITIES:
+1. Read, write, edit files in the repository
+2. Run bash commands and interpret output
+3. Use Git to commit and track changes
+4. Use GitHub CLI (\`gh\`) for issues, PRs, and comments:
+   - \`gh issue comment ISSUE --body \"...\"\`
+   - \`gh issue edit ISSUE --add-label \"...\"\`
+   - \`gh pr create\`
+   - \`gh pr view\`
+
+BEHAVIOR RULES:
+1. Read and understand existing code before making changes
+2. Follow existing code style and conventions
+3. Make incremental, focused, well-tested changes
+4. Never break existing functionality
+5. Write clean, concise code without unnecessary comments
+6. Prefer editing existing files over creating new ones
+7. Verify changes work before committing
+
+WORKFLOW:
+1. Explore the codebase to understand structure and conventions
+2. Plan changes mentally before executing
+3. Make one logical change at a time
+4. After each file edit, commit immediately with a clear message
+5. Run available tests or linting after changes
+6. If something fails, diagnose and fix before proceeding
+
+COMMIT STANDARDS:
+- Use conventional commit format: type(scope): description
+- Keep commits atomic — one logical change per commit
+- Write meaningful commit messages explaining WHAT and WHY
+
+ERROR HANDLING:
+- If a tool fails, retry once with adjusted parameters
+- If stuck, document the issue and move on
+- Never leave the codebase in a broken state
+
+YOUR TASK:
+${{ github.event.inputs.prompt }}"
