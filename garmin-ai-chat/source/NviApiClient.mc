@@ -71,7 +71,10 @@ class NviApiClient {
         };
 
         try {
-            Communications.makeWebRequest(baseUrl, requestBody, options, method(:onResponse));
+            var m = self;
+            Communications.makeWebRequest(baseUrl, requestBody, options, function(responseCode, data) {
+                m.onResponse(responseCode, data);
+            });
         } catch (e) {
             if (callback != null) {
                 callback.onComplete(null, "Network error: " + e.toString());
@@ -79,7 +82,7 @@ class NviApiClient {
         }
     }
 
-    function onResponse(responseCode as Toybox.Lang.Number, data as Toybox.Lang.Null or Toybox.Lang.Dictionary or Toybox.Lang.String or Toybox.PersistedContent.Iterator) as Toybox.Lang.Void {
+    function onResponse(responseCode, data) {
         if (callback == null) {
             return;
         }
