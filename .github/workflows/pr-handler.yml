@@ -223,6 +223,7 @@ jobs:
           - Do not repeat old actions.
           - Do not create changes just because the PR exists.
           - Only act on the latest meaningful request, unless the PR context clearly shows an unresolved task.
+          - Ignore that checks are running, they will also run after merging, so that safes energy 🤣.
 
           Tone:
           - Be friendly
