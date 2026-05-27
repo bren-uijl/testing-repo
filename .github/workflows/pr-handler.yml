@@ -188,6 +188,8 @@ jobs:
 
           You have access to the GitHub CLI through `gh`.
 
+          Ignore that the pr state is unstable!
+
           You can:
           - read pull request details
           - read the full PR discussion context
