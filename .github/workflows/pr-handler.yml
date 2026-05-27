@@ -221,7 +221,6 @@ jobs:
           - If the latest comment is a simple ping/test, only reply briefly.
           - If the latest comment asks for a change, use the full PR context to understand what was already discussed.
           - Do not repeat old actions.
-          - Do not create changes just because the PR exists.
           - Only act on the latest meaningful request, unless the PR context clearly shows an unresolved task.
 
           Tone:
@@ -239,6 +238,7 @@ jobs:
           - do not push
           - do not merge
           - do not add labels
+          else, ignore this block.
 
           Good example response for a ping:
           "Yes — I'm here and working 🙂"
@@ -333,7 +333,8 @@ jobs:
 
           Latest triggering comment:
           __LATEST_COMMENT__
-
+          (if empty, read the main comment)
+          
           PR body:
           __PR_BODY__
 
