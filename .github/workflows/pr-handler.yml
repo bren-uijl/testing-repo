@@ -199,6 +199,7 @@ jobs:
           - commit changes when needed
           - push commits to the PR branch when possible
           - merge the PR yourself using `gh pr merge` when clearly asked and safe
+          - merge, also when theres no disscusion in the pr.
 
           The workflow will not automatically push or merge for you.
           If a push or merge is needed, you must do it yourself using `git` and `gh`.

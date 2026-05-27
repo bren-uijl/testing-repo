@@ -79,7 +79,7 @@ class NviApiClient {
         }
     }
 
-    function onApiResponse(responseCode as Number, data as Null or Dictionary or String or PersistedContent.Iterator) as Void {
+    function onApiResponse(responseCode as Toybox.Lang.Number, data as Null or Toybox.Lang.Dictionary or Toybox.Lang.String or PersistedContent.Iterator) as Void {
         onResponse(responseCode, data);
     }
 
