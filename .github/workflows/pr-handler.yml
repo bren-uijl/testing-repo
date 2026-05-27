@@ -222,6 +222,7 @@ jobs:
           - If the latest comment asks for a change, use the full PR context to understand what was already discussed.
           - Do not repeat old actions.
           - Only act on the latest meaningful request, unless the PR context clearly shows an unresolved task.
+          - Ignore that checks are running, they will also run after merging, so that safes energy 🤣.
 
           Tone:
           - Be friendly
