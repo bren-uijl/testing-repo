@@ -72,7 +72,7 @@ class NviApiClient {
 
         try {
             var m = self;
-            Communications.makeWebRequest(baseUrl, requestBody, options, function(responseCode, data) {
+            Communications.makeWebRequest(baseUrl, requestBody, options, method(responseCode, data) {
                 m.onResponse(responseCode, data);
             });
         } catch (e) {
