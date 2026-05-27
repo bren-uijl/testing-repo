@@ -74,8 +74,20 @@ jobs:
             > /tmp/issue-context.json
 
           ISSUE_BODY="$(jq -r '.body // ""' /tmp/issue-context.json)"
-          FULL_ISSUE_CONTEXT="$(jq -r '.' /tmp/issue-context.json)"
           ISSUE_URL="$(jq -r '.url // ""' /tmp/issue-context.json)"
+
+          # Truncate body to max 10,000 characters
+          if [ ${#ISSUE_BODY} -gt 10000 ]; then
+            ISSUE_BODY="${ISSUE_BODY:0:10000}"
+            ISSUE_BODY="$ISSUE_BODY"$'\n\n---\n*Issue body was truncated to 10,000 characters.*'
+          fi
+
+          # Truncate comments to latest 30
+          jq '.comments | .[-30:]' /tmp/issue-context.json > /tmp/comments-truncated.json
+          jq --slurpfile comments /tmp/comments-truncated.json '.comments = $comments[0]' /tmp/issue-context.json > /tmp/issue-context-truncated.json
+          mv /tmp/issue-context-truncated.json /tmp/issue-context.json
+
+          FULL_ISSUE_CONTEXT="$(jq -r '.' /tmp/issue-context.json)"
 
           {
             echo "body<<ISSUE_BODY_EOF"
@@ -189,7 +201,7 @@ jobs:
           inserted to /tmp/context.json
 
           Full issue context as JSON:
-          __FULL_ISSUE_CONTEXT__
+          inserted to /tmp/context.json
           PROMPT_EOF
 
           python3 - <<'PY'
@@ -205,7 +217,6 @@ jobs:
               "__ISSUE_TITLE__": os.environ.get("ISSUE_TITLE", ""),
               "__ISSUE_URL__": os.environ.get("ISSUE_URL", ""),
               "__LATEST_COMMENT__": os.environ.get("LATEST_COMMENT", ""),
-              "__ISSUE_BODY__": os.environ.get("ISSUE_BODY", ""),
           }
 
           for key, value in replacements.items():
