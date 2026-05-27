@@ -71,15 +71,16 @@ class NviApiClient {
         };
 
         try {
-            var m = self;
-            Communications.makeWebRequest(baseUrl, requestBody, options, method(responseCode, data) {
-                m.onResponse(responseCode, data);
-            });
+            Communications.makeWebRequest(baseUrl, requestBody, options, method(:onApiResponse));
         } catch (e) {
             if (callback != null) {
                 callback.onComplete(null, "Network error: " + e.toString());
             }
         }
+    }
+
+    function onApiResponse(responseCode as Number, data as Null or Dictionary or String or PersistedContent.Iterator) as Void {
+        onResponse(responseCode, data);
     }
 
     function onResponse(responseCode, data) {
