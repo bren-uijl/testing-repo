@@ -29,12 +29,45 @@ class ConversationListView extends WatchUi.View {
     var viewWidth;
     var viewHeight;
 
+    var titleY;
+    var warningY;
+    var iconRightMargin;
+    var iconY;
+    var dividerY;
+    var newBtnY;
+    var btnWidth;
+    var btnHeight;
+    var promptBtnHeight;
+    var promptHPad;
+    var promptVPad;
+    var promptCols;
+    var promptSidePad;
+    var promptTopMargin;
+    var listHPad;
+    var listVPad;
+
     function initialize() {
         View.initialize();
         conversations = [];
         scrollOffset = 0;
         itemHeight = 50;
         headerHeight = 50;
+        titleY = 22;
+        warningY = 44;
+        iconRightMargin = 35;
+        iconY = 22;
+        dividerY = 55;
+        newBtnY = 68;
+        btnWidth = 70;
+        btnHeight = 24;
+        promptBtnHeight = 22;
+        promptHPad = 10;
+        promptVPad = 8;
+        promptCols = 2;
+        promptSidePad = 10;
+        promptTopMargin = 12;
+        listHPad = 5;
+        listVPad = 4;
         selectedIdx = -1;
         storage = null;
         deleteMode = false;
@@ -121,27 +154,24 @@ class ConversationListView extends WatchUi.View {
         dc.clear();
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(width / 2, 22, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.AppName), Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(width / 2, titleY, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.AppName), Graphics.TEXT_JUSTIFY_CENTER);
 
         if (!storage.isApiKeySet()) {
             dc.setColor(Graphics.COLOR_YELLOW, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, 44, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.NoApiKey), Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, warningY, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.NoApiKey), Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         if (deleteMode) {
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width - 35, 22, Graphics.FONT_MEDIUM, "X", Graphics.TEXT_JUSTIFY_RIGHT);
+            dc.drawText(width - iconRightMargin, iconY, Graphics.FONT_MEDIUM, "X", Graphics.TEXT_JUSTIFY_RIGHT);
         } else {
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width - 35, 22, Graphics.FONT_MEDIUM, "?", Graphics.TEXT_JUSTIFY_RIGHT);
+            dc.drawText(width - iconRightMargin, iconY, Graphics.FONT_MEDIUM, "?", Graphics.TEXT_JUSTIFY_RIGHT);
         }
 
         dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
-        dc.drawLine(0, 55, width, 55);
+        dc.drawLine(0, dividerY, width, dividerY);
 
-        var newBtnY = 68;
-        var btnWidth = 70;
-        var btnHeight = 24;
         var btnX = (width - btnWidth) / 2;
 
         dc.setColor(Graphics.COLOR_BLUE, Graphics.COLOR_BLUE);
@@ -151,15 +181,14 @@ class ConversationListView extends WatchUi.View {
         dc.drawText(width / 2, newBtnY + 12, Graphics.FONT_MEDIUM, WatchUi.loadResource(Rez.Strings.NewConversation), Graphics.TEXT_JUSTIFY_CENTER);
 
         if (showQuickPrompts) {
-            var promptY = newBtnY + btnHeight + 12;
-            var promptBtnWidth = (width - 30) / 2;
-            var promptBtnHeight = 22;
+            var promptY = newBtnY + btnHeight + promptTopMargin;
+            var promptBtnWidth = (width - promptSidePad * 3) / 2;
             for (var pi = 0; pi < quickPrompts.size(); pi++) {
                 var prompt = quickPrompts[pi];
-                var col = pi % 2;
-                var row = pi / 2;
-                var px = 10 + col * (promptBtnWidth + 10);
-                var py = promptY + row * (promptBtnHeight + 8);
+                var col = pi % promptCols;
+                var row = pi / promptCols;
+                var px = promptSidePad + col * (promptBtnWidth + promptHPad);
+                var py = promptY + row * (promptBtnHeight + promptVPad);
 
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
                 dc.fillRoundedRectangle(px, py, promptBtnWidth, promptBtnHeight, 6);
@@ -179,12 +208,13 @@ class ConversationListView extends WatchUi.View {
 
         if (deleteMode) {
             dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width / 2, newBtnY + 12, Graphics.FONT_MEDIUM, "Delete Mode", Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(width / 2, newBtnY + btnHeight / 2, Graphics.FONT_MEDIUM, "Delete Mode", Graphics.TEXT_JUSTIFY_CENTER);
         }
 
         var listTop;
         if (showQuickPrompts) {
-            listTop = newBtnY + btnHeight + 12 + 3 * (22 + 8) + 10;
+            var promptRows = (quickPrompts.size() + promptCols - 1) / promptCols;
+            listTop = newBtnY + btnHeight + promptTopMargin + promptRows * (promptBtnHeight + promptVPad) + 10;
         } else {
             listTop = newBtnY + btnHeight + 15;
         }
@@ -202,30 +232,30 @@ class ConversationListView extends WatchUi.View {
 
             if (deleteMode && ci == deleteTargetIdx) {
                 dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_RED);
-                dc.fillRectangle(5, y, width - 10, itemHeight - 4);
+                dc.fillRectangle(listHPad, y, width - listHPad * 2, itemHeight - listVPad);
             } else if (ci == selectedIdx) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_DK_GRAY);
-                dc.fillRectangle(5, y, width - 10, itemHeight - 4);
+                dc.fillRectangle(listHPad, y, width - listHPad * 2, itemHeight - listVPad);
             }
 
             var titleColor = deleteMode && ci == deleteTargetIdx ? Graphics.COLOR_WHITE : Graphics.COLOR_WHITE;
             dc.setColor(titleColor, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(15, y + 8, Graphics.FONT_MEDIUM, conv.title, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(listHPad + 10, y + 8, Graphics.FONT_MEDIUM, conv.title, Graphics.TEXT_JUSTIFY_LEFT);
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(width - 15, y + 8, Graphics.FONT_MEDIUM, conv.getDisplayTime(), Graphics.TEXT_JUSTIFY_RIGHT);
+            dc.drawText(width - listHPad - 10, y + 8, Graphics.FONT_MEDIUM, conv.getDisplayTime(), Graphics.TEXT_JUSTIFY_RIGHT);
 
             dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(15, y + 26, Graphics.FONT_MEDIUM, conv.getPreview(), Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(listHPad + 10, y + 26, Graphics.FONT_MEDIUM, conv.getPreview(), Graphics.TEXT_JUSTIFY_LEFT);
 
             if (deleteMode) {
                 dc.setColor(Graphics.COLOR_RED, Graphics.COLOR_TRANSPARENT);
-                dc.drawText(width - 25, y + 24, Graphics.FONT_MEDIUM, "X", Graphics.TEXT_JUSTIFY_RIGHT);
+                dc.drawText(width - listHPad - 20, y + 24, Graphics.FONT_MEDIUM, "X", Graphics.TEXT_JUSTIFY_RIGHT);
             }
 
             if (ci < conversations.size() - 1) {
                 dc.setColor(Graphics.COLOR_DK_GRAY, Graphics.COLOR_TRANSPARENT);
-                dc.drawLine(10, y + itemHeight - 4, width - 10, y + itemHeight - 4);
+                dc.drawLine(listHPad + 5, y + itemHeight - listVPad, width - listHPad - 5, y + itemHeight - listVPad);
             }
         }
 
@@ -247,9 +277,6 @@ class ConversationListView extends WatchUi.View {
         }
         var width = viewWidth;
 
-        var newBtnY = 68;
-        var btnWidth = 70;
-        var btnHeight = 24;
         var btnX = (width - btnWidth) / 2;
 
         if (x >= btnX && x <= btnX + btnWidth && y >= newBtnY && y <= newBtnY + btnHeight) {
@@ -262,16 +289,15 @@ class ConversationListView extends WatchUi.View {
         }
 
         if (showQuickPrompts) {
-            var promptY = newBtnY + btnHeight + 12;
-            var promptBtnWidth = (width - 30) / 2;
-            var promptBtnHeight = 22;
+            var promptY = newBtnY + btnHeight + promptTopMargin;
+            var promptBtnWidth = (width - promptSidePad * 3) / 2;
 
             for (var pi = 0; pi < quickPrompts.size(); pi++) {
                 var prompt = quickPrompts[pi];
-                var col = pi % 2;
-                var row = pi / 2;
-                var px = 10 + col * (promptBtnWidth + 10);
-                var py = promptY + row * (promptBtnHeight + 8);
+                var col = pi % promptCols;
+                var row = pi / promptCols;
+                var px = promptSidePad + col * (promptBtnWidth + promptHPad);
+                var py = promptY + row * (promptBtnHeight + promptVPad);
 
                 if (x >= px && x <= px + promptBtnWidth && y >= py && y <= py + promptBtnHeight) {
                     startQuickConversation(prompt.prompt);
@@ -280,7 +306,7 @@ class ConversationListView extends WatchUi.View {
             }
         }
 
-        if (x > width - 40 && y < 30) {
+        if (x > width - iconRightMargin - 5 && y < iconY + 15) {
             if (deleteMode) {
                 deleteMode = false;
                 deleteTargetIdx = -1;
@@ -293,7 +319,8 @@ class ConversationListView extends WatchUi.View {
 
         var listTop;
         if (showQuickPrompts) {
-            listTop = newBtnY + btnHeight + 12 + 3 * (22 + 8) + 10;
+            var promptRows = (quickPrompts.size() + promptCols - 1) / promptCols;
+            listTop = newBtnY + btnHeight + promptTopMargin + promptRows * (promptBtnHeight + promptVPad) + 10;
         } else {
             listTop = newBtnY + btnHeight + 15;
         }
