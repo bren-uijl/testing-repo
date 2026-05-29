@@ -1,0 +1,400 @@
+name: OpenCode Cloudflare One File Proxy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    env:
+      OPENCODE_PORT: "4096"
+      PROXY_PORT: "8080"
+      OPENCODE_BASE_URL: "http://127.0.0.1:4096"
+
+      # Optional. If unset, use api_key="not-needed".
+      PROXY_API_KEY: ${{ secrets.PROXY_API_KEY }}
+
+    steps:
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl python3 python3-pip
+
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> "$GITHUB_PATH"
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install fastapi "uvicorn[standard]" httpx
+
+      - name: Install cloudflared
+        run: |
+          curl -L \
+            https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
+            -o cloudflared
+
+          chmod +x cloudflared
+          sudo mv cloudflared /usr/local/bin/cloudflared
+          cloudflared --version
+
+      - name: Create opencode.json
+        run: |
+          mkdir -p "$HOME/.config/opencode"
+
+          cat > "$HOME/.config/opencode/opencode.json" <<'JSON'
+          {
+            "model": "opencode/deepseek-v4-flash-free",
+            "models": {
+              "deepseek-v4-flash-free": {
+                "id": "opencode/deepseek-v4-flash-free",
+                "variants": [
+                  "",
+                  "low",
+                  "medium",
+                  "high",
+                  "max"
+                ]
+              },
+              "mimo-v2.5-free": {
+                "id": "opencode/mimo-v2.5-free",
+                "variants": [
+                  "",
+                  "low",
+                  "medium",
+                  "high"
+                ]
+              }
+            }
+          }
+          JSON
+
+          echo "Created opencode.json:"
+          cat "$HOME/.config/opencode/opencode.json"
+
+      - name: Create embedded OpenAI-style proxy
+        run: |
+          cat > proxy.py <<'PY'
+          import json
+          import os
+          from typing import Dict, Optional, Tuple
+
+          import httpx
+          from fastapi import FastAPI, Request, HTTPException
+          from fastapi.responses import StreamingResponse
+          from starlette.background import BackgroundTask
+
+
+          OPENCODE_BASE_URL = os.getenv("OPENCODE_BASE_URL", "http://127.0.0.1:4096").rstrip("/")
+          PROXY_API_KEY = os.getenv("PROXY_API_KEY", "")
+
+          DEFAULT_MODEL = "deepseek-v4-flash-free"
+
+          MODELS = {
+              "deepseek-v4-flash-free": {
+                  "target": "opencode/deepseek-v4-flash-free",
+                  "defaultVariant": "",
+                  "variants": ["", "low", "medium", "high", "max"],
+              },
+              "mimo-v2.5-free": {
+                  "target": "opencode/mimo-v2.5-free",
+                  "defaultVariant": "",
+                  "variants": ["", "low", "medium", "high"],
+              },
+          }
+
+          app = FastAPI(title="OpenAI-compatible OpenCode proxy")
+
+          limits = httpx.Limits(
+              max_connections=100,
+              max_keepalive_connections=50,
+              keepalive_expiry=120.0,
+          )
+
+          timeout = httpx.Timeout(
+              connect=30.0,
+              read=None,
+              write=30.0,
+              pool=30.0,
+          )
+
+          client = httpx.AsyncClient(
+              timeout=timeout,
+              limits=limits,
+              follow_redirects=False,
+          )
+
+          HOP_BY_HOP_HEADERS = {
+              "connection",
+              "keep-alive",
+              "proxy-authenticate",
+              "proxy-authorization",
+              "te",
+              "trailers",
+              "transfer-encoding",
+              "upgrade",
+              "host",
+              "content-length",
+          }
+
+
+          def clean_headers(headers: Dict[str, str]) -> Dict[str, str]:
+              return {
+                  key: value
+                  for key, value in headers.items()
+                  if key.lower() not in HOP_BY_HOP_HEADERS
+              }
+
+
+          def check_auth(request: Request) -> None:
+              if not PROXY_API_KEY:
+                  return
+
+              expected = f"Bearer {PROXY_API_KEY}"
+              actual = request.headers.get("authorization", "")
+
+              if actual != expected:
+                  raise HTTPException(status_code=401, detail="Invalid or missing API key")
+
+
+          def split_model_and_variant(model_value: str) -> Tuple[str, Optional[str]]:
+              if not model_value:
+                  return DEFAULT_MODEL, None
+
+              model_value = model_value.strip()
+
+              if model_value.startswith("opencode/"):
+                  model_value = model_value[len("opencode/"):]
+
+              if ":" in model_value:
+                  model_name, variant = model_value.split(":", 1)
+                  return model_name.strip(), variant.strip()
+
+              return model_value, None
+
+
+          def resolve_model(model_value: str, explicit_variant: Optional[str]) -> Tuple[str, str]:
+              model_name, inline_variant = split_model_and_variant(model_value)
+
+              if model_name not in MODELS:
+                  raise HTTPException(
+                      status_code=400,
+                      detail={
+                          "error": "Unknown model",
+                          "model": model_name,
+                          "allowedModels": list(MODELS.keys()),
+                      },
+                  )
+
+              model_config = MODELS[model_name]
+
+              variant = explicit_variant
+
+              if variant is None:
+                  variant = inline_variant
+
+              if variant is None:
+                  variant = model_config["defaultVariant"]
+
+              if variant not in model_config["variants"]:
+                  raise HTTPException(
+                      status_code=400,
+                      detail={
+                          "error": "Invalid variant",
+                          "model": model_name,
+                          "variant": variant,
+                          "allowedVariants": model_config["variants"],
+                      },
+                  )
+
+              return model_config["target"], variant
+
+
+          async def rewrite_json_body(request: Request) -> bytes:
+              raw_body = await request.body()
+
+              if not raw_body:
+                  return raw_body
+
+              content_type = request.headers.get("content-type", "")
+
+              if "application/json" not in content_type:
+                  return raw_body
+
+              try:
+                  body = json.loads(raw_body)
+              except json.JSONDecodeError:
+                  return raw_body
+
+              if not isinstance(body, dict):
+                  return raw_body
+
+              original_model = body.get("model", DEFAULT_MODEL)
+
+              explicit_variant = body.get("variant")
+              header_variant = request.headers.get("x-opencode-variant")
+
+              if explicit_variant is None and header_variant is not None:
+                  explicit_variant = header_variant
+
+              target_model, variant = resolve_model(original_model, explicit_variant)
+
+              body["model"] = target_model
+
+              if variant == "":
+                  body.pop("variant", None)
+              else:
+                  body["variant"] = variant
+
+              return json.dumps(body, separators=(",", ":")).encode("utf-8")
+
+
+          @app.get("/health")
+          async def health():
+              return {
+                  "status": "ok",
+                  "upstream": OPENCODE_BASE_URL,
+                  "models": {
+                      name: config["variants"]
+                      for name, config in MODELS.items()
+                  },
+                  "keepalive": {
+                      "max_connections": 100,
+                      "max_keepalive_connections": 50,
+                      "keepalive_expiry_seconds": 120,
+                  },
+              }
+
+
+          @app.get("/v1/models")
+          async def list_models():
+              data = []
+
+              for name, config in MODELS.items():
+                  for variant in config["variants"]:
+                      model_id = name if variant == "" else f"{name}:{variant}"
+                      data.append(
+                          {
+                              "id": model_id,
+                              "object": "model",
+                              "owned_by": "opencode",
+                          }
+                      )
+
+              return {
+                  "object": "list",
+                  "data": data,
+              }
+
+
+          @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"])
+          async def proxy(path: str, request: Request):
+              check_auth(request)
+
+              upstream_url = f"{OPENCODE_BASE_URL}/{path}"
+
+              headers = clean_headers(dict(request.headers))
+              body = await rewrite_json_body(request)
+
+              upstream_request = client.build_request(
+                  method=request.method,
+                  url=upstream_url,
+                  headers=headers,
+                  content=body,
+                  params=request.query_params,
+              )
+
+              upstream_response = await client.send(upstream_request, stream=True)
+
+              response_headers = clean_headers(dict(upstream_response.headers))
+
+              return StreamingResponse(
+                  upstream_response.aiter_raw(),
+                  status_code=upstream_response.status_code,
+                  headers=response_headers,
+                  background=BackgroundTask(upstream_response.aclose),
+              )
+
+
+          @app.on_event("shutdown")
+          async def shutdown_event():
+              await client.aclose()
+          PY
+
+      - name: Start OpenCode server
+        run: |
+          nohup opencode serve --port "$OPENCODE_PORT" > opencode.log 2>&1 &
+          echo $! > opencode.pid
+
+          echo "Waiting for OpenCode on port $OPENCODE_PORT..."
+
+          for i in {1..60}; do
+            if curl -fsS "http://127.0.0.1:$OPENCODE_PORT/v1/models" > /dev/null; then
+              echo "OpenCode is running."
+              exit 0
+            fi
+
+            sleep 2
+          done
+
+          echo "OpenCode failed to start."
+          cat opencode.log || true
+          exit 1
+
+      - name: Start OpenAI-compatible proxy
+        run: |
+          nohup python3 -m uvicorn proxy:app \
+            --host 127.0.0.1 \
+            --port "$PROXY_PORT" \
+            --timeout-keep-alive 120 \
+            --log-level info \
+            > proxy.log 2>&1 &
+
+          echo $! > proxy.pid
+
+          echo "Waiting for proxy on port $PROXY_PORT..."
+
+          for i in {1..60}; do
+            if curl -fsS "http://127.0.0.1:$PROXY_PORT/health" > /dev/null; then
+              echo "Proxy is running."
+              curl -fsS "http://127.0.0.1:$PROXY_PORT/health"
+              exit 0
+            fi
+
+            sleep 2
+          done
+
+          echo "Proxy failed to start."
+          cat proxy.log || true
+          exit 1
+
+      - name: Start Cloudflare quick tunnel
+        run: |
+          echo "Starting Cloudflare quick tunnel."
+          echo "Use the printed https://something.trycloudflare.com URL from the logs."
+          echo "Your local computer connects to that URL with /v1."
+
+          while true; do
+            if ! kill -0 "$(cat opencode.pid)" 2>/dev/null; then
+              echo "OpenCode process died."
+              cat opencode.log || true
+              exit 1
+            fi
+
+            if ! kill -0 "$(cat proxy.pid)" 2>/dev/null; then
+              echo "Proxy process died."
+              cat proxy.log || true
+              exit 1
+            fi
+
+            cloudflared tunnel \
+              --url "http://127.0.0.1:$PROXY_PORT" \
+              --no-autoupdate \
+              --protocol http2
+
+            echo "cloudflared stopped. Restarting in 5 seconds..."
+            sleep 5
+          done
