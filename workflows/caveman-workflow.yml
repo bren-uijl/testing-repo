@@ -1,0 +1,30 @@
+# Caveman Code Test Workflow
+# Copy this to .github/workflows/caveman-test.yml to enable it
+#
+# name: Caveman Test
+#
+# on:
+#   workflow_dispatch:
+#
+# jobs:
+#   test-caveman:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version: '20'
+#       - name: Install Caveman Code
+#         run: npm install -g @juliusbrussee/caveman-code
+#       - name: Verify installation
+#         run: caveman --version
+#       - name: Run Caveman
+#         env:
+#           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+#         run: |
+#           if [ -n "$ANTHROPIC_API_KEY" ]; then
+#             caveman -p "list files" --no-caveman-mode
+#           else
+#             echo "Set ANTHROPIC_API_KEY secret to run caveman"
+#             caveman --help
+#           fi
