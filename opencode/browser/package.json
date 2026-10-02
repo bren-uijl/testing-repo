@@ -82,7 +82,7 @@
     "publish": null
   },
   "devDependencies": {
-    "electron": "^39.8.10",
+    "electron": "^41.10.6",
     "electron-builder": "^26.15.3",
     "electron-packager": "^17.1.2",
     "eslint": "^8.56.0",
